@@ -13,9 +13,9 @@ import spark.components.CheckBox;
 import com.bienvisto.UIComponents.charts.ChartsWindow;
 import com.bienvisto.UIComponents.LoadingWindow;
 
-import core.Tools;
+import com.bienvisto.core.Tools;
 
-import elements.ElementBase;
+import com.bienvisto.elements.ElementBase;
 
 
 protected static const MENU_HEIGHT:int = 50;
@@ -46,6 +46,7 @@ protected var loadStart_:uint;
  */
 public function initApp():void
 {
+	trace("Application Initialized");
 	addEventListener(MouseEvent.MOUSE_DOWN, startDragScroll);
 	addEventListener(MouseEvent.MOUSE_UP, stopDragScroll);
 	
