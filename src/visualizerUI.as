@@ -46,7 +46,6 @@ protected var loadStart_:uint;
  */
 public function initApp():void
 {
-	trace("Application Initialized");
 	addEventListener(MouseEvent.MOUSE_DOWN, startDragScroll);
 	addEventListener(MouseEvent.MOUSE_UP, stopDragScroll);
 	

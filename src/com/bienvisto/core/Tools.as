@@ -24,7 +24,7 @@ package com.bienvisto.core
 		 */
 		public static function log(text:String, level:String = Tools.LOG_LEVEL_NOTE):void
 		{
-			FlexGlobals.topLevelApplication.logTextBox.text += text + "\n";
+			// FlexGlobals.topLevelApplication.logTextBox.text += text + "\n";
 		}
 
 
