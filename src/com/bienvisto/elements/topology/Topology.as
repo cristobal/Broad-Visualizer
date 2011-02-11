@@ -1,17 +1,21 @@
 package com.bienvisto.elements.topology
 {
-	import flash.display.Sprite;
-	
-	import flash.events.MouseEvent
-	import flash.events.Event;
-	
-	import com.bienvisto.elements.ElementBase;
-	
-	import com.bienvisto.core.Visualizer;
+	import com.bienvisto.UIComponents.node.NodeWindow;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	
+	import mx.core.Application;
+	import mx.core.FlexGlobals;
+	
+	import spark.components.Application;
 
 
 	/**
@@ -185,6 +189,10 @@ package com.bienvisto.elements.topology
 			visualizer_.update(0);
 			
 			visualizer_.dispatchEvent(new Event(Visualizer.NODE_CLICKED));
+		
+			// TODO: Move this outside of the topology and refactor the node classes to one.
+			var method:String = "setSelectedNode";
+			FlexGlobals.topLevelApplication["nodeWindow"][method](node);
 		}
 
 

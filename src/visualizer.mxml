@@ -7,7 +7,7 @@
 			   scriptTimeLimit="60"
 			   width="100%"
 			   height="100%"
-			   creationComplete="initApp()" enterFrame="enterFrame(event)">
+			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*">
 	
 	<s:layout>
 		<s:BasicLayout/>
@@ -29,9 +29,10 @@
 	
 	
 	<s:controlBarLayout>
-		<s:HorizontalLayout horizontalAlign="left" />
+		<s:HorizontalLayout horizontalAlign="left"  />
 	</s:controlBarLayout>
 	
+	<!-- TODO: Mask ControlBarContent so tha the Visualizer is show at the bottom. -->
 	<s:controlBarContent>
 		<s:Button id="loadFileButton" label="Load file" click="fileHelper.browseFile(v.loadFromTraceFile);"/>
 		<mx:Spacer width="100%"/>
@@ -114,4 +115,6 @@
 		<mx:TextArea id="logTextBox" width="100%" height="{LOG_HEIGHT}" editable="false" />
 	</s:BorderContainer>
 	
+	<!-- The Node Window -->
+	<node:NodeWindow id="nodeWindow" visible="false" right="10" bottom="60" />
 </s:Application>
