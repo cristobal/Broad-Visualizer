@@ -3,17 +3,13 @@
 
 using namespace ns3;
 
-
 VisualizerTraceHelper::VisualizerTraceHelper (unsigned int simulationLengthInMilliseconds,
-                         NodeContainer theNodeContainer,
-                         std::vector<ns3::Ptr<olsr::RoutingProtocol> > *theOlsrVector)
+                         NodeContainer theNodeContainer)
 {
   simulationLength = simulationLengthInMilliseconds;
   nodeContainer = theNodeContainer;
-  olsrVector = theOlsrVector;
-  
+
   ConnectSinks();
-  
 }
 
 
@@ -48,18 +44,34 @@ VisualizerTraceHelper::CourseChanged (std::string context, Ptr<const MobilityMod
   outputStream << endl;
 }
 
+/**
+ * @brief Sink that handles static positioned nodes (Added by Morten)
+ */
+void
+VisualizerTraceHelper::StaticPosition(int nodeId, int x, int y)
+{
+  if (!outputStream.is_open())
+    return;
+
+  // FORMAT: cc <node id> <time> <pos_x> <pos_y> <vel_x> <vel_y>
+
+   outputStream << "cc "; // Line type: Course Changed
+   outputStream << nodeId << " ";
+   outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+   outputStream << x << " ";
+   outputStream << y << " ";
+   outputStream << 0 << " ";
+   outputStream << 0;
+   outputStream << endl;
+}
 
 void
 VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
 {
   if (!outputStream.is_open())
     return;
-  
-  if (olsrVector == NULL)
-    return;
-  
+
   int nodeId;
-  std::vector<RoutingTableEntry> olsrTable;
   
   sscanf(text.c_str(), "/NodeList/%i/", &nodeId); // Get its id
   
@@ -67,16 +79,13 @@ VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
   outputStream << nodeId << " ";
   outputStream << Simulator::Now ().GetMilliSeconds() << " ";
   
-  // Get the routing table for this node
-  olsrTable = olsrVector->at (nodeId)->GetRoutingTableEntries ();
-  
+  std::vector<GenericRoutingTableEntry> table = nodeContainer.Get (nodeId)->GetObject<CrossLayerInterface> ()->GetGenericRoutingTable ();
+
   // Iterate through all entries in the table
-  for (olsrTableIterator it = olsrTable.begin();
-       it != olsrTable.end();
-       it++)
+  for (std::vector<GenericRoutingTableEntry>::iterator it = table.begin(); it != table.end(); it++)
   {
-    outputStream << GetNodeIdForAddress(it->destAddr) << ",";
-    outputStream << GetNodeIdForAddress(it->nextAddr) << ",";
+    outputStream << GetNodeIdForAddress(it->GetDestAddr ()) << ",";
+    outputStream << GetNodeIdForAddress(it->GetNextAddr ()) << ",";
   }
   
   outputStream << endl;
@@ -209,8 +218,7 @@ VisualizerTraceHelper::MacDrop (std::string text, Ptr<const Packet> packet)
 void
 VisualizerTraceHelper::QueueChange (std::string text, int nPackets)
 {
-  
-  int nodeId;
+   int nodeId;
   
   sscanf(text.c_str(), "/NodeList/%i/", &nodeId); // Get its id
   
@@ -229,6 +237,24 @@ void
 VisualizerTraceHelper::ManualTrace (std::string text)
 {
   outputStream << text.c_str() << endl;
+}
+
+void
+VisualizerTraceHelper::PeriodicBufferSizeUpdate ()
+{
+  int j = 0;
+  for (NodeContainer::Iterator i = nodeContainer.Begin (); i != nodeContainer.End (); ++i)
+  {
+      outputStream << "be "; // Line type: Buffer Enqueue
+      outputStream << j << " ";
+      outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+      outputStream << (*i)->GetObject<ResourceManager> ()->GetQueuedPacketCount ();
+      outputStream << endl;
+      j++;
+  }
+
+  // Repeat each second..
+  Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate, this);
 }
 
 
@@ -267,6 +293,9 @@ VisualizerTraceHelper::ConnectSinks()
     MakeCallback (&VisualizerTraceHelper::MacDrop, this));
   Config::Connect("/NodeList/*/ApplicationList/*/$ns3::DtsOverlay/Enqueue",
     MakeCallback (&VisualizerTraceHelper::QueueChange, this));
+
+  // Added by Morten.
+  Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate,this);
 }
 
 

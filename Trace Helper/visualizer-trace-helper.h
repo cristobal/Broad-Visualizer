@@ -9,26 +9,25 @@
 #include "ns3/mobility-module.h"
 #include "ns3/wifi-module.h"
 #include "ns3/output-stream-wrapper.h"
-#include "ns3/olsr-routing-protocol.h"
-#include "ns3/olsr-state.h"
-#include <ns3/ipv4-header.h>
-
+#include "ns3/ipv4-header.h"
+#include "ns3/cross-layer-interface.h"
+#include "ns3/resource-manager.h"
 
 #ifndef __VISUALICER_TRACE_HELPER_H__
 #define __VISUALICER_TRACE_HELPER_H__
 
 
-
 /**
  * Helps with printing a valid trace file to be read by the Visualizer tool
  *
+ * Minor changes added by Morten, for generic routing support, and added support for static positioned nodes, and hacked so that we periodically see store-carry-forward buffer size for each node...
  */
 class VisualizerTraceHelper
 {
 
 public:
 
-  typedef std::vector<ns3::olsr::RoutingTableEntry>::const_iterator olsrTableIterator;
+  typedef std::vector<ns3::GenericRoutingTableEntry>::const_iterator GenericTableIterator;
 
   /**
   * @brief Constructor of the class
@@ -39,8 +38,7 @@ public:
   * everything
   */
   VisualizerTraceHelper (unsigned int simulationLengthInMilliseconds,
-                         ns3::NodeContainer theNodeContainer,
-                         std::vector<ns3::Ptr<ns3::olsr::RoutingProtocol> > *theOlsrVector = NULL);
+                         ns3::NodeContainer theNodeContainer);
 
   /**
   * @brief Destructor of the class
@@ -53,6 +51,11 @@ public:
    */
   void CourseChanged(std::string context,
                      ns3::Ptr<const ns3::MobilityModel> model);
+
+  /**
+   * @brief Sink that handles static positioned nodes
+   */
+  void StaticPosition(int nodeId, int x, int y);
 
   /**
    * @brief Sink that handles a change in the routing table
@@ -85,11 +88,17 @@ public:
   QueueChange (std::string text, int nPackets);
 
   /**
+   * @brief Periodically prints the no. of packets in buffers for each node. Added by Morten..
+   */
+  void
+  PeriodicBufferSizeUpdate ();
+
+  /**
    * @brief Prints the string passed as a parameter to the trace file 
    */
   void
   ManualTrace (std::string text);
-  
+
   /**
    * @brief Tells the trace helper where and how to write the trace information
    */
@@ -109,8 +118,6 @@ protected:
 
   ns3::NodeContainer nodeContainer;
 
-  std::vector<ns3::Ptr<ns3::olsr::RoutingProtocol> > *olsrVector;
-  
   std::ofstream outputStream;
   
   /**
@@ -135,7 +142,7 @@ protected:
    */
   int
   GetNodeIdForAddress(ns3::Mac48Address address);
-  
+
 };
 
 #endif /* VISUALICER_TRACE_HELPER_H */
