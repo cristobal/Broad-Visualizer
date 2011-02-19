@@ -45,6 +45,21 @@ VisualizerTraceHelper::CourseChanged (std::string context, Ptr<const MobilityMod
 }
 
 /**
+ * @brief Append the node role for the nodes in a NodeContainer
+ */
+void
+VisualizerTraceHelper::LogNodeRole(NodeContainer nodeContainer, std::string nodeRole, uint32_t nodeIdStart) 
+{
+	uint32_t nodeId = nodeIdStart;
+	NodeContainer::Iterator i;
+	for (i = nodeContainer.Begin(); i != nodeContainer.End(); ++i, nodeId++) 
+	{
+		// FORMAT: nr <id> <role> <ipv4address>
+		outputStream << "nr " << nodeId << " " << nodeRole << " " << (*i)->GetObject<Ipv4> ()->GetAddress(1, 0).GetLocal () << endl;
+	}
+}
+
+/**
  * @brief Sink that handles static positioned nodes (Added by Morten)
  */
 void

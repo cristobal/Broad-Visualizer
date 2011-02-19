@@ -45,17 +45,23 @@ public:
   */
   ~VisualizerTraceHelper ();
 
-
   /**
    * @brief Sink that handles a change in a node's course
    */
-  void CourseChanged(std::string context,
-                     ns3::Ptr<const ns3::MobilityModel> model);
-
+  void 
+	CourseChanged(std::string context, ns3::Ptr<const ns3::MobilityModel> model);
+	
+	/**
+	 * @brief Log the node role for the nodes in a NodeContainer
+	 */
+	void 
+	LogNodeRole(ns3::NodeContainer nodeContainer, std::string nodeRole, uint32_t nodeIdStart);
+	
   /**
    * @brief Sink that handles static positioned nodes
    */
-  void StaticPosition(int nodeId, int x, int y);
+  void 
+	StaticPosition(int nodeId, int x, int y);
 
   /**
    * @brief Sink that handles a change in the routing table
