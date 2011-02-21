@@ -7,6 +7,7 @@ package com.bienvisto.elements.topology
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.roles.NodeRole;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -158,13 +159,17 @@ package com.bienvisto.elements.topology
 			// Check if this is a new node
 			if (nodes_[nodeId] == null)
 			{
+				// Find its nodeRole
+				var nodeRole:NodeRole = visualizer_.roles.findRoleById(nodeId);
+				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var newNode:Node = new Node(nodeId, nodeRole);
 				newNode.x = position.x;
 				newNode.y = position.y;
 
 				// ...and we add it to the nodes list
 				nodes_[nodeId] = newNode;
+
 			}
 			
 			// Add the new waypoint to the node
@@ -193,6 +198,8 @@ package com.bienvisto.elements.topology
 			// TODO: Move this outside of the topology and refactor the node classes to one.
 			var method:String = "setSelectedNode";
 			FlexGlobals.topLevelApplication["nodeWindow"][method](node);
+			
+			
 		}
 
 

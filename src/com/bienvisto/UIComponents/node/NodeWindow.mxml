@@ -10,4 +10,6 @@
 	<node:controlBarContent>
 		<s:Label id="selectedNodeLabel" paddingLeft="3" paddingTop="3">Selected Node: x</s:Label>
 	</node:controlBarContent>
+	<s:Label x="10" y="10" text="IPv4Address" fontSize="14" id="nodeRoleAddress"/>
+	<s:Label x="10" y="32" text="Stats" fontSize="14" id="nodeStats"/>
 </node:NodeWindowContainer>

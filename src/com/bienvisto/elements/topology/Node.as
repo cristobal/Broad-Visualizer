@@ -1,15 +1,15 @@
 package com.bienvisto.elements.topology
 {
 
-	import flash.events.Event;
-
-	import spark.effects.AnimateColor;
-
-	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Tools;
+	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
-
 	import com.bienvisto.elements.NodeBase;
+	import com.bienvisto.elements.roles.NodeRole;
+	
+	import flash.events.Event;
+	
+	import spark.effects.AnimateColor;
 
 
 
@@ -49,7 +49,7 @@ package com.bienvisto.elements.topology
 		/**
 		 * Constructor of the class
 		 */
-		public function Node(nodeId:int)
+		public function Node(nodeId:int, nodeRole:NodeRole=null)
 		{
 			super(nodeId);
 			
@@ -62,10 +62,22 @@ package com.bienvisto.elements.topology
 			//animation_.addEventListener(EffectEvent.EFFECT_END, effectEnded);
 			
 			waypoint_ = 0; // The simulation starts at the first waypoint
-			
+			_nodeRole = nodeRole;
 			updateGraphics();
 		}
-
+		
+		/**
+		 * @private
+		 */ 
+		private var _nodeRole:NodeRole;
+		
+		/**
+		 * @readonly nodeRole
+		 */ 
+		public function get nodeRole():NodeRole
+		{
+			return _nodeRole;
+		}
 
 		/**
 		 * Adds a waypoint at the end of the path.

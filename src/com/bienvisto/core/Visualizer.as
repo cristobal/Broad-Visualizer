@@ -1,27 +1,27 @@
 package com.bienvisto.core
 {
 
-	import mx.core.UIComponent;
+	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.buffer.Buffer;
+	import com.bienvisto.elements.drops.Drops;
+	import com.bienvisto.elements.receptions.Receptions;
+	import com.bienvisto.elements.roles.Roles;
+	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.topology.Topology;
+	import com.bienvisto.elements.transmissions.Transmissions;
 	
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
-	import flash.events.EventDispatcher;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.ProgressEvent;
-	import flash.utils.getTimer;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
-
-	import com.bienvisto.core.events.TraceLoadEvent;
-	import com.bienvisto.core.events.TimedEvent;
+	import flash.utils.getTimer;
 	
-	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.topology.Topology;
-	import com.bienvisto.elements.routing.Routing;
-	import com.bienvisto.elements.transmissions.Transmissions;
-	import com.bienvisto.elements.receptions.Receptions;
-	import com.bienvisto.elements.drops.Drops;
-	import com.bienvisto.elements.buffer.Buffer;
+	import mx.core.UIComponent;
 	
 	
 	public class Visualizer extends UIComponent
@@ -145,8 +145,20 @@ package com.bienvisto.core
 		 * option to represent any of these variables
 		 */
 		protected var variables_:Vector.<VariableBase>;
-
-
+		
+		/**
+		 * @private
+		 */ 
+		private var _roles:Roles;
+		
+		/**
+		 * @readonly roles
+		 */ 
+		public function get roles():Roles
+		{	
+			return _roles;
+		}
+		
 		// ELEMENTS:
 		/**
 		 * Topology element
@@ -462,7 +474,9 @@ package com.bienvisto.core
 			addChild(canvasTopLayer_);
 			
 			topology = new Topology(this, canvasTopLayer_);
+			_roles = new Roles(this, canvasBottomLayer_);
 			elements_ = new Vector.<ElementBase>();
+			elements_.push(_roles);
 			elements_.push(new Routing(this, canvasBottomLayer_));
 			elements_.push(new Transmissions(this, canvasTopLayer_));
 			elements_.push(new Receptions(this, canvasBottomLayer_));

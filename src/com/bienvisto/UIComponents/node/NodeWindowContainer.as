@@ -29,9 +29,15 @@ package com.bienvisto.UIComponents.node
 		public var selectedNodeLabel:Label;
 		
 		/**
+		 * @public
+		 */ 
+		public var nodeRoleAddress:Label;
+		
+		/**
 		 * @private
 		 */ 
 		private var selectedNode:Node = null;
+		
 		
 		/**
 		 * Set the current selected node
@@ -50,7 +56,15 @@ package com.bienvisto.UIComponents.node
 			
 			visible = node.selected;
 			selectedNode = node;
-			selectedNodeLabel.text = "Selected Node: " + String(node.id);
+			
+			var value:String = String(node.id);
+			var addressValue:String = "IPv4Address";
+			if (node.nodeRole) {
+				value = node.nodeRole.role;	
+				addressValue = node.nodeRole.address;
+			} 
+			selectedNodeLabel.text = "Selected Node: " + value;
+			nodeRoleAddress.text = addressValue;	
 		}
 		
 		
