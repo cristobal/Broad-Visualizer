@@ -11,10 +11,6 @@ package com.bienvisto.elements
 	 */
 	public class NodeBase extends Sprite
 	{
-		/**
-		 * Id of the node in the simulation
-		 */
-		protected var id_:int;
 		
 		/**
 		 * Vector of the keypoints associated to this node
@@ -31,11 +27,12 @@ package com.bienvisto.elements
 		/**
 		 * Builds a new node
 		 *
-		 * @param nodeId Id of the node in the simulation
+		 * @param id The id of the node in the simulation
 		 */
-		public function NodeBase(nodeId:int)
+		public function NodeBase(id:int, node:Node=null)
 		{
-			id_ = nodeId;
+			id_ = id;
+			_node = node;
 			
 			keypoints_ = new Vector.<KeypointBase>();
 			lastUpdate_ = 0;
@@ -52,8 +49,30 @@ package com.bienvisto.elements
 		
 		
 		/**
-		 * Id of the node
+		 * Id of the node in the simulation
 		 */
-		public function get id():int { return id_; }
+		protected var id_:int;
+		
+		/**
+		 * @readonly id
+		 */
+		public function get id():int { 
+			return id_; 
+		}
+		
+		
+		/**
+		 * @private
+		 */ 
+		private var _node:Node;
+		
+		/**
+		 * @readonly node
+		 */ 
+		public function get node():Node
+		{
+			return _node;
+		}
+		
 	}
 }

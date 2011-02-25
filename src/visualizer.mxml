@@ -3,11 +3,11 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   xmlns:core="com.bienvisto.core.*"
-			   xmlns:UIComponents="com.bienvisto.UIComponents.*"
+			   xmlns:ui="com.bienvisto.ui.*"
 			   scriptTimeLimit="60"
 			   width="100%"
 			   height="100%"
-			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*">
+			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.node.*">
 	
 	<s:layout>
 		<s:BasicLayout/>
@@ -42,7 +42,7 @@
 	</s:controlBarContent>
 	
 	<s:Group y="0" width="100%" height="100%">
-		<UIComponents:Grid id="grid" visible="false" width="100%" height="100%" />
+		<ui:Grid id="grid" visible="false" width="100%" height="100%" />
 		<core:Visualizer id="v"/>
 	</s:Group>
 	
@@ -116,5 +116,5 @@
 	</s:BorderContainer>
 	
 	<!-- The Node Window -->
-	<node:NodeWindow id="nodeWindow" visible="false" right="10" bottom="60" />
+	<node1:NodeWindow id="nodeWindow" visible="false" right="10" bottom="60" />
 </s:Application>

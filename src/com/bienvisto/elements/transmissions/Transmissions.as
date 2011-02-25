@@ -1,14 +1,14 @@
 package com.bienvisto.elements.transmissions
 {
-	import flash.display.Sprite;
-	
-	import com.bienvisto.elements.ElementBase;
-	
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
+	
+	import flash.display.Sprite;
 
 
 	/**
@@ -79,7 +79,7 @@ package com.bienvisto.elements.transmissions
 				return;
 			
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:TransmissionNode in nodes_)
 			{
 				// Check if the node is added to the canvas, add it if it's not
 				if (!this.contains(node))
@@ -100,23 +100,26 @@ package com.bienvisto.elements.transmissions
 		protected override function loadNewLine(params:Array):void
 		{
 			// Get transmission data
-			var nodeId:int = params[0];
+			var id:int = params[0];
 			var milliseconds:uint = params[1];
 			var size:Number = params[2];
 			var destination:int = params.length > 3 ? params[3] : -1;
 			
 			// Check if this is a new node
-			if (nodes_[nodeId] == null)
+			if (nodes_[id] == null)
 			{
+				// Get
+				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var newNode:TransmissionNode = new TransmissionNode(id, node);
 				
 				// ...and we add it to the nodes list
-				nodes_[nodeId] = newNode;
+				nodes_[id] = newNode;
 			}
 			
 			// Add the new waypoint to the node and
-			var newKeypoint:Transmission = nodes_[nodeId].addTransmission(milliseconds, destination, size);
+			var newKeypoint:Transmission = nodes_[id].addTransmission(milliseconds, destination, size);
 			// Add the new waypoint to the variables that will be displayed 
 			// in the statistics window
 			packetsForwarded_.addKeypoint(newKeypoint);

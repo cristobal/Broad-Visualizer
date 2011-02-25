@@ -1,15 +1,15 @@
 package com.bienvisto.elements.receptions
 {
-	import flash.display.Sprite;
-
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-
+	import com.bienvisto.core.Visualizer;
+	import com.bienvisto.elements.Node;
 	import com.bienvisto.elements.NodeBase;
+	
+	import flash.display.Sprite;
 
 
-	public class Node extends NodeBase
+	public class ReceptionNode extends NodeBase
 	{
 		/**
 		 * A node will be highlited if it transmitted a packet in the last 
@@ -30,11 +30,11 @@ package com.bienvisto.elements.receptions
 		/**
 		 * Builds a new node
 		 *
-		 * @param nodeId Id of the node in the simulation
+		 * @param id The id of the node in the simulation
 		 */
-		public function Node(nodeId:int)
+		public function ReceptionNode(id:int, node:Node)
 		{
-			super(nodeId);
+			super(id, node);
 		}
 		
 		
@@ -55,6 +55,8 @@ package com.bienvisto.elements.receptions
 		public function addReception(nr:Reception):Reception
 		{
 			keypoints_.push(nr);
+			
+			node.addReception(nr.milliseconds, nr.source, nr.size);
 			return nr;
 		}
 		

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<node:NodeWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:node="com.bienvisto.ui.node.*" width="400" height="250" title="NodeWindow">
+	
+	<node:controlBarLayout>
+		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
+	</node:controlBarLayout>
+	
+	<node:controlBarContent>
+		<s:Label id="selectedNodeLabel" paddingLeft="3" paddingTop="3">Selected Node: x</s:Label>
+	</node:controlBarContent>
+	<s:Label x="10" y="10" text="IPv4Address" fontSize="14" id="nodeRoleAddress"/>
+	<s:Label x="10" y="32" text="Stats" fontSize="14" id="nodeStats" textDecoration="underline"/>
+	<s:Label x="30" y="54" text="- BufferSize:" fontWeight="bold"/>
+	<s:Label x="108" y="54" text="0" id="bufferSize"/>
+	<s:Label x="30" y="74" text="- Tx total:" fontWeight="bold"/>
+	<s:Label x="108" y="74" text="0" id="transmissionTotal"/>
+	<s:Label x="30" y="94" text="- Rx total:" fontWeight="bold"/>
+	<s:Label x="108" y="94" id="receptionsTotal" text="0"/>
+	<s:Label x="30" y="114" text="- Dx total:" fontWeight="bold"/>
+	<s:Label x="108" y="114" id="dropsTotal" text="0"/>
+	<s:BorderContainer x="206" y="53" width="159" height="74">
+		<s:Label x="35" y="22" text="Video Sequence&#xd;Data (Inspector)"/>
+	</s:BorderContainer>
+</node:NodeWindowContainer>

@@ -1,14 +1,14 @@
 package com.bienvisto.elements.receptions
 {
-	import flash.display.Sprite;
-	
-	import com.bienvisto.elements.ElementBase;
-	
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
+	
+	import flash.display.Sprite;
 
 
 	/**
@@ -80,7 +80,7 @@ package com.bienvisto.elements.receptions
 				return;
 			
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:ReceptionNode in nodes_)
 			{
 				// Check if the node is added to the canvas, add it if it's not
 				if (!this.contains(node))
@@ -101,28 +101,31 @@ package com.bienvisto.elements.receptions
 		protected override function loadNewLine(params:Array):void
 		{
 			// Get receptions data
-			var nodeId:int = params[0];
+			var id:int = params[0];
 			var milliseconds:uint = params[1];
 			var size:Number = params[2];
 			var source:int = params.length > 3 ? params[3] : -1;
 			var destination:int = params.length > 4 ? params[4] : -1;
 			
 			// Check if this is a new node
-			if (nodes_[nodeId] == null)
+			if (nodes_[id] == null)
 			{
+				// Get the reference to the real node
+				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var newNode:ReceptionNode = new ReceptionNode(id, node);
 				
 				// ...and we add it to the nodes list
-				nodes_[nodeId] = newNode;
+				nodes_[id] = newNode;
 			}
 			
 			// Create the new keypoint
-			var newKeypoint:Reception = new Reception(milliseconds, nodeId,
+			var newKeypoint:Reception = new Reception(milliseconds, id,
 				source, destination, size);
 			
 			// Add the new keypoint to the node
-			nodes_[nodeId].addReception(newKeypoint);
+			nodes_[id].addReception(newKeypoint);
 			
 			// Add the new waypoint to the variables that will be displayed 
 			// in the statistics window

@@ -4,6 +4,7 @@ package com.bienvisto.core
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.NodeManager;
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.receptions.Receptions;
@@ -157,6 +158,19 @@ package com.bienvisto.core
 		public function get roles():Roles
 		{	
 			return _roles;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _nodeManager:NodeManager;
+		
+		/**
+		 * @readonly nodeManager
+		 */ 
+		public function get nodeManager():NodeManager
+		{
+			return _nodeManager;
 		}
 		
 		// ELEMENTS:
@@ -474,7 +488,10 @@ package com.bienvisto.core
 			addChild(canvasTopLayer_);
 			
 			topology = new Topology(this, canvasTopLayer_);
+			
 			_roles = new Roles(this, canvasBottomLayer_);
+			_nodeManager = new NodeManager();
+			
 			elements_ = new Vector.<ElementBase>();
 			elements_.push(_roles);
 			elements_.push(new Routing(this, canvasBottomLayer_));

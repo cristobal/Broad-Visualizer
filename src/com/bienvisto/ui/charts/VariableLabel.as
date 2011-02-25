@@ -1,4 +1,4 @@
-package com.bienvisto.UIComponents.charts
+package com.bienvisto.ui.charts
 {
 	import spark.components.BorderContainer;
 	import spark.components.Label;

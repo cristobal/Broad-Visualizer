@@ -1,14 +1,14 @@
 package com.bienvisto.elements.drops
 {
-	import flash.display.Sprite;
-	
-	import com.bienvisto.elements.ElementBase;
-	
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
+	
+	import flash.display.Sprite;
 
 
 	/**
@@ -75,7 +75,7 @@ package com.bienvisto.elements.drops
 		public override function update(e:TimedEvent):void
 		{
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:DropNode in nodes_)
 			{
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
@@ -90,21 +90,24 @@ package com.bienvisto.elements.drops
 		protected override function loadNewLine(params:Array):void
 		{
 			// Get receptions data
-			var nodeId:int = params[0];
+			var id:int = params[0];
 			var milliseconds:uint = params[1];
 			
 			// Check if this is a new node
-			if (nodes_[nodeId] == null)
+			if (nodes_[id] == null)
 			{
+				// Get the reference to the real node
+				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var newNode:DropNode = new DropNode(id, node);
 				
 				// ...and we add it to the nodes list
-				nodes_[nodeId] = newNode;
+				nodes_[id] = newNode;
 			}
 			
 			// Add the new waypoint to the node and
-			var newKeypoint:PacketDrop = nodes_[nodeId].addPacketDrop(milliseconds);
+			var newKeypoint:PacketDrop = nodes_[id].addPacketDrop(milliseconds);
 			// Add the new waypoint to the variables that will be displayed 
 			packetsDropped_.addKeypoint(newKeypoint);
 		}

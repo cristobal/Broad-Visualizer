@@ -1,13 +1,13 @@
 package com.bienvisto.elements.topology
 {
-	import com.bienvisto.UIComponents.node.NodeWindow;
+	import com.bienvisto.ui.node.NodeWindow;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.roles.NodeRole;
+	import com.bienvisto.elements.Node;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -129,7 +129,7 @@ package com.bienvisto.elements.topology
 		public override function update(e:TimedEvent):void
 		{
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:TopologyNode in nodes_)
 			{
 				// Check if the node is added to the canvas, add it if it's not
 				if (!this.contains(node))
@@ -159,11 +159,10 @@ package com.bienvisto.elements.topology
 			// Check if this is a new node
 			if (nodes_[nodeId] == null)
 			{
-				// Find its nodeRole
-				var nodeRole:NodeRole = visualizer_.roles.findRoleById(nodeId);
 				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId, nodeRole);
+				var node:Node = visualizer_.nodeManager.findNodeById(nodeId);
+				var newNode:TopologyNode = new TopologyNode(nodeId, node);
 				newNode.x = position.x;
 				newNode.y = position.y;
 
@@ -182,7 +181,7 @@ package com.bienvisto.elements.topology
 		 */
 		protected function nodeClicked(e:MouseEvent):void
 		{
-			var node:Node = e.target as Node;
+			var node:TopologyNode = e.target as TopologyNode;
 			
 			node.selected = !node.selected;
 			

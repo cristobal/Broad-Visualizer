@@ -1,14 +1,14 @@
 package com.bienvisto.elements.buffer
 {
-	import flash.display.Sprite;
-	
-	import com.bienvisto.elements.ElementBase;
-	
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
+	
+	import flash.display.Sprite;
 
 
 	/**
@@ -66,7 +66,7 @@ package com.bienvisto.elements.buffer
 		 */
 		public override function get lineType():String
 		{
-			return "bc"; // buffer change
+			return "be"; // buffer enqueue(/change?)
 		}
 
 
@@ -78,7 +78,7 @@ package com.bienvisto.elements.buffer
 		public override function update(e:TimedEvent):void
 		{
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:BufferNode in nodes_)
 			{
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
@@ -95,22 +95,25 @@ package com.bienvisto.elements.buffer
 		protected override function loadNewLine(params:Array):void
 		{
 			// Get receptions data
-			var nodeId:int = params[0];
+			var id:int = params[0];
 			var milliseconds:uint = params[1];
 			var currentSize:Number = params[2];
 			
 			// Check if this is a new node
-			if (nodes_[nodeId] == null)
+			if (nodes_[id] == null)
 			{
+				// Get the real node
+				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var newNode:BufferNode = new BufferNode(id, node);
 				
 				// ...and we add it to the nodes list
-				nodes_[nodeId] = newNode;
+				nodes_[id] = newNode;
 			}
 			
 			// Add the new waypoint to the node and
-			var newKeypoint:BufferChange = nodes_[nodeId].addBufferChange(milliseconds, currentSize);
+			var newKeypoint:BufferChange = nodes_[id].addBufferChange(milliseconds, currentSize);
 			// Add the new waypoint to the variables that will be displayed 
 			bufferSize_.addKeypoint(newKeypoint);
 		}

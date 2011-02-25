@@ -1,12 +1,12 @@
 package com.bienvisto.elements.transmissions
 {
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
-
+	import com.bienvisto.core.Visualizer;
+	import com.bienvisto.elements.Node;
 	import com.bienvisto.elements.NodeBase;
 
 
-	public class Node extends NodeBase
+	public class TransmissionNode extends NodeBase
 	{
 		/**
 		 * A node will be highlited if it transmitted a packet in the last 
@@ -33,11 +33,11 @@ package com.bienvisto.elements.transmissions
 		/**
 		 * Builds a new node
 		 *
-		 * @param nodeId Id of the node in the simulation
+		 * @param id  The id of the node in the simulation
 		 */
-		public function Node(nodeId:int)
+		public function TransmissionNode(id:int, node:Node)
 		{
-			super(nodeId);
+			super(id, node);
 		}
 		
 		
@@ -52,6 +52,8 @@ package com.bienvisto.elements.transmissions
 		{
 			var nt:Transmission = new Transmission(ms, id_, destination, size);
 			keypoints_.push(nt);
+			
+			node.addTransmission(ms, destination, size);
 			return nt;
 		}
 		

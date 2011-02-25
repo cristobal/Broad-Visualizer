@@ -1,4 +1,4 @@
-package com.bienvisto.UIComponents {
+package com.bienvisto.ui {
 
 	import flash.events.Event;
 	

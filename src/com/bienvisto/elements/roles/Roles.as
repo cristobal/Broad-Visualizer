@@ -3,6 +3,7 @@ package com.bienvisto.elements.roles
 	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
 	
 	import flash.display.Sprite;
 	
@@ -19,7 +20,8 @@ package com.bienvisto.elements.roles
 		public function Roles(v:Visualizer, c:Sprite=null)
 		{
 			super(v, c);
-			setup();
+			
+			_nodes = new Vector.<Node>;
 		}
 		
 		/**
@@ -41,22 +43,28 @@ package com.bienvisto.elements.roles
 		/**
 		 * @private
 		 */ 
-		private var nodes:Vector.<NodeRole>;
+		private var _nodes:Vector.<Node>;
 		
 		/**
-		 * Setup
+		 * @readonly nodes
 		 */ 
-		private function setup():void
+		public function get nodes():Vector.<Node>
 		{
-			nodes = new Vector.<NodeRole>();
+			return _nodes.concat();
 		}
+		
 		
 		/**
 		 * @override
 		 */ 
 		public override function update(event:TimedEvent):void
 		{
-			// nothing todo here 
+			// TODO: Refactor time use message passing instead faste. 
+			//		 And Move this code out afterwards 
+			var time:uint = event.milliseconds;
+			for each (var node:Node in _nodes) {
+				node.time = time;
+			}
 		}
 		
 		/**
@@ -68,35 +76,13 @@ package com.bienvisto.elements.roles
 			var id:int = params[0];
 			var role:String = params[1];
 			var address:String = params[2];
-			var node:NodeRole = new NodeRole(id, role, address);
 			
-			// push the nodeRole
-			nodes.push(node);
+			// Get the node and set the role and address properties
+			var node:Node = visualizer_.nodeManager.findNodeById(id);
+			node.address = address;
+			node.role = role;
+			_nodes.push(node);
 		}
 		
-		/**
-		 * Find role by id
-		 * 
-		 * @param id The id of the node to lookup
-		 * @return	Returns the nodeRole if found otherwise null
-		 */ 
-		public function findRoleById(id:int):NodeRole
-		{
-			var node:NodeRole = null;
-			var flag:Boolean = false;
-			
-			for each(node in nodes) {
-				if (node.id == id) {
-					flag = true;
-					break;
-				}
-			}
-				
-			if (!flag) {
-				node = null;	
-			}
-			
-			return node;
-		}
 	}
 }

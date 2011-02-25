@@ -1,25 +1,24 @@
 package com.bienvisto.elements.buffer
 {
-	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
-
+	import com.bienvisto.core.Visualizer;
+	import com.bienvisto.elements.Node;
 	import com.bienvisto.elements.NodeBase;
 
 
-	public class Node extends NodeBase
+	public class BufferNode extends NodeBase
 	{
 		
 		/**
 		 * Builds a new node
 		 *
-		 * @param nodeId Id of the node in the simulation
+		 * @param id The id of the node in the simulation
 		 */
-		public function Node(nodeId:int)
+		public function BufferNode(id:int, node:Node)
 		{
-			super(nodeId);
+			super(id, node);
 		}
-		
 		
 		/**
 		 * Adds a new buffer operation related to this node
@@ -65,7 +64,9 @@ package com.bienvisto.elements.buffer
 				return;
 			}
 			
-			updateGraphics((keypoints_[mid] as BufferChange).bufferSize);
+			
+			node.bufferSize = (keypoints_[mid] as BufferChange).bufferSize; 
+			updateGraphics(node.bufferSize);
 		}
 		
 		

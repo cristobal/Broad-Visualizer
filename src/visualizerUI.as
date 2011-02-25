@@ -10,8 +10,8 @@ import spark.components.HGroup;
 import spark.components.Label;
 import spark.components.CheckBox;
 
-import com.bienvisto.UIComponents.charts.ChartsWindow;
-import com.bienvisto.UIComponents.LoadingWindow;
+import com.bienvisto.ui.charts.ChartsWindow;
+import com.bienvisto.ui.LoadingWindow;
 
 import com.bienvisto.core.Tools;
 

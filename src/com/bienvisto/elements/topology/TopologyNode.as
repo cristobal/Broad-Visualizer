@@ -4,8 +4,8 @@ package com.bienvisto.elements.topology
 	import com.bienvisto.core.Tools;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
+	import com.bienvisto.elements.Node;
 	import com.bienvisto.elements.NodeBase;
-	import com.bienvisto.elements.roles.NodeRole;
 	
 	import flash.events.Event;
 	
@@ -17,7 +17,7 @@ package com.bienvisto.elements.topology
 	 * Represents a node in the visualization and stores its movement along a
 	 * number of Waypoints
 	 */
-	public class Node extends NodeBase
+	public class TopologyNode extends NodeBase
 	{
 
 		/**
@@ -49,9 +49,9 @@ package com.bienvisto.elements.topology
 		/**
 		 * Constructor of the class
 		 */
-		public function Node(nodeId:int, nodeRole:NodeRole=null)
+		public function TopologyNode(id:int, node:Node=null)
 		{
-			super(nodeId);
+			super(id, node);
 			
 			color_ = 0x555555;
 			animation_ = new AnimateColor(this);
@@ -62,21 +62,8 @@ package com.bienvisto.elements.topology
 			//animation_.addEventListener(EffectEvent.EFFECT_END, effectEnded);
 			
 			waypoint_ = 0; // The simulation starts at the first waypoint
-			_nodeRole = nodeRole;
+
 			updateGraphics();
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _nodeRole:NodeRole;
-		
-		/**
-		 * @readonly nodeRole
-		 */ 
-		public function get nodeRole():NodeRole
-		{
-			return _nodeRole;
 		}
 
 		/**
