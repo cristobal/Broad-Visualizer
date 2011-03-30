@@ -4,7 +4,7 @@ package com.bienvisto.elements
 	import flash.events.Event;
 
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.core.events.TimedEvent;
 	

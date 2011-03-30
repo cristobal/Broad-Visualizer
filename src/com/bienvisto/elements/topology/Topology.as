@@ -1,7 +1,7 @@
 package com.bienvisto.elements.topology
 {
 	import com.bienvisto.ui.node.NodeWindow;
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;

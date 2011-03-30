@@ -12,7 +12,7 @@ import mx.charts.series.AreaSeries;
 import mx.charts.series.LineSeries;
 import mx.graphics.Stroke;
 
-import com.bienvisto.core.Tools;
+import com.bienvisto.util.Tools;
 import com.bienvisto.core.VariableBase;
 import com.bienvisto.core.Visualizer;
 

@@ -13,9 +13,10 @@ import spark.components.CheckBox;
 import com.bienvisto.ui.charts.ChartsWindow;
 import com.bienvisto.ui.LoadingWindow;
 
-import com.bienvisto.core.Tools;
+import com.bienvisto.util.Tools;
 
 import com.bienvisto.elements.ElementBase;
+import com.bienvisto.util.FileHelper;
 
 
 protected static const MENU_HEIGHT:int = 50;

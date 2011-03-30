@@ -1,6 +1,6 @@
 package com.bienvisto.elements.template_element
 {
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Visualizer;
 
 	import com.bienvisto.elements.NodeBase;

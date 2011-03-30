@@ -5,6 +5,7 @@ package com.bienvisto.core
 	import mx.collections.ArrayList;
 
 	import com.bienvisto.elements.KeypointBase;
+	import com.bienvisto.util.Tools;
 
 	/**
 	 * Class to be extended by all variables to be displayed in the statistics

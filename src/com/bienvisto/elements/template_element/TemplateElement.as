@@ -5,7 +5,7 @@ package com.bienvisto.elements.template_element
 	import com.bienvisto.elements.ElementBase;
 	
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.events.TimedEvent;
 
 

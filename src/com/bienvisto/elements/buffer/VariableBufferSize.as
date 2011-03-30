@@ -5,7 +5,7 @@ package com.bienvisto.elements.buffer
 	import mx.collections.ArrayList;
 
 	import com.bienvisto.core.VariableBase;
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 
 	import com.bienvisto.elements.KeypointBase;
 

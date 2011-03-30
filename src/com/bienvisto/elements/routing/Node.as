@@ -4,7 +4,7 @@ package com.bienvisto.elements.routing
 	import flash.utils.*;
 	
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Visualizer;
 
 	import com.bienvisto.elements.NodeBase;

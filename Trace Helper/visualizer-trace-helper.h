@@ -94,6 +94,33 @@ public:
   QueueChange (std::string text, int nPackets);
 
   /**
+   * @brief Sink that handles a sequence received
+   */
+	void
+	SeqTsReceived (std::string text, ns3::Ptr<const ns3::Packet> packet, uint32_t sequenceNumber);
+	
+	/**
+   * @brief Sink that handles a sequence sent
+   */
+	void
+	SeqTsSent (std::string text, ns3::Ptr<const ns3::Packet> packet, uint32_t sequenceNumber);
+	
+	/**
+	 * @brief Check wether a packet contains a SeqTsHeader
+	 */
+	bool
+	PacketHasSeqTsHeader (ns3::Ptr<const ns3::Packet> packet);
+	
+	SeqTsHeader* 
+	GetSeqTsHeader (ns3::Ptr<const ns3::Packet> packet);
+	
+	/**
+	 * @brief Direct the packet print contents into a string stream 
+	 */
+	void	
+	PacketContents (ns3::Ptr<const ns3::Packet> packet, std::stringstream &ss);
+	
+  /**
    * @brief Periodically prints the no. of packets in buffers for each node. Added by Morten..
    */
   void

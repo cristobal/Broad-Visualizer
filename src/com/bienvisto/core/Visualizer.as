@@ -23,6 +23,7 @@ package com.bienvisto.core
 	import flash.utils.getTimer;
 	
 	import mx.core.UIComponent;
+	import com.bienvisto.util.Tools;
 	
 	
 	public class Visualizer extends UIComponent

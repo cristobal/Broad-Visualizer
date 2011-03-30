@@ -114,23 +114,30 @@ VisualizerTraceHelper::MacTransmit (std::string text, Ptr<const Packet> original
   WifiMacHeader macHeader;
   Ptr<Packet> packet;
   Mac48Address nextHopAddress;
-  
+	
   // Make a copy of the packet so that it can be modified
   packet = Ptr<Packet>(new Packet(*originalPacket));
-  
-  // Make a copy of the packet so that it can be modified
-  packet = Ptr<Packet>(new Packet(*originalPacket));
-  
+
   // Peek and remove the MAC header
   packet->RemoveHeader (macHeader);
   
-  if (!macHeader.IsData())
+  if (!macHeader.IsData()) {
     return;
-  
+  }
+
+	bool hasSeqTs = PacketHasSeqTsHeader (packet);
+	if (hasSeqTs) {
+		// std::cout << "VisualizerTraceHelper::MacTransmit -> *packet >> " << *packet << std::endl;
+		// SeqTsHeader seqTs;
+		// packet->RemoveHeader (seqTs);
+		SeqTsHeader *seqTs = GetSeqTsHeader (packet);
+		std::cout << "VisualizerTraceHelper::MacTransmit -> *sequenceNumber >> " << *seqTs << " " << std::endl;
+	}
+
   nextHopAddress = macHeader.GetAddr1();
   
   sscanf(text.c_str(), "/NodeList/%i/", &nodeId); // Get its id
-  
+	  
   // Write to file,
   // format: mt <node id> <time> <packet_size> <next_hop_id>
   
@@ -241,12 +248,127 @@ VisualizerTraceHelper::QueueChange (std::string text, int nPackets)
   // format: be <node id> <time> <new_queue_size>
   
   outputStream << "be "; // Line type: Buffer Enqueue
-  outputStream << nodeId << " ";
+  outputStream << nodeId << " " ;
   outputStream << Simulator::Now ().GetMilliSeconds() << " ";
   outputStream << nPackets;
   outputStream << endl;
 }
 
+void
+VisualizerTraceHelper::SeqTsReceived(std::string text, Ptr<const Packet> packet, uint32_t sequenceNumber) 
+{
+	int nodeId;
+	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
+	
+	// Write to file
+	// format: sr <node id> <time> <sequence number>
+	outputStream << "sr "; // Line type: Sequence Received
+	outputStream << nodeId << " ";
+	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+	outputStream << sequenceNumber << " ";
+	outputStream << endl;
+	
+}
+
+void
+VisualizerTraceHelper::SeqTsSent (std::string text, Ptr<const Packet> packet, uint32_t sequenceNumber)
+{
+	int nodeId;
+	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
+	
+	// Write to file
+	// format: ss <node id> <time> <sequence number>
+	outputStream << "ss "; // Line type: Sequence Received
+	outputStream << nodeId << " ";
+	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+	outputStream << sequenceNumber << " ";
+	outputStream << endl;}
+
+bool
+VisualizerTraceHelper::PacketHasSeqTsHeader (Ptr<const Packet> packet) 
+{
+	bool found = false;
+	
+	std::stringstream ss;
+	PacketContents (packet, ss);
+	string str = ss.str();
+	string needle = "SeqTsHeader";
+	size_t pos = str.find(needle);
+	
+	if (pos != string::npos) {
+		found = true;
+	}
+	
+	return found;
+}
+
+SeqTsHeader*
+VisualizerTraceHelper::GetSeqTsHeader (Ptr<const Packet> packet)
+{
+	SeqTsHeader *seqTs;
+	PacketMetadata::ItemIterator i = packet->BeginItem();
+	string name;
+	string needle = "SeqTsHeader";
+	size_t pos;
+	while (i.HasNext()) {
+		PacketMetadata::Item item = i.Next();
+		if (!item.isFragment) {
+			if (item.type == PacketMetadata::Item::HEADER) {
+				name = item.tid.GetName ();
+				pos = name.find(needle);
+				if (pos != string::npos) {
+					NS_ASSERT(item.tid.HasConstructor ());
+					Callback<ObjectBase *> constructor = item.tid.GetConstructor();
+					NS_ASSERT(!constructor.IsNull ());
+					ObjectBase *instance = constructor();
+					NS_ASSERT(instance != 0);
+					Chunk *chunk = dynamic_cast<Chunk *>(instance);
+					NS_ASSERT(seqTs != 0);
+					chunk->Deserialize (item.current);
+					seqTs = dynamic_cast<SeqTsHeader *>(chunk);
+					break;
+				}
+			}
+		}
+	}
+	return seqTs;
+}
+
+void 
+VisualizerTraceHelper::PacketContents (Ptr<const Packet> packet, std::stringstream &ss)
+{
+	// From Packet->Print(os);
+	PacketMetadata::ItemIterator i = packet->BeginItem();
+	while (i.HasNext()) {
+		PacketMetadata::Item item = i.Next();
+		if (item.isFragment) {
+			switch (item.type) {
+				case PacketMetadata::Item::PAYLOAD:
+					ss << "Payload";
+					break;
+				case PacketMetadata::Item::HEADER:
+				case PacketMetadata::Item::TRAILER:
+					ss << item.tid.GetName ();
+					break;
+			}
+			ss << " Fragment [" << item.currentTrimedFromStart<<":"
+		     << (item.currentTrimedFromStart + item.currentSize) << "]";
+		}
+		else {
+			switch (item.type) {
+	     case PacketMetadata::Item::PAYLOAD:
+	      ss << "Payload (size=" << item.currentSize << ")";
+	     	break;
+	     case PacketMetadata::Item::HEADER:
+	     case PacketMetadata::Item::TRAILER:
+				ss << item.tid.GetName () << " (";
+				/* chunk part */
+				ss << ")";
+				break;
+			}
+		}
+	}
+}
 
 void
 VisualizerTraceHelper::ManualTrace (std::string text)
@@ -306,9 +428,13 @@ VisualizerTraceHelper::ConnectSinks()
     MakeCallback (&VisualizerTraceHelper::MacDrop, this));
   Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Mac/$ns3::AdhocWifiMac/MacRxDrop",
     MakeCallback (&VisualizerTraceHelper::MacDrop, this));
-  Config::Connect("/NodeList/*/ApplicationList/*/$ns3::DtsOverlay/Enqueue",
+  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsOverlay/Enqueue",
     MakeCallback (&VisualizerTraceHelper::QueueChange, this));
-
+	// Added by Cristobal
+	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsServer/SeqTsReceived",
+		MakeCallback (&VisualizerTraceHelper::SeqTsReceived, this));
+	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
+		MakeCallback (&VisualizerTraceHelper::SeqTsSent, this));
   // Added by Morten.
   Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate,this);
 }

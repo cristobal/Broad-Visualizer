@@ -1,6 +1,6 @@
 package com.bienvisto.elements.routing
 {
-	import com.bienvisto.core.Tools;
+	import com.bienvisto.util.Tools;
 
 	/**
 	 * A single entry of a routing table
