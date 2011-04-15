@@ -73,10 +73,12 @@ package com.bienvisto.elements.buffer
 		protected function updateGraphics(size:Number):void
 		{
 			var nodePos:Vector2D = Visualizer.topology.getNodePosition(id_);
-			graphics.clear();
-			graphics.lineStyle(5, 0xAA8888);
-			graphics.moveTo(nodePos.x, nodePos.y);
-			graphics.lineTo(nodePos.x, nodePos.y - size/3000);
+			if (nodePos) {
+				graphics.clear();
+				graphics.lineStyle(5, 0xAA8888);
+				graphics.moveTo(nodePos.x, nodePos.y);
+				graphics.lineTo(nodePos.x, nodePos.y - size/3000);
+			}
 		}
 	}
 }

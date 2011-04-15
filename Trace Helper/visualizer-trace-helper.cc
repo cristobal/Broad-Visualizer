@@ -48,15 +48,14 @@ VisualizerTraceHelper::CourseChanged (std::string context, Ptr<const MobilityMod
  * @brief Append the node role for the nodes in a NodeContainer
  */
 void
-VisualizerTraceHelper::LogNodeRole(NodeContainer nodeContainer, std::string nodeRole, uint32_t nodeIdStart) 
+VisualizerTraceHelper::LogNodeRole(Ptr<const Node> node, std::string nodeRole) 
 {
-	uint32_t nodeId = nodeIdStart;
-	NodeContainer::Iterator i;
-	for (i = nodeContainer.Begin(); i != nodeContainer.End(); ++i, nodeId++) 
-	{
-		// FORMAT: nr <id> <role> <ipv4address>
-		outputStream << "nr " << nodeId << " " << nodeRole << " " << (*i)->GetObject<Ipv4> ()->GetAddress(1, 0).GetLocal () << endl;
-	}
+	// FORMAT: nr <id> <role> <ipv4address>	
+	outputStream << "nr ";
+	outputStream << node->GetId() << " ";
+	outputStream << nodeRole << " ";
+	outputStream << node->GetObject<Ipv4> ()->GetAddress(1, 0).GetLocal () ;
+	outputStream << endl;
 }
 
 /**
@@ -125,14 +124,14 @@ VisualizerTraceHelper::MacTransmit (std::string text, Ptr<const Packet> original
     return;
   }
 
-	bool hasSeqTs = PacketHasSeqTsHeader (packet);
-	if (hasSeqTs) {
-		// std::cout << "VisualizerTraceHelper::MacTransmit -> *packet >> " << *packet << std::endl;
-		// SeqTsHeader seqTs;
-		// packet->RemoveHeader (seqTs);
-		SeqTsHeader *seqTs = GetSeqTsHeader (packet);
-		std::cout << "VisualizerTraceHelper::MacTransmit -> *sequenceNumber >> " << *seqTs << " " << std::endl;
-	}
+	// bool hasSeqTs = PacketHasSeqTsHeader (packet);
+	// if (hasSeqTs) {
+	// std::cout << "VisualizerTraceHelper::MacTransmit -> *packet >> " << *packet << std::endl;
+	// SeqTsHeader seqTs;
+	// packet->RemoveHeader (seqTs);
+	// SeqTsHeader *seqTs = GetSeqTsHeader (packet);
+	// std::cout << "VisualizerTraceHelper::MacTransmit -> *sequenceNumber >> " << *seqTs << " " << std::endl;
+	// }
 
   nextHopAddress = macHeader.GetAddr1();
   

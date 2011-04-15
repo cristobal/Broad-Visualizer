@@ -1,22 +1,20 @@
 
 
-import mx.managers.PopUpManager;
-
-import flash.events.ProgressEvent;
-import flash.utils.getTimer;
-import flash.geom.Point;
-
-import spark.components.HGroup;
-import spark.components.Label;
-import spark.components.CheckBox;
-
-import com.bienvisto.ui.charts.ChartsWindow;
+import com.bienvisto.elements.ElementBase;
 import com.bienvisto.ui.LoadingWindow;
-
+import com.bienvisto.ui.charts.ChartsWindow;
+import com.bienvisto.util.FileHelper;
 import com.bienvisto.util.Tools;
 
-import com.bienvisto.elements.ElementBase;
-import com.bienvisto.util.FileHelper;
+import flash.events.ProgressEvent;
+import flash.geom.Point;
+import flash.utils.getTimer;
+
+import mx.managers.PopUpManager;
+
+import spark.components.CheckBox;
+import spark.components.HGroup;
+import spark.components.Label;
 
 
 protected static const MENU_HEIGHT:int = 50;
@@ -83,6 +81,13 @@ public function openChartsWindow():void
 	{
 		var charts:ChartsWindow = ChartsWindow(PopUpManager.createPopUp(this, ChartsWindow));
 		charts.variables = v.getVariables();
+	}
+}
+
+public function openSequencesWindow():void
+{
+	if (v != null) {
+		sequencesWindow.visible = true;
 	}
 }
 
@@ -260,7 +265,18 @@ protected function updateVisibleElements():void
 		
 		auxGroup.addElement(auxCheckBox);
 		auxGroup.addElement(auxLabel);
-		visibleElements.addElement(auxGroup);
+		
+		var flag:Boolean = true;
+		switch (auxLabel.text) {
+			case 'Roles':
+			case 'SequencesSent':
+			case 'SequencesRecv':
+				flag = false;
+			break;
+		}
+		if (flag) {
+			visibleElements.addElement(auxGroup);
+		}
 	}
 }
 

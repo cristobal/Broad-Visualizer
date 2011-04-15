@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sequences:SequencesWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+								   xmlns:s="library://ns.adobe.com/flex/spark" 
+								   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:sequences="com.bienvisto.ui.sequences.*" width="400" height="250" title="Sequences Stats" fontSize="16">
+	<sequences:controlBarLayout>
+		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
+	</sequences:controlBarLayout>
+	<s:Label x="10" y="10" text="Sent" textDecoration="underline"/>
+	<s:Label x="20" y="34" text="Total:" fontSize="14"/>
+	<s:Label x="110" y="35" text="0" fontSize="14" id="totalSent"/>
+	<s:Label x="20" y="110" text="Total:" fontSize="14"/>
+	<s:Label x="20" y="55" text="Last Seq:" fontSize="14"/>
+	<s:Label x="110" y="55" text="0" fontSize="14" id="lastSeqNumSent"/>
+	
+	<s:Label x="10" y="87" text="Recv" textDecoration="underline"/>
+	<s:Label x="110" y="111" text="0" fontSize="14" id="totalRecv"/>
+	<s:Label x="20" y="131" text="Last Seq:" fontSize="14"/>
+	<s:Label x="110" y="131" text="0" fontSize="14" id="lastSeqNumRecv"/>
+	<s:Label x="20" y="152" text="Perc:" fontSize="14"/>
+	<s:Label x="110" y="152" text="0" fontSize="14" id="percRecv"/>
+	<mx:ProgressBar x="10" y="174" width="378" label=" " id="progressBar" height="20" mode="manual" />
+	
+
+</sequences:SequencesWindowContainer>
+	

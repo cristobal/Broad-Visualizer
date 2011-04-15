@@ -7,7 +7,7 @@
 			   scriptTimeLimit="60"
 			   width="100%"
 			   height="100%"
-			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.node.*">
+			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.node.*" xmlns:sequences="com.bienvisto.ui.sequences.*">
 	
 	<s:layout>
 		<s:BasicLayout/>
@@ -37,6 +37,7 @@
 		<s:Button id="loadFileButton" label="Load file" click="fileHelper.browseFile(v.loadFromTraceFile);"/>
 		<mx:Spacer width="100%"/>
 		<s:Button id="showStatsButton" label="Open Stats Window" click="openChartsWindow()"/>
+		<s:Button id="showSequencesButton" label="Open Sequences Window" click="openSequencesWindow()" />
 		<s:Button id="openOptions" label="Options" click="toggleOptions();"/>
 		<s:Button id="toggleLogButton" label="Toggle log" click="toggleLog();"/>
 	</s:controlBarContent>
@@ -114,6 +115,9 @@
 		
 		<mx:TextArea id="logTextBox" width="100%" height="{LOG_HEIGHT}" editable="false" />
 	</s:BorderContainer>
+	
+	<!-- The Sequences Stats Window -->
+	<sequences:SequencesWindow id="sequencesWindow" visible="false" right="420" bottom="60" />
 	
 	<!-- The Node Window -->
 	<node1:NodeWindow id="nodeWindow" visible="false" right="10" bottom="60" />

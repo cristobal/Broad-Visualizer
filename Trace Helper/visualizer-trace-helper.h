@@ -55,7 +55,7 @@ public:
 	 * @brief Log the node role for the nodes in a NodeContainer
 	 */
 	void 
-	LogNodeRole(ns3::NodeContainer nodeContainer, std::string nodeRole, uint32_t nodeIdStart);
+	LogNodeRole(ns3::Ptr<const ns3::Node> node, std::string nodeRole);
 	
   /**
    * @brief Sink that handles static positioned nodes

@@ -5,13 +5,17 @@ package com.bienvisto.core
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
 	import com.bienvisto.elements.NodeManager;
+	import com.bienvisto.elements.SequencesManager;
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.roles.Roles;
 	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.sequences.SequencesRecv;
+	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
+	import com.bienvisto.util.Tools;
 	
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
@@ -23,7 +27,6 @@ package com.bienvisto.core
 	import flash.utils.getTimer;
 	
 	import mx.core.UIComponent;
-	import com.bienvisto.util.Tools;
 	
 	
 	public class Visualizer extends UIComponent
@@ -173,6 +176,20 @@ package com.bienvisto.core
 		{
 			return _nodeManager;
 		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _sequencesManager:SequencesManager;
+		
+		/**
+		 * @readonly sequencesManager
+		 */ 
+		public function get sequencesManager():SequencesManager
+		{
+			return _sequencesManager;
+		}
+		
 		
 		// ELEMENTS:
 		/**
@@ -492,6 +509,7 @@ package com.bienvisto.core
 			
 			_roles = new Roles(this, canvasBottomLayer_);
 			_nodeManager = new NodeManager();
+			_sequencesManager = new SequencesManager();
 			
 			elements_ = new Vector.<ElementBase>();
 			elements_.push(_roles);
@@ -500,6 +518,8 @@ package com.bienvisto.core
 			elements_.push(new Receptions(this, canvasBottomLayer_));
 			elements_.push(new Drops(this, null));
 			elements_.push(new Buffer(this, canvasTopLayer_));
+			elements_.push(new SequencesSent(this));
+			elements_.push(new SequencesRecv(this));
 			
 			zoom_ = 1.0;
 			
