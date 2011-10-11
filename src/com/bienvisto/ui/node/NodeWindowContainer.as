@@ -2,6 +2,8 @@ package com.bienvisto.ui.node
 {
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.routing.RoutingTable;
+	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.topology.TopologyNode;
 	
 	import flash.events.Event;
@@ -12,6 +14,7 @@ package com.bienvisto.ui.node
 	
 	import spark.components.Label;
 	import spark.components.NavigatorContent;
+	import spark.components.RichText;
 	import spark.components.TitleWindow;
 	
 	// TODO: Add video sequences sent forward total 
@@ -70,6 +73,11 @@ package com.bienvisto.ui.node
 		 * @public
 		 */ 
 		public var vyValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var routingTableValue:RichText; 
 		
 		/**
 		 * @public
@@ -340,6 +348,16 @@ package com.bienvisto.ui.node
 					
 					vx = String(selectedNode.direction.x);
 					vy = String(selectedNode.direction.y);
+					
+					var table:RoutingTable = selectedNode.node.routingTable;
+					if (table) {
+						var value:String = "";
+						for each(var entry:RoutingTableEntry in table.entries) {
+							value += entry.toString() + "\n";
+						}
+						
+						routingTableValue.text = value;
+					}
 				}
 				else if (metrics.visible) {
 					bufferSize = String(selectedNode.node.bufferSize);

@@ -1,5 +1,7 @@
 package com.bienvisto.elements
 {
+	import com.bienvisto.elements.routing.RoutingTable;
+
 	// TODO: Add some memoization for total like for a set of interval of time to store.
 	
 	/**
@@ -189,6 +191,23 @@ package com.bienvisto.elements
 			return calculateTotalPackets(_drops, _time);
 		}
 
+		/**
+		 * @private
+		 */ 
+		private var _routingTable:RoutingTable;
+		
+		/**
+		 * @readwrite routingTable
+		 */ 
+		public function get routingTable():RoutingTable
+		{
+			return _routingTable;
+		}
+		
+		public function set routingTable(value:RoutingTable):void
+		{
+			_routingTable = value;
+		}
 		
 		/**
 		 * Add transmission

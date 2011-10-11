@@ -47,6 +47,15 @@
 				<s:Label id="vxValue" styleName="value" y="142" text="0" /> 
 				<s:Label id="vyValue" styleName="value" y="162" text="0" /> 
 			</s:Group>
+			<s:Group x="220">
+				<s:Label styleName="label" text="Routes" />
+				<s:Scroller x="0" y="15" width="160" height="160" minViewportInset="1" focusEnabled="false">
+					<s:Group>
+						<s:RichText styleName="value" id="routingTableValue" />	
+					</s:Group>
+				</s:Scroller>
+				
+			</s:Group>	
 		</s:NavigatorContent>
 		
 		<!-- Node::Metrics/Statistics Tab -->
@@ -71,7 +80,7 @@
 		
 		<!-- Node::Topolgy/Routing tab-->
 		<s:NavigatorContent width="100%" height="100%" label="Topology">
-			
+
 		</s:NavigatorContent>
 	</mx:TabNavigator>
 </node:NodeWindowContainer>

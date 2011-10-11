@@ -1,14 +1,14 @@
 package com.bienvisto.elements.routing
 {
-	import flash.display.Sprite;
-
-	import com.bienvisto.elements.ElementBase;
-
-	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.events.TraceLoadEvent;
+	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.elements.Node;
+	import com.bienvisto.util.Tools;
+	
+	import flash.display.Sprite;
 
 
 	/**
@@ -78,7 +78,7 @@ package com.bienvisto.elements.routing
 			if (e.milliseconds == 0) return;
 			
 			// Update all nodes
-			for each(var node:Node in nodes_)
+			for each(var node:RoutingNode in nodes_)
 			{
 				// Check if the node is added to the canvas, add it if it's not
 				if (!this.contains(node))
@@ -107,7 +107,8 @@ package com.bienvisto.elements.routing
 			if (nodes_[nodeId] == null)
 			{
 				// If it is, we create it
-				var newNode:Node = new Node(nodeId);
+				var node:Node = visualizer_.nodeManager.findNodeById(nodeId);
+				var newNode:RoutingNode = new RoutingNode(nodeId, node);
 
 				// ...and we add it to the nodes list
 				nodes_[nodeId] = newNode;
