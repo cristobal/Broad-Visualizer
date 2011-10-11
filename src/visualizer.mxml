@@ -12,6 +12,7 @@
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
+	<fx:Style source="visualizer.css"/>
 	
 	<fx:Script source="visualizerUI.as" />
 	

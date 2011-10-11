@@ -1,26 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<node:NodeWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:node="com.bienvisto.ui.node.*" width="400" height="250" title="NodeWindow">
-	
+<node:NodeWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+						  xmlns:s="library://ns.adobe.com/flex/spark"
+						  xmlns:mx="library://ns.adobe.com/flex/mx"
+						  xmlns:node="com.bienvisto.ui.node.*"
+						  width="400" height="250" borderVisible="true" dropShadowVisible="true"
+						  title="Node #id">
+
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace node "com.bienvisto.ui.node.*";
+		.label{
+			fontSize: 12px;
+		}
+		.value {
+			fontFamily: "DejaVuSansMono";
+			fontSize: 10px;
+		}
+	</fx:Style>
 	<node:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
 	</node:controlBarLayout>
+	<node:controlBarContent/>
 	
-	<node:controlBarContent>
-		<s:Label id="selectedNodeLabel" paddingLeft="3" paddingTop="3">Selected Node: x</s:Label>
-	</node:controlBarContent>
-	<s:Label x="10" y="10" text="IPv4Address" fontSize="14" id="nodeRoleAddress"/>
-	<s:Label x="10" y="32" text="Stats" fontSize="14" id="nodeStats" textDecoration="underline"/>
-	<s:Label x="30" y="54" text="- BufferSize:" fontWeight="bold"/>
-	<s:Label x="108" y="54" text="0" id="bufferSize"/>
-	<s:Label x="30" y="74" text="- Tx total:" fontWeight="bold"/>
-	<s:Label x="108" y="74" text="0" id="transmissionTotal"/>
-	<s:Label x="30" y="94" text="- Rx total:" fontWeight="bold"/>
-	<s:Label x="108" y="94" id="receptionsTotal" text="0"/>
-	<s:Label x="30" y="114" text="- Dx total:" fontWeight="bold"/>
-	<s:Label x="108" y="114" id="dropsTotal" text="0"/>
-	<s:BorderContainer x="206" y="53" width="159" height="74">
-		<s:Label x="35" y="22" text="Video Sequence&#xd;Data (Inspector)"/>
-	</s:BorderContainer>
+	
+	<mx:TabNavigator x="0" y="-1" width="398" height="215" borderVisible="true" dropShadowVisible="false">
+		<!-- Node::Properties Tab -->
+		<s:NavigatorContent id="properties" width="100%" height="100%" label="Properties">
+			<s:Group x="10">
+				<s:Label styleName="label" text="Role:"  />
+				<s:Label styleName="label" y="20" text="IPv4 Address:" />
+				<s:Label styleName="label" y="40" text="Mac Address:" />
+				<s:Label styleName="label" y="60" text="Coordinates" />
+				<s:Label styleName="label" y="80" x="15" text="x:" />
+				<s:Label styleName="label" y="100" x="15" text="y:" />
+				<s:Label styleName="label" y="120" text="Speed (m/s)" />
+				<s:Label styleName="label" y="140" x="15" text="vx:" />
+				<s:Label styleName="label" y="160" x="15" text="vy:" />
+			</s:Group>	
+			<s:Group x="100">
+				<s:Label id="roleValue" y="2" styleName="value" text="–"/>
+				<s:Label id="ipv4AddressValue" styleName="value" y="22" text="00.00.00.00" />
+				<s:Label id="macAddressValue" styleName="value" y="42" text="00:00:00:00:00:00" />
+				<s:Label id="pxValue" styleName="value" y="82" text="0" />
+				<s:Label id="pyValue" styleName="value" y="102" text="0" />
+				<s:Label id="vxValue" styleName="value" y="142" text="0" /> 
+				<s:Label id="vyValue" styleName="value" y="162" text="0" /> 
+			</s:Group>
+		</s:NavigatorContent>
+		
+		<!-- Node::Metrics/Statistics Tab -->
+		<s:NavigatorContent id="metrics" width="100%" height="100%" label="Metrics">
+			<s:Group x="10">
+				<s:Label styleName="label" text="Buffer size:"  />
+				<s:Label styleName="label" y="20" text="Tx total:" />
+				<s:Label styleName="label" y="40" text="Rx total:" />
+				<s:Label styleName="label" y="60" text="Dx total:" />
+				<s:Label styleName="label" y="80" text="Sx total:" />
+				<s:Label styleName="label" y="100" text="Dx total:" />
+			</s:Group>	
+			<s:Group x="100">
+				<s:Label id="bufferSizeValue" styleName="value" y="2" text="0" />
+				<s:Label id="txTotalValue" styleName="value"  y="22" text="0" />
+				<s:Label id="rxTotalValue" styleName="value" y="42" text="0" />
+				<s:Label id="dxTotalValue" styleName="value" y="62" text="0" />
+				<s:Label id="sxTotalValue" styleName="value" y="82" text="0" />
+				<s:Label id="sdTotalValue" styleName="value" y="102" text="0" />
+			</s:Group>
+		</s:NavigatorContent>
+		
+		<!-- Node::Topolgy/Routing tab-->
+		<s:NavigatorContent width="100%" height="100%" label="Topology">
+			
+		</s:NavigatorContent>
+	</mx:TabNavigator>
 </node:NodeWindowContainer>

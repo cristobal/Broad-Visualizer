@@ -56,7 +56,7 @@ package com.bienvisto.elements
 		/**
 		 * @private
 		 */ 
-		private var _role:String = "undefined";
+		private var _role:String = "–";
 		
 		/**
 		 * @readwrite role
@@ -74,19 +74,37 @@ package com.bienvisto.elements
 		/**
 		 * @private
 		 */ 
-		private var _address:String;
+		private var _ipv4Address:String = "00.00.00.00";
 		
 		/**
 		 * @readwrite address
 		 */ 
-		public function get address():String
+		public function get ipv4Address():String
 		{
-			return _address;
+			return _ipv4Address;
 		}
 	 
-		public function set address(value:String):void
+		public function set ipv4Address(value:String):void
 		{
-			_address = value;
+			_ipv4Address = value;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _macAddress:String = "00:00:00:00:00:00";
+		
+		/**
+		 * @readwrite macAddress
+		 */ 
+		public function get macAddress():String
+		{
+			return _macAddress;
+		}
+		
+		public function set macAddress(value:String):void
+		{
+			_macAddress = value;
 		}
 		
 		/**

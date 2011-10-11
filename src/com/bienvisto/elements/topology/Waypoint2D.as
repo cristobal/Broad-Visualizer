@@ -1,8 +1,6 @@
 package com.bienvisto.elements.topology
 {
-
 	import com.bienvisto.core.Vector2D;
-
 	import com.bienvisto.elements.KeypointBase;
 
 
@@ -12,22 +10,13 @@ package com.bienvisto.elements.topology
 	public class Waypoint2D extends KeypointBase
 	{
 
-		/**
-		 * Position of the waypoint
-		 */
-		protected var position_:Vector2D;
-
-		/**
-		 * Direction of the waypoint
-		 */
-		protected var direction_:Vector2D;
 
 
 		/**
 		 * Constructor of the class
 		 *
 		 * @param pos Position of the waypoint
-		 * @param dir Direction of the waypoint, in meters/s
+		 * @param dir Direction of the waypoint, in meter/s
 		 * @param ms Milliseconds elapsed since the beginning of the simulation
 		 * until the node passed through this waypoint
 		 * @param node Id of the node associated to this keypoint
@@ -36,20 +25,34 @@ package com.bienvisto.elements.topology
 		{
 			super(ms, node);
 			
-			position_ = new Vector2D(pos.x, pos.y);
-			direction_ = new Vector2D(dir.x, dir.y);
+			_position = pos.clone();
+			_direction = dir.clone(); 
 		}
 
-
+		/**
+		 * @private
+		 * 	Position of the waypoint
+		 */
+		private var _position:Vector2D;
+		
+		/**
+		 * Direction of the waypoint
+		 */
+		protected var _direction:Vector2D;
+		
 		/**
 		 * Position of the waypoint
 		 */
-		public function get position():Vector2D { return position_; }
+		public function get position():Vector2D { 
+			return _position; 
+		}
 
 		/**
 		 * Direction of the waypoint
 		 */
-		public function get direction():Vector2D { return direction_; }
+		public function get direction():Vector2D { 
+			return _direction; 
+		}
 
 
 

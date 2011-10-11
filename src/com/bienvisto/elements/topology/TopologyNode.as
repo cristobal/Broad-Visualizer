@@ -1,11 +1,11 @@
 package com.bienvisto.elements.topology
 {
 
-	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.elements.Node;
 	import com.bienvisto.elements.NodeBase;
+	import com.bienvisto.util.Tools;
 	
 	import flash.events.Event;
 	
@@ -25,24 +25,24 @@ package com.bienvisto.elements.topology
 		 * Since the stepTo function is no longer in use, this variable is not used
 		 * However, it could be still useful (see comments at stepTo function)
 		 */
-		protected var waypoint_:int;
+		protected var _waypoint:int;
 		/**
 		 * Whether the node has reached the end of its path or not
 		 */
-		protected var finished_:Boolean = false;
+		protected var _finished:Boolean = false;
 		/**
 		 * Whether the node is selected or not
 		 */
-		protected var selected_:Boolean = false;
+		protected var _selected:Boolean = false;
 		/**
 		 * Color used to represent the node
 		 */
-		public var color_:uint;
+		public var _color:uint;
 		
 		/**
-		 * Animation that changes the color of the node when it is highglighted
+		 * Animation that changes the color of the node when it is highlighted
 		 */
-		protected var animation_:AnimateColor;
+		protected var _animation:AnimateColor;
 
 
 
@@ -53,19 +53,32 @@ package com.bienvisto.elements.topology
 		{
 			super(id, node);
 			
-			color_ = 0x555555;
-			animation_ = new AnimateColor(this);
-			animation_.duration = 400;
-			animation_.colorFrom = 0xFFCC00;
-			animation_.colorTo = color_;
-			animation_.colorPropertyName = "color";
+			_color = 0x555555;
+			_animation = new AnimateColor(this);
+			_animation.duration = 400;
+			_animation.colorFrom = 0xFFCC00;
+			_animation.colorTo = _color;
+			_animation.colorPropertyName = "color";
 			//animation_.addEventListener(EffectEvent.EFFECT_END, effectEnded);
 			
-			waypoint_ = 0; // The simulation starts at the first waypoint
-
+			_waypoint = 0; // The simulation starts at the first waypoint
+			_direction = new Vector2D(0, 0);
 			updateGraphics();
 		}
-
+		
+		/**
+		 * @protected
+		 */ 
+		protected var _direction:Vector2D;
+		
+		/**
+		 * @readonly direction
+		 */ 
+		public function get direction():Vector2D
+		{
+			return _direction;
+		}
+		
 		/**
 		 * Adds a waypoint at the end of the path.
 		 * <strong>NOTE:</strong> Order of added waypoints is important. Waypoints
@@ -130,6 +143,9 @@ package com.bienvisto.elements.topology
 				+ (waypoint.direction.x/1000)*millisecondsElapsed;
 			y = waypoint.position.y
 				+ (waypoint.direction.y/1000)*millisecondsElapsed;
+			
+			_direction.x = waypoint.direction.x;
+			_direction.y = waypoint.direction.y;
 		}
 
 
@@ -141,10 +157,10 @@ package com.bienvisto.elements.topology
 		public function highlight(color:uint = 0xFFCC00):void
 		{
 			
-			animation_.colorFrom = color;
+			_animation.colorFrom = color;
 			
-			animation_.stop();
-			animation_.play();
+			_animation.stop();
+			_animation.play();
 		}
 
 
@@ -157,20 +173,20 @@ package com.bienvisto.elements.topology
 		{
 			graphics.clear(); // Clear the graphics layer
 			
-			graphics.beginFill(color_);
-			if (selected_) graphics.lineStyle(3, 0xff6622);
+			graphics.beginFill(_color);
+			if (_selected) graphics.lineStyle(3, 0xff6622);
 			graphics.drawCircle(0, 0, 10);
 			graphics.endFill();
 		}
 
 
-		public function get selected():Boolean { return selected_; }
-		public function set selected(s:Boolean):void { selected_ = s; updateGraphics(); }
+		public function get selected():Boolean { return _selected; }
+		public function set selected(s:Boolean):void { _selected = s; updateGraphics(); }
 
 		public function get position():Vector2D { return new Vector2D(x,y); }
 		
-		public function get color():uint { return color_; }
-		public function set color(c:uint):void { color_ = c; updateGraphics(); }
+		public function get color():uint { return _color; }
+		public function set color(c:uint):void { _color = c; updateGraphics(); }
 
 
 		/*

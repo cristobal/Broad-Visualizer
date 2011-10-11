@@ -1,0 +1,18 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+global
+{
+	font-family: "Lucida Grande";
+	font-size: 13;
+}
+
+@font-face {
+	src: url("assets/fonts/dejavu/ttf/DejaVuSansMono.ttf");
+	fontFamily: "DejaVuSans";
+	fontName: "DejaVuSansMono";
+	advancedAntiAliasing: true;
+}
+	

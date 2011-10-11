@@ -1,13 +1,12 @@
 package com.bienvisto.elements.routing
 {
 
-	import flash.utils.*;
-	
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Visualizer;
-
 	import com.bienvisto.elements.NodeBase;
+	import com.bienvisto.util.Tools;
+	
+	import flash.utils.*;
 
 
 
@@ -65,12 +64,12 @@ package com.bienvisto.elements.routing
 		public function addTable(table:String, ms:uint):void
 		{
 			var entriesArray:Vector.<RoutingTableEntry> = new Vector.<RoutingTableEntry>();
+			
 			var entries:Array = table.split(",");
 			
 			var i:int = 0;
 			var n:int = entries.length;
-			
-			while (i+1 < n)
+			while (i < n)
 			{
 				// The distance is not currently used, always -1
 				entriesArray.push(new RoutingTableEntry(entries[i], entries[i+1], -1));
@@ -88,35 +87,48 @@ package com.bienvisto.elements.routing
 		 */
 		public function updateGraphics(table:RoutingTable):void
 		{
-			var origin:Vector2D; // Origin of a link
-			var next:Vector2D; // Next hop of a path
+
 			var highlighted:Boolean = false;
 			
 			graphics.clear(); // Clean all lines from previous drawings
 			
-			for each (var entry:RoutingTableEntry in table.entries)
+			
+			for (var i:int = 0, l:int = table.entries.length; i < l; i++) {
+				drawPath(table.entries[i]);	
+			}
+		}
+		
+		private function drawPath(entry:RoutingTableEntry):void
+		{
+			
+			var highlighted:Boolean = 
+				Visualizer.topology.isNodeSelected(id_) ||
+				Visualizer.topology.isNodeSelected(entry.next) ||
+				Visualizer.topology.isNodeSelected(entry.destination);
+			
+			if (highlighted) {
+				graphics.lineStyle(3, 0xff6622)
+			}
+			else {
+				graphics.lineStyle(1, 0xcccccc);
+			}
+			
+			var origin:Vector2D	= Visualizer.topology.getNodePosition(id_), 			  // Origin of a link, this current node
+				dest:Vector2D	= Visualizer.topology.getNodePosition(entry.destination), // Destination of the link 
+				next:Vector2D	= Visualizer.topology.getNodePosition(entry.next);		  // And the Next hop
+			
+			/**
+			 * Routing table can be invalid some times
+			 */
+			if (origin && dest)
 			{
-				highlighted = Visualizer.topology.isNodeSelected(id_) ||
-							Visualizer.topology.isNodeSelected(entry.next) ||
-							Visualizer.topology.isNodeSelected(entry.destination);
-				
-				if (highlighted)
-					graphics.lineStyle(3, 0xff6622)
-				else
-					graphics.lineStyle(1, 0xcccccc);
-				
-				origin = Visualizer.topology.getNodePosition(id_);
-				next = Visualizer.topology.getNodePosition(entry.next);
-
-				/**
-				 * Routing table can be invalid some times
-				 */
-				if (origin != null && next != null)
-				{
-					graphics.moveTo(origin.x, origin.y);
+				graphics.moveTo(origin.x, origin.y);
+				graphics.lineTo(dest.x, dest.y);
+					
+				if (next) {
 					graphics.lineTo(next.x, next.y);
 				}
-			}
+			}	
 		}
 
 

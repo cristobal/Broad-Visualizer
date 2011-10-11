@@ -9,7 +9,7 @@ package com.bienvisto.core
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.receptions.Receptions;
-	import com.bienvisto.elements.roles.Roles;
+	import com.bienvisto.elements.properties.Properties;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
@@ -154,12 +154,12 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var _roles:Roles;
+		private var _roles:Properties;
 		
 		/**
 		 * @readonly roles
 		 */ 
-		public function get roles():Roles
+		public function get roles():Properties
 		{	
 			return _roles;
 		}
@@ -507,7 +507,7 @@ package com.bienvisto.core
 			
 			topology = new Topology(this, canvasTopLayer_);
 			
-			_roles = new Roles(this, canvasBottomLayer_);
+			_roles = new Properties(this, canvasBottomLayer_);
 			_nodeManager = new NodeManager();
 			_sequencesManager = new SequencesManager();
 			

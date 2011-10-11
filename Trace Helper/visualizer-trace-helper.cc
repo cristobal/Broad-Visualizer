@@ -277,7 +277,7 @@ VisualizerTraceHelper::SeqTsSent (std::string text, Ptr<const Packet> packet, ui
 	
 	// Write to file
 	// format: ss <node id> <time> <sequence number>
-	outputStream << "ss "; // Line type: Sequence Received
+	outputStream << "ss "; // Line type: Sequence Sent
 	outputStream << nodeId << " ";
 	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
 	outputStream << sequenceNumber << " ";
