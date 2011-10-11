@@ -42,21 +42,43 @@ VisualizerTraceHelper::CourseChanged (std::string context, Ptr<const MobilityMod
   outputStream << velocity.x << " ";
   outputStream << velocity.y;
   outputStream << endl;
+}                                       
+
+/**
+ * @brief Log the properties and role for the nodes in a node container
+ */
+void 
+VisualizerTraceHelper::LogNodeContainerProperties(const NodeContainer nodeContainer, std::string role)
+{
+	NodeContainer::Iterator it;
+	// Iterate trough the nodes and log the node properties and role
+	for (it = nodeContainer.Begin(); it != nodeContainer.End(); it++) {
+		LogNodeProperties((*it), role);
+	}
 }
 
 /**
- * @brief Append the node role for the nodes in a NodeContainer
+ * @brief Output the node properties and role for the given node
  */
 void
-VisualizerTraceHelper::LogNodeRole(Ptr<const Node> node, std::string nodeRole) 
+VisualizerTraceHelper::LogNodeProperties(Ptr<const Node> node, std::string role) 
 {
-	// FORMAT: nr <id> <role> <ipv4address>	
-	outputStream << "nr ";
-	outputStream << node->GetId() << " ";
-	outputStream << nodeRole << " ";
-	outputStream << node->GetObject<Ipv4> ()->GetAddress(1, 0).GetLocal () ;
-	outputStream << endl;
+	uint32_t id = node->GetId();         
+	Ipv4Address ipv4Address = node->GetObject<Ipv4> ()->GetAddress(1, 0).GetLocal ();
+	Mac48Address macAddress = DynamicCast<WifiNetDevice> (node->GetDevice (0))->GetMac()->GetAddress ();
+	
+	// FORMAT: np <id> <role> <ipv4address>	<macAddress>
+	outputStream << "np " << id <<  " " << role << " " << ipv4Address << " " << macAddress << endl;
 }
+
+/**
+ * @brief Sink that handles static positioned nodes
+ */                     
+void 
+VisualizerTraceHelper::StaticPosition(Ptr<const Node> node, int x, int y) 
+{
+	StaticPosition (node->GetId(), x, y);
+}                      
 
 /**
  * @brief Sink that handles static positioned nodes (Added by Morten)
@@ -95,11 +117,25 @@ VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
   
   std::vector<GenericRoutingTableEntry> table = nodeContainer.Get (nodeId)->GetObject<CrossLayerInterface> ()->GetGenericRoutingTable ();
 
-  // Iterate through all entries in the table
-  for (std::vector<GenericRoutingTableEntry>::iterator it = table.begin(); it != table.end(); it++)
-  {
-    outputStream << GetNodeIdForAddress(it->GetDestAddr ()) << ",";
-    outputStream << GetNodeIdForAddress(it->GetNextAddr ()) << ",";
+  // Iterate through all entries in the table                      
+	int destId;
+	int nextId;            
+	int hops;
+	int index = 0;
+	std::vector<GenericRoutingTableEntry>::iterator it;
+  for (it = table.begin(); it != table.end(); it++)
+  {               
+		if (index > 0) {
+			outputStream << ",";
+		}                     
+		destId = GetNodeIdForAddress(it->GetDestAddr ());
+		nextId = GetNodeIdForAddress(it->GetNextAddr ());
+		hops	 = it->GetDistance();
+		if (destId == nextId) {
+			nextId = -1; // there is no next id points to same node final destination.
+		}
+		outputStream << destId << "," << nextId << "," << hops;
+		index++;
   }
   
   outputStream << endl;
@@ -277,7 +313,7 @@ VisualizerTraceHelper::SeqTsSent (std::string text, Ptr<const Packet> packet, ui
 	
 	// Write to file
 	// format: ss <node id> <time> <sequence number>
-	outputStream << "ss "; // Line type: Sequence Sent
+	outputStream << "ss "; // Line type: Sequence Received
 	outputStream << nodeId << " ";
 	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
 	outputStream << sequenceNumber << " ";
@@ -491,4 +527,4 @@ VisualizerTraceHelper::GetNodeIdForAddress(Mac48Address address)
   }
   
   return -1;
-}
+}    

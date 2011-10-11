@@ -50,13 +50,25 @@ public:
    */
   void 
 	CourseChanged(std::string context, ns3::Ptr<const ns3::MobilityModel> model);
-	
+
 	/**
-	 * @brief Log the node role for the nodes in a NodeContainer
+	 * @brief Log the properties and role for the nodes in a node container
 	 */
 	void 
-	LogNodeRole(ns3::Ptr<const ns3::Node> node, std::string nodeRole);
+	LogNodeContainerProperties(const ns3::NodeContainer nodeContainer, std::string role);
 	
+	/**
+	 * @brief Log the properties and role for a node
+	 */
+	void 
+	LogNodeProperties(ns3::Ptr<const ns3::Node> node, std::string role);
+
+  /**
+   * @brief Sink that handles static positioned nodes
+   */
+  void 
+	StaticPosition(ns3::Ptr<const ns3::Node> node, int x, int y);
+		
   /**
    * @brief Sink that handles static positioned nodes
    */
