@@ -3,7 +3,7 @@ package com.bienvisto.elements.buffer
 	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.NodeBase;
 
 

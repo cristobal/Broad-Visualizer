@@ -45,14 +45,14 @@ package com.bienvisto.elements.routing
 		/**
 		 * Number of hops until the destination node
 		 */
-		public function get hops():int { return distance_; }
+		public function get distance():int { return distance_; }
 		
 		/**
 		 * To string
 		 */ 
 		public function toString():String 
 		{
-			return destination + " - " + next + ", hops: " + hops;	
+			return destination + " - " + next + ", hops: " + distance;	
 		}
 	}
 

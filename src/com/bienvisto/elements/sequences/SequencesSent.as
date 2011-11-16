@@ -44,7 +44,7 @@ package com.bienvisto.elements.sequences
 		 */
 		public override function update(event:TimedEvent):void
 		{
-			var time:uint = event.milliseconds;
+			var time:uint = event.elapsed;
 			visualizer_.sequencesManager.update(time, lineType, sequences.getDataForTime(time));
 		}
 		

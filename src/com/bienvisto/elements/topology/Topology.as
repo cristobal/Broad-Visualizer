@@ -7,7 +7,7 @@ package com.bienvisto.elements.topology
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -140,7 +140,7 @@ package com.bienvisto.elements.topology
 				
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
-				node.goTo(e.milliseconds);
+				node.goTo(e.elapsed);
 			}
 		}
 
@@ -161,7 +161,7 @@ package com.bienvisto.elements.topology
 			{
 				
 				// If it is, we create it
-				var node:Node = visualizer_.nodeManager.findNodeById(nodeId);
+				var node:Node = visualizer_.nodeManager.getNode(nodeId);
 				var newNode:TopologyNode = new TopologyNode(nodeId, node);
 				newNode.x = position.x;
 				newNode.y = position.y;

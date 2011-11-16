@@ -1,5 +1,6 @@
 
 
+import com.bienvisto.Bienvisto;
 import com.bienvisto.elements.ElementBase;
 import com.bienvisto.ui.LoadingWindow;
 import com.bienvisto.ui.charts.ChartsWindow;
@@ -45,6 +46,7 @@ protected var loadStart_:uint;
  */
 public function initApp():void
 {
+	// new Bienvisto();
 	addEventListener(MouseEvent.MOUSE_DOWN, startDragScroll);
 	addEventListener(MouseEvent.MOUSE_UP, stopDragScroll);
 	
@@ -97,7 +99,7 @@ public function openSequencesWindow():void
  */
 public function toggleLog():void
 {
-	if (menu.bottom == -LOG_HEIGHT) menuAnimation.play();
+	if (oldMenu.bottom == -LOG_HEIGHT) menuAnimation.play();
 	else { menuAnimation.play(null, true); }
 }
 

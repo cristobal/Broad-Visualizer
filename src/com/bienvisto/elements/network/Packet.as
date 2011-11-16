@@ -1,5 +1,7 @@
-package com.bienvisto.elements
+package com.bienvisto.elements.network
 {
+	import com.bienvisto.core.aggregate.Aggregate;
+
 	/**
 	 * Packet.as
 	 * 	Represents a basic transmission packet (sent/recv)
@@ -8,7 +10,7 @@ package com.bienvisto.elements
 	 * @author Cristobal Dabed
 	 * @version {{VERSION_NUMBER}}
 	 */ 
-	public final class Packet
+	public class Packet extends Aggregate
 	{
 		// TODO: Add support for IPv6 for the moment we are working with IPv4 only.
 		// NOTE: Using uint's for the node ids not the address from,to lookup by using the NodeManager.
@@ -19,23 +21,10 @@ package com.bienvisto.elements
 		 */ 
 		public function Packet(time:uint, from:uint, to:uint, size:uint)
 		{
-			_time = time;
+			super(time);
 			_from = from;
 			_to   = to;
 			_size = size;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _time:uint = 0;
-		
-		/**
-		 * @readonly time
-		 */ 
-		public function get time():uint
-		{
-			return _time;
 		}
 		
 		/**

@@ -7,7 +7,7 @@
 			   scriptTimeLimit="60"
 			   width="100%"
 			   height="100%"
-			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.node.*" xmlns:sequences="com.bienvisto.ui.sequences.*">
+			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.node.*" xmlns:sequences="com.bienvisto.ui.sequences.*" xmlns:components="com.bienvisto.ui.components.*" xmlns:menu="com.bienvisto.ui.menu.*">
 	
 	<s:layout>
 		<s:BasicLayout/>
@@ -19,7 +19,7 @@
 	
 	<fx:Declarations>
 		
-		<s:Animate id="menuAnimation" targets="{[menu]}" duration="500">
+		<s:Animate id="menuAnimation" targets="{[oldMenu]}" duration="500">
 			<s:SimpleMotionPath property="bottom" valueFrom="{-LOG_HEIGHT}" valueTo="0" />
 		</s:Animate>
 		<s:Animate id="optionsAnimation" targets="{[options]}" duration="250">
@@ -28,20 +28,21 @@
 		
 	</fx:Declarations>
 	
+	<menu:Menu id="menu" />
 	
-	<s:controlBarLayout>
+	<!--<s:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="left"  />
 	</s:controlBarLayout>
-	
+	-->	
 	<!-- TODO: Mask ControlBarContent so tha the Visualizer is show at the bottom. -->
-	<s:controlBarContent>
+	<!-- <s:controlBarContent>
 		<s:Button id="loadFileButton" label="Load file" click="fileHelper.browseFile(v.loadFromTraceFile);"/>
 		<mx:Spacer width="100%"/>
 		<s:Button id="showStatsButton" label="Open Stats Window" click="openChartsWindow()"/>
 		<s:Button id="showSequencesButton" label="Open Sequences Window" click="openSequencesWindow()" />
 		<s:Button id="openOptions" label="Options" click="toggleOptions();"/>
 		<s:Button id="toggleLogButton" label="Toggle log" click="toggleLog();"/>
-	</s:controlBarContent>
+	</s:controlBarContent>-->
 	
 	<s:Group y="0" width="100%" height="100%">
 		<ui:Grid id="grid" visible="false" width="100%" height="100%" />
@@ -84,7 +85,11 @@
 		
 	</s:BorderContainer>
 	
-	<s:BorderContainer id="menu" width="100%" bottom="{-LOG_HEIGHT}"
+	<!-- Playback menu -->
+	<menu:Playback id="playback" height="50" bottom="0" />
+	
+	<!-- Old Menu -->
+	<s:BorderContainer id="oldMenu" visible="false" width="100%" bottom="{-LOG_HEIGHT}"
 					   backgroundColor="0xf1f1f1" borderColor="0xcccccc">
 		
 		<s:layout>

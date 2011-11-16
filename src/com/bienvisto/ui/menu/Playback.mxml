@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  xmlns:components="com.bienvisto.ui.components.*" 
+						  width="100%"
+						  height="50"
+						  backgroundColor="0xF1F1F1"
+						  borderColor="0xCCCCCC">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.bienvisto.util.sprintf;
+
+			private static var secondsPerMinut:uint = 60;
+			private static var secondsPerHour:uint = 60 * secondsPerMinut;
+
+			/**
+			 * Set time
+			 * 
+			 * @param value
+			 */ 
+			public function setTime(value:uint):void
+			{
+				var text:String = miliSecondsToText(value);
+				timeLabel.text = text;
+			}
+			
+			/**
+			 * Set duration
+			 * 
+			 * @param value Total duration value in ms
+			 */ 
+			public function setDuration(value:uint):void
+			{
+				var text:String = miliSecondsToText(value);
+				durationLabel.text = text;
+			}
+			
+			/**
+			 * Miliseconds to text
+			 * 
+			 * 
+			 * @param value The amount of ms
+			 * @return The text as a time text in the format hh:mm:ss
+			 */ 
+			private function miliSecondsToText(value:uint):String
+			{
+				value = value / 1000;
+				
+				var hours:int = Math.floor(value / secondsPerHour);
+				value -= hours * secondsPerHour;
+				
+				var minutes:int = Math.floor(value / secondsPerMinut);
+				value -= minutes * secondsPerMinut;
+				
+			
+				return sprintf("%02d:%02d:%02d", hours, minutes, value);
+			}
+		]]>
+	</fx:Script>
+	<s:layout>
+		<s:VerticalLayout gap="0" paddingTop="0" paddingBottom="0" />
+	</s:layout>
+
+	<s:Group width="100%" height="50">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingTop="0" paddingLeft="20" />
+		</s:layout>
+		
+		<!-- Zoom -->
+		<s:Label>Zoom</s:Label>
+		<s:NumericStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="500" minimum="10" />
+		
+		<!-- playButton -->
+		<s:Button id="playButton" label="Play" />
+		
+		<!-- Playback speed -->
+		<s:NumericStepper id="playbackSpeed" 
+						  width="45"
+						  value="1.0" 
+						  stepSize="0.5"  
+						  maximum="10.0"
+						  minimum="0.1" />
+						<!-- snapInterval="0.1" -->
+		
+		<!-- Time slider -->
+		<s:HSlider id="timeSlider" enabled="false" width="300" minimum="0" maximum="1000" />
+		
+		<!-- Time display -->
+		<s:Label id="timeLabel">00:00:00</s:Label>
+		<s:Label>/</s:Label>
+		<s:Label id="durationLabel">00:00:00</s:Label>
+		
+	</s:Group>
+</s:BorderContainer>

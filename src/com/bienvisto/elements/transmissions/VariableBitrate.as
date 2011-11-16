@@ -33,7 +33,7 @@ package com.bienvisto.elements.transmissions
 		protected override function aggregateKeypoint(oldValue:Number, groupSize:int,
 			keypoint:KeypointBase):Number
 		{
-			return oldValue + (keypoint as Transmission).size;
+			return oldValue + (keypoint as TransmissionKeypoint).size;
 		}
 	}
 

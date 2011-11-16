@@ -2,7 +2,7 @@ package com.bienvisto.elements.transmissions
 {
 	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.NodeBase;
 
 
@@ -48,12 +48,12 @@ package com.bienvisto.elements.transmissions
 		 * the simulation until the node performed this transmission
 		 * @param size The size of the packet transmitted
 		 */
-		public function addTransmission(ms:uint, destination:int, size:Number):Transmission
+		public function addTransmission(ms:uint, destination:int, size:Number):TransmissionKeypoint
 		{
-			var nt:Transmission = new Transmission(ms, id_, destination, size);
+			var nt:TransmissionKeypoint = new TransmissionKeypoint(ms, id_, destination, size);
 			keypoints_.push(nt);
 			
-			node.addTransmission(ms, destination, size);
+			// node.addTransmission(ms, destination, size);
 			return nt;
 		}
 		
@@ -116,7 +116,7 @@ package com.bienvisto.elements.transmissions
 			{
 				Tools.drawArrow(Visualizer.topology.getNodePosition(id_),
 								Visualizer.topology.getNodePosition(
-								(keypoints_[startingKeypoint] as Transmission).destination),
+								(keypoints_[startingKeypoint] as TransmissionKeypoint).destination),
 								graphics,
 								COMMUNICATION_HIGHLIGHT_COLOR,
 								2);

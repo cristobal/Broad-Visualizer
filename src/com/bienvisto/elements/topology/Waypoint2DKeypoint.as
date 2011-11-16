@@ -7,7 +7,7 @@ package com.bienvisto.elements.topology
 	/**
 	 * Stores the position and direction of some node at some point in time
 	 */
-	public class Waypoint2D extends KeypointBase
+	public class Waypoint2DKeypoint extends KeypointBase
 	{
 
 
@@ -21,7 +21,7 @@ package com.bienvisto.elements.topology
 		 * until the node passed through this waypoint
 		 * @param node Id of the node associated to this keypoint
 		 */
-		public function Waypoint2D(pos:Vector2D, dir:Vector2D, ms:uint, node:int)
+		public function Waypoint2DKeypoint(pos:Vector2D, dir:Vector2D, ms:uint, node:int)
 		{
 			super(ms, node);
 			

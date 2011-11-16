@@ -1,4 +1,4 @@
-package com.bienvisto.elements.buffer
+package com.bienvisto.elements.transmissions
 {
 	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Vector2D;
@@ -12,34 +12,32 @@ package com.bienvisto.elements.buffer
 
 
 	/**
-	 * Class responsible of parsing the "buffer" block of the trace to
-	 * visualize and of actually displaying buffer data in the visualization
+	 * Class responsible of parsing the "transmissions" block of the trace to
+	 * visualize and of actually displaying the transmissions in the simulation
 	 */
-	public class Buffer extends ElementBase
+	public class TransmissionsElementBase extends ElementBase
 	{
-
 		/**
 		 * Array of Node. Each node stores the info about its movement
 		 */
 		protected var nodes_:Array;
 		
-		protected var bufferSize_:VariableBufferSize;
+		protected var packetsForwarded_:VariablePacketsForwarded;
+		protected var bitrate_:VariableBitrate;
 
 		/**
 		 * Constructor of the class
 		 * 
 		 * @param visualizer Reference to the visualizer
 		 */
-		public function Buffer(visualizer:Visualizer, canvas:Sprite)
+		public function TransmissionsElementBase(visualizer:Visualizer, canvas:Sprite)
 		{
 			super(visualizer, canvas);
 			
 			nodes_ = new Array();
 			
-			bufferSize_ = new VariableBufferSize();
-			
-			mouseEnabled = false;
-			mouseChildren = false;
+			packetsForwarded_ = new VariablePacketsForwarded();
+			bitrate_ = new VariableBitrate();
 		}
 
 
@@ -59,14 +57,14 @@ package com.bienvisto.elements.buffer
 		 */
 		public override function get name():String
 		{
-			return "Buffer";
+			return "Mac Transmissions";
 		}
 		/**
 		 * @inheritDoc
 		 */
 		public override function get lineType():String
 		{
-			return "be"; // buffer enqueue(/change?)
+			return "mt"; // mac transmissions
 		}
 
 
@@ -77,14 +75,21 @@ package com.bienvisto.elements.buffer
 		 */
 		public override function update(e:TimedEvent):void
 		{
+			if (!visible_)
+				return;
+			
 			// Update all nodes
-			for each(var node:BufferNode in nodes_)
+			for each(var node:TransmissionNode in nodes_)
 			{
+				// Check if the node is added to the canvas, add it if it's not
+				if (!this.contains(node))
+				{
+					this.addChild(node);
+				}
+				
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
 				node.goTo(e.elapsed);
-				
-				addChild(node);
 			}
 		}
 
@@ -94,28 +99,31 @@ package com.bienvisto.elements.buffer
 		 */
 		protected override function loadNewLine(params:Array):void
 		{
-			// Get receptions data
+			// Get transmission data
 			var id:int = params[0];
 			var milliseconds:uint = params[1];
-			var currentSize:Number = params[2];
+			var size:Number = params[2];
+			var destination:int = params.length > 3 ? params[3] : -1;
 			
 			// Check if this is a new node
 			if (nodes_[id] == null)
 			{
-				// Get the real node
+				// Get
 				var node:Node = visualizer_.nodeManager.getNode(id);
 				
 				// If it is, we create it
-				var newNode:BufferNode = new BufferNode(id, node);
+				var newNode:TransmissionNode = new TransmissionNode(id, node);
 				
 				// ...and we add it to the nodes list
 				nodes_[id] = newNode;
 			}
 			
 			// Add the new waypoint to the node and
-			var newKeypoint:BufferChange = nodes_[id].addBufferChange(milliseconds, currentSize);
+			var newKeypoint:TransmissionKeypoint = nodes_[id].addTransmission(milliseconds, destination, size);
 			// Add the new waypoint to the variables that will be displayed 
-			bufferSize_.addKeypoint(newKeypoint);
+			// in the statistics window
+			packetsForwarded_.addKeypoint(newKeypoint);
+			bitrate_.addKeypoint(newKeypoint);
 		}
 
 

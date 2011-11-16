@@ -2,6 +2,7 @@ package com.bienvisto.elements
 {
 
 	import flash.display.Sprite;
+	import com.bienvisto.elements.network.Node;
 
 
 

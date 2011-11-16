@@ -2,7 +2,7 @@ package com.bienvisto.elements.drops
 {
 	import com.bienvisto.util.Tools;
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.NodeBase;
 
 

@@ -6,7 +6,7 @@ package com.bienvisto.elements.drops
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	
 	import flash.display.Sprite;
 
@@ -79,7 +79,7 @@ package com.bienvisto.elements.drops
 			{
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
-				node.goTo(e.milliseconds);
+				node.goTo(e.elapsed);
 			}
 		}
 
@@ -97,7 +97,7 @@ package com.bienvisto.elements.drops
 			if (nodes_[id] == null)
 			{
 				// Get the reference to the real node
-				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				var node:Node = visualizer_.nodeManager.getNode(id);
 				
 				// If it is, we create it
 				var newNode:DropNode = new DropNode(id, node);

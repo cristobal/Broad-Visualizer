@@ -5,7 +5,7 @@ package com.bienvisto.elements.routing
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.util.Tools;
 	
 	import flash.display.Sprite;
@@ -75,7 +75,7 @@ package com.bienvisto.elements.routing
 			if (!visible_)
 				return;
 			
-			if (e.milliseconds == 0) return;
+			if (e.elapsed == 0) return;
 			
 			// Update all nodes
 			for each(var node:RoutingNode in nodes_)
@@ -88,7 +88,7 @@ package com.bienvisto.elements.routing
 				
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
-				node.goTo(e.milliseconds);
+				node.goTo(e.elapsed);
 			}
 		}
 
@@ -107,7 +107,7 @@ package com.bienvisto.elements.routing
 			if (nodes_[nodeId] == null)
 			{
 				// If it is, we create it
-				var node:Node = visualizer_.nodeManager.findNodeById(nodeId);
+				var node:Node = visualizer_.nodeManager.getNode(nodeId);
 				var newNode:RoutingNode = new RoutingNode(nodeId, node);
 
 				// ...and we add it to the nodes list

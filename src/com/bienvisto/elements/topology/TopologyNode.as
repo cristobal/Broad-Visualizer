@@ -3,7 +3,7 @@ package com.bienvisto.elements.topology
 
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.NodeBase;
 	import com.bienvisto.util.Tools;
 	
@@ -98,7 +98,7 @@ package com.bienvisto.elements.topology
 				this.y = position.y;
 			}
 
-			keypoints_.push(new Waypoint2D(position, direction, ms, id_));
+			keypoints_.push(new Waypoint2DKeypoint(position, direction, ms, id_));
 		}
 
 
@@ -111,7 +111,7 @@ package com.bienvisto.elements.topology
 		 */
 		public function goTo(millisecondsTotal:uint):void
 		{
-			var waypoint:Waypoint2D; // Active waypoint
+			var waypoint:Waypoint2DKeypoint; // Active waypoint
 			var w:int = 0;
 			
 			// Search for the waypoint corresponding to millisecondsTotal
@@ -129,7 +129,7 @@ package com.bienvisto.elements.topology
 					(keypoints_[mid].milliseconds > millisecondsTotal || 
 					keypoints_[mid+1].milliseconds <= millisecondsTotal));
 			
-			waypoint = keypoints_[mid] as Waypoint2D;
+			waypoint = keypoints_[mid] as Waypoint2DKeypoint;
 		
 			// Calculate the distance in milliseconds between the waypoint and the
 			// instant to visualize

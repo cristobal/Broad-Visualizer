@@ -1,7 +1,7 @@
 package com.bienvisto.ui.node
 {
 	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.topology.TopologyNode;

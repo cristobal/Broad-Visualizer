@@ -1,11 +1,11 @@
-package com.bienvisto.elements.properties
+package com.bienvisto.elements.node
 {
 	import com.bienvisto.core.Visualizer;
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
 	
 	import flash.display.Sprite;
+	import com.bienvisto.elements.network.Node;
 	
 	/**
 	 * Class responsible of parsing the "node properties" block of the trace to
@@ -61,7 +61,7 @@ package com.bienvisto.elements.properties
 		{
 			// TODO: Refactor time use message passing instead faster. 
 			//		 And Move this code out afterwards 
-			var time:uint = event.milliseconds;
+			var time:uint = event.elapsed;
 			for each (var node:Node in _nodes) {
 				node.time = time;
 			}
@@ -79,7 +79,7 @@ package com.bienvisto.elements.properties
 			var macAddress:String  = params[3];
 			
 			// Get the node and set the role and address properties
-			var node:Node = visualizer_.nodeManager.findNodeById(id);
+			var node:Node = visualizer_.nodeManager.getNode(id);
 			node.ipv4Address = ipv4Address;
 			node.macAddress = macAddress;
 			

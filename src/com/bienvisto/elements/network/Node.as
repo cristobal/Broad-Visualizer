@@ -1,6 +1,11 @@
-package com.bienvisto.elements
+package com.bienvisto.elements.network
 {
+	import com.bienvisto.core.aggregate.Aggregate;
+	import com.bienvisto.core.aggregate.AggregateCollection;
+	import com.bienvisto.elements.mobility.IMobilityModel;
+	import com.bienvisto.elements.mobility.Waypoint;
 	import com.bienvisto.elements.routing.RoutingTable;
+	import com.bienvisto.elements.transmissions.Transmission;
 
 	// TODO: Add some memoization for total like for a set of interval of time to store.
 	
@@ -19,7 +24,8 @@ package com.bienvisto.elements
 		public function Node(id:int)
 		{
 			_id = id;
-			_transmissions = new Vector.<Packet>;
+			_waypoints = new AggregateCollection();
+			_transmissions = new AggregateCollection();
 			_receptions = new Vector.<Packet>;
 		}
 		
@@ -130,14 +136,14 @@ package com.bienvisto.elements
 		/**
 		 * @private
 		 */ 
-		private var _transmissions:Vector.<Packet> = null;
+		private var _transmissions:AggregateCollection;
 		
 		/**
 		 * @readonly transmissions
 		 */ 
-		public function get transmissions():Vector.<Packet>
+		public function get transmissions():Vector.<Aggregate>
 		{
-			return _transmissions.concat(); // return shallow copy
+			return _transmissions.items;
 		}
 		
 		/**
@@ -145,7 +151,7 @@ package com.bienvisto.elements
 		 */ 
 		public function get transmissionsTotal():uint
 		{	
-			return calculateTotalPackets(_transmissions, _time);
+			return _transmissions.getTotal(_time);
 		}
 		
 		/**
@@ -210,14 +216,46 @@ package com.bienvisto.elements
 		}
 		
 		/**
+		 * @private
+		 */
+		private var _mobilityModel:IMobilityModel;
+		
+		/**
+		 * @readwrite mobilityModel
+		 */ 
+		public function get mobilityModel():IMobilityModel
+		{
+			return _mobilityModel;
+		}
+		
+		public function set mobilityModel(value:IMobilityModel):void
+		{
+			_mobilityModel = value;
+		}
+		
+		
+		/**
+		 * @private
+		 */
+		private var _waypoints:AggregateCollection;
+		
+		/**
+		 * @rea
+		 */ 
+		public function get waypoints():Vector.<Aggregate>
+		{
+			return _waypoints.items;
+		}
+
+		
+		/**
 		 * Add transmission
 		 * 
-		 * @param time
-		 * @param to
+		 * @param item
 		 */ 
-		public function addTransmission(time:uint, to:uint, size:uint):void
+		public function addTransmission(item:Transmission):void
 		{
-			_transmissions.push( new Packet(time, id, to, size) );
+			_transmissions.add(item);
 		}
 			
 		/**
@@ -239,6 +277,16 @@ package com.bienvisto.elements
 		public function addDrop(time:uint):void
 		{
 			_drops.push( new Packet(time, 0, id, 0) );
+		}
+		
+		/**
+		 * Add waypoint
+		 * 
+		 * @param point
+		 */ 
+		public function addWaypoint(point:Waypoint):void
+		{
+			_waypoints.add(point);
 		}
 		
 		/**

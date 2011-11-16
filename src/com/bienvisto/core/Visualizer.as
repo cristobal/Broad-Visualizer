@@ -4,17 +4,16 @@ package com.bienvisto.core
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.NodeManager;
 	import com.bienvisto.elements.SequencesManager;
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.receptions.Receptions;
-	import com.bienvisto.elements.properties.Properties;
+	import com.bienvisto.elements.node.Properties;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.topology.Topology;
-	import com.bienvisto.elements.transmissions.Transmissions;
+	import com.bienvisto.elements.transmissions.TransmissionsElementBase;
 	import com.bienvisto.util.Tools;
 	
 	import flash.display.MovieClip;
@@ -27,6 +26,7 @@ package com.bienvisto.core
 	import flash.utils.getTimer;
 	
 	import mx.core.UIComponent;
+	import com.bienvisto.elements.network.Nodes;
 	
 	
 	public class Visualizer extends UIComponent
@@ -167,12 +167,12 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var _nodeManager:NodeManager;
+		private var _nodeManager:Nodes;
 		
 		/**
 		 * @readonly nodeManager
 		 */ 
-		public function get nodeManager():NodeManager
+		public function get nodeManager():Nodes
 		{
 			return _nodeManager;
 		}
@@ -289,7 +289,6 @@ package com.bienvisto.core
 			while (flash.utils.getTimer() - a < 100 && traceLinesLoaded_ < traceLinesTotal_)
 			{
 				params = trace_[traceLinesLoaded_++].split(" ");
-				
 				var e:TraceLoadEvent = new TraceLoadEvent(TRACE_LINE_FOUND, params[0], params);
 				
 				// The parseTraceLine_ method is called directly instead of dispatching an event
@@ -373,7 +372,7 @@ package com.bienvisto.core
 			// To consume less CPU, this could be called only when 
 			// playbackSpeed != 0. However, the links highlighting would stop
 			// working when selecting a node with the tool paused
-			dispatchEvent(new TimedEvent(STEP, simulationTime_));
+			dispatchEvent(new TimedEvent(STEP, false, false, simulationTime_));
 			
 			// Update the zoom and position of the canvas
 			updateCanvas();
@@ -396,7 +395,7 @@ package com.bienvisto.core
 			
 			// A TimedEvent is dispatched, containing the number of milliseconds
 			// since the visualization started
-			dispatchEvent(new TimedEvent(STEP, simulationTime_));
+			dispatchEvent(new TimedEvent(STEP, false, false, simulationTime_));
 		}
 		
 		
@@ -508,13 +507,13 @@ package com.bienvisto.core
 			topology = new Topology(this, canvasTopLayer_);
 			
 			_roles = new Properties(this, canvasBottomLayer_);
-			_nodeManager = new NodeManager();
+			_nodeManager = new Nodes(null);
 			_sequencesManager = new SequencesManager();
 			
 			elements_ = new Vector.<ElementBase>();
 			elements_.push(_roles);
 			elements_.push(new Routing(this, canvasBottomLayer_));
-			elements_.push(new Transmissions(this, canvasTopLayer_));
+			elements_.push(new TransmissionsElementBase(this, canvasTopLayer_));
 			elements_.push(new Receptions(this, canvasBottomLayer_));
 			elements_.push(new Drops(this, null));
 			elements_.push(new Buffer(this, canvasTopLayer_));

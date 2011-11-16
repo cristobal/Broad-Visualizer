@@ -6,7 +6,7 @@ package com.bienvisto.elements.receptions
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.elements.network.Node;
 	
 	import flash.display.Sprite;
 
@@ -90,7 +90,7 @@ package com.bienvisto.elements.receptions
 				
 				// Update the node. We pass the total amount of milliseconds 
 				// elapsed since the beginning of the simulation
-				node.goTo(e.milliseconds);
+				node.goTo(e.elapsed);
 			}
 		}
 
@@ -111,7 +111,7 @@ package com.bienvisto.elements.receptions
 			if (nodes_[id] == null)
 			{
 				// Get the reference to the real node
-				var node:Node = visualizer_.nodeManager.findNodeById(id);
+				var node:Node = visualizer_.nodeManager.getNode(id);
 				
 				// If it is, we create it
 				var newNode:ReceptionNode = new ReceptionNode(id, node);

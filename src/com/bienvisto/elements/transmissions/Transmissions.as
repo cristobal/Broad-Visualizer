@@ -1,131 +1,55 @@
 package com.bienvisto.elements.transmissions
 {
-	import com.bienvisto.util.Tools;
-	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.events.TimedEvent;
-	import com.bienvisto.core.events.TraceLoadEvent;
-	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.Node;
+	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.parser.TraceSource;
+	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.Nodes;
 	
-	import flash.display.Sprite;
-
-
 	/**
-	 * Class responsible of parsing the "transmissions" block of the trace to
-	 * visualize and of actually displaying the transmissions in the simulation
-	 */
-	public class Transmissions extends ElementBase
+	 * TransmissionsParser.as
+	 * 	A parser subclass which parses all the trace sources 
+	 *  for the mac transmisions event type in the simulations.
+	 * 
+	 * @author Cristobal Dabed
+	 */ 
+	public final class Transmissions extends TraceSource implements ISimulationObject
 	{
-		/**
-		 * Array of Node. Each node stores the info about its movement
-		 */
-		protected var nodes_:Array;
+		public function Transmissions(nodes:Nodes)
+		{
+			super("Mac Transmissions", "mt"); // mac transmissions
+			
+			this.nodes = nodes;
+		}
 		
-		protected var packetsForwarded_:VariablePacketsForwarded;
-		protected var bitrate_:VariableBitrate;
-
 		/**
-		 * Constructor of the class
+		 * @private
+		 */ 
+		private var nodes:Nodes;
+		
+		/**
+		 * @override
+		 */ 
+		override public function update(params:Vector.<String>):void
+		{
+						
+			// format: mt <node id> <time> <packet_size> <next_hop_id> 
+			var id:int = int(params[0]);
+			var time:uint = uint(params[1]);
+			var size:Number = uint(params[2]);
+			var destination:int = params.length > 3 ? uint(params[3]) : -1;
+			
+			var transmission:Transmission = new Transmission(time, id, destination, size);
+			nodes.getNode(id).addTransmission(transmission);
+		}
+		
+		/**
+		 * On time update
 		 * 
-		 * @param visualizer Reference to the visualizer
-		 */
-		public function Transmissions(visualizer:Visualizer, canvas:Sprite)
+		 * @parm elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
 		{
-			super(visualizer, canvas);
 			
-			nodes_ = new Array();
-			
-			packetsForwarded_ = new VariablePacketsForwarded();
-			bitrate_ = new VariableBitrate();
 		}
-
-
-		/**
-		 * Tries to free all used memory. Use only when an instance of this
-		 * class is not needed anymore.
-		 */
-		public override function cleanUp():void
-		{
-			super.cleanUp();
-			nodes_ = null;
-		}
-
-
-		/**
-		 * @inheritDoc
-		 */
-		public override function get name():String
-		{
-			return "Mac Transmissions";
-		}
-		/**
-		 * @inheritDoc
-		 */
-		public override function get lineType():String
-		{
-			return "mt"; // mac transmissions
-		}
-
-
-		/**
-		 * Function called when a STEP event is raised. Updates the status of
-		 * the transmissions data and modifies the appearance of the nodes 
-		 * according to what they are transmitting
-		 */
-		public override function update(e:TimedEvent):void
-		{
-			if (!visible_)
-				return;
-			
-			// Update all nodes
-			for each(var node:TransmissionNode in nodes_)
-			{
-				// Check if the node is added to the canvas, add it if it's not
-				if (!this.contains(node))
-				{
-					this.addChild(node);
-				}
-				
-				// Update the node. We pass the total amount of milliseconds 
-				// elapsed since the beginning of the simulation
-				node.goTo(e.milliseconds);
-			}
-		}
-
-
-		/**
-		 * @inheritDoc
-		 */
-		protected override function loadNewLine(params:Array):void
-		{
-			// Get transmission data
-			var id:int = params[0];
-			var milliseconds:uint = params[1];
-			var size:Number = params[2];
-			var destination:int = params.length > 3 ? params[3] : -1;
-			
-			// Check if this is a new node
-			if (nodes_[id] == null)
-			{
-				// Get
-				var node:Node = visualizer_.nodeManager.findNodeById(id);
-				
-				// If it is, we create it
-				var newNode:TransmissionNode = new TransmissionNode(id, node);
-				
-				// ...and we add it to the nodes list
-				nodes_[id] = newNode;
-			}
-			
-			// Add the new waypoint to the node and
-			var newKeypoint:Transmission = nodes_[id].addTransmission(milliseconds, destination, size);
-			// Add the new waypoint to the variables that will be displayed 
-			// in the statistics window
-			packetsForwarded_.addKeypoint(newKeypoint);
-			bitrate_.addKeypoint(newKeypoint);
-		}
-
-
 	}
 }

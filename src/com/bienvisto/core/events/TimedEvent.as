@@ -8,36 +8,41 @@ package com.bienvisto.core.events
 	 * stored in milliseconds
 	 *
 	 * @author Miguel Santirso
+	 * @author Cristobal Dabed
 	 */
 	public class TimedEvent extends Event
 	{
-
-		/**
-		 * The time value
-		 */
-		protected var milliseconds_:uint;
 
 
 		/**
 		 * Constructor of the event.
 		 *
-		 * @param milliseconds A time value in milliseconds associated with this event
+		 * @param elapsed A time value in milliseconds associated with this event
 		 */
-		public function TimedEvent (type:String, ms:uint, bubbles:Boolean = false, cancelable:Boolean = false)
+		public function TimedEvent (type:String, bubbles:Boolean = false, cancelable:Boolean = false, elapsed:uint = 0)
 		{
 			super(type, bubbles, cancelable);
 			
-			milliseconds_ = ms;
+			_elapsed = elapsed;
 		}
+		
+		
+		/**
+		 * The time value
+		 */
+		private var _elapsed:uint;
 
+		/**
+		 * @readonly elapsed time in ms
+		 */ 
+		public function get elapsed():uint { 
+			return _elapsed; 
+		}
 
 		public override function clone():Event
 		{
-			return new TimedEvent(type,milliseconds_, bubbles, cancelable);
+			return new TimedEvent(type, bubbles, cancelable, elapsed);
 		}
-
-
-		public function get milliseconds():uint { return milliseconds_; }
 
 
 	}
