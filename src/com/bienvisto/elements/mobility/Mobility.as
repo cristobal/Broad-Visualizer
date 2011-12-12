@@ -3,11 +3,11 @@ package com.bienvisto.elements.mobility
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.Nodes;
+	import com.bienvisto.elements.network.NodeContainer;
 	
 	public final class Mobility extends TraceSource implements ISimulationObject
 	{
-		public function Mobility(nodes:Nodes, model:IMobilityModel)
+		public function Mobility(nodes:NodeContainer, model:IMobilityModel)
 		{
 			super("Course Changed", "cc");
 			this.nodes = nodes;
@@ -30,7 +30,7 @@ package com.bienvisto.elements.mobility
 		/**
 		 * @private
 		 */ 
-		private var nodes:Nodes;
+		private var nodes:NodeContainer;
 		
 		/**
 		 * @override

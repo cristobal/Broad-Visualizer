@@ -4,10 +4,12 @@ package com.bienvisto
 	import com.bienvisto.core.parser.TraceSourceParser;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.model.WaypointMobilityModel;
-	import com.bienvisto.elements.network.Nodes;
+	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
+	import com.bienvisto.view.VisualizerView;
+	import com.bienvisto.view.drawing.NodesDrawingManager;
 	
 	import flash.errors.IOError;
 	import flash.events.Event;
@@ -24,21 +26,29 @@ package com.bienvisto
 	 */ 
 	public final class Bienvisto
 	{
+		/**
+		 * Constructor
+		 * 
+		 * @param app
+		 * @param window
+		 */ 
 		public function Bienvisto(app:Application, window:ApplicationWindow)
-		{
-			setup();
+		{		
+			setup(window);
 			bindWindow(window);
 			
-			this.app = app;
-			this.window = window;
+			this.app 	= app;
+			this.window = window; 
 		}
 		
 		private var app:Application;
 		private var window:ApplicationWindow;
 		
+		private var view:VisualizerView;
+		
 		private var simulation:Simulation;
 		private var mobilityModel:WaypointMobilityModel;
-		private var nodes:Nodes;
+		private var nodeContainer:NodeContainer;
 		private var mobility:Mobility;
 		private var transmissions:Transmissions;
 		
@@ -46,19 +56,21 @@ package com.bienvisto
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
 
-		
-		private function setup():void
+		/**
+		 * Setup
+		 */ 
+		private function setup(window:ApplicationWindow):void
 		{
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
 			
 			mobilityModel = new WaypointMobilityModel();
-			nodes   = new Nodes(mobilityModel);
-			mobility = new Mobility(nodes, mobilityModel);
-			transmissions = new Transmissions(nodes);
+			nodeContainer   = new NodeContainer(mobilityModel);
+			mobility = new Mobility(nodeContainer, mobilityModel);
+			transmissions = new Transmissions(nodeContainer);
 			
-			simulation.addSimulationObject(nodes);
+			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
 			simulation.addSimulationObject(transmissions);
 			
@@ -66,12 +78,27 @@ package com.bienvisto
 			parser = new TraceSourceParser(reader);
 			
 			parser.addTraceSource(simulation);
-			parser.addTraceSource(nodes);
+			parser.addTraceSource(nodeContainer);
 			parser.addTraceSource(mobility);
 			parser.addTraceSource(transmissions);
 			
+			// Setup the view
+			// 1. Append nodes
+			view = window.visualizerView;
+			view.setNodeContainer(nodeContainer);
 			
+			// 2.  
 			
+			// 2. Append drawing managers
+/*			view.addDrawingManager(
+				new NodesDrawingManager()
+			);*/
+			// view.addDrawingManager(
+			//	new TopologyDrawingManager()
+			// );
+			
+			// 3. Append components
+			// view.addComponent()…;
 		}
 		
 		/**

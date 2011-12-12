@@ -6,6 +6,7 @@ package com.bienvisto.elements.network
 	import com.bienvisto.elements.mobility.Waypoint;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.transmissions.Transmission;
+	import com.bienvisto.util.sprintf;
 
 	// TODO: Add some memoization for total like for a set of interval of time to store.
 	
@@ -307,6 +308,14 @@ package com.bienvisto.elements.network
 			}
 			
 			return total;
+		}
+		
+		/**
+		 * To String
+		 */ 
+		public function toString():String
+		{
+			return sprintf('{id: "%d", ipv4Address: "%s", macAddress: "%s", role: "%s"}', id, ipv4Address, macAddress, role);
 		}
 	}
 }

@@ -3,7 +3,7 @@ package com.bienvisto.elements.transmissions
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.Nodes;
+	import com.bienvisto.elements.network.NodeContainer;
 	
 	/**
 	 * TransmissionsParser.as
@@ -14,7 +14,7 @@ package com.bienvisto.elements.transmissions
 	 */ 
 	public final class Transmissions extends TraceSource implements ISimulationObject
 	{
-		public function Transmissions(nodes:Nodes)
+		public function Transmissions(nodes:NodeContainer)
 		{
 			super("Mac Transmissions", "mt"); // mac transmissions
 			
@@ -24,7 +24,7 @@ package com.bienvisto.elements.transmissions
 		/**
 		 * @private
 		 */ 
-		private var nodes:Nodes;
+		private var nodes:NodeContainer;
 		
 		/**
 		 * @override

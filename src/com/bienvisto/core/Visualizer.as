@@ -26,7 +26,7 @@ package com.bienvisto.core
 	import flash.utils.getTimer;
 	
 	import mx.core.UIComponent;
-	import com.bienvisto.elements.network.Nodes;
+	import com.bienvisto.elements.network.NodeContainer;
 	
 	
 	public class Visualizer extends UIComponent
@@ -167,12 +167,12 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var _nodeManager:Nodes;
+		private var _nodeManager:NodeContainer;
 		
 		/**
 		 * @readonly nodeManager
 		 */ 
-		public function get nodeManager():Nodes
+		public function get nodeManager():NodeContainer
 		{
 			return _nodeManager;
 		}
@@ -507,7 +507,7 @@ package com.bienvisto.core
 			topology = new Topology(this, canvasTopLayer_);
 			
 			_roles = new Properties(this, canvasBottomLayer_);
-			_nodeManager = new Nodes(null);
+			_nodeManager = new NodeContainer(null);
 			_sequencesManager = new SequencesManager();
 			
 			elements_ = new Vector.<ElementBase>();

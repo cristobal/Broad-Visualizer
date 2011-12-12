@@ -3,19 +3,20 @@ package com.bienvisto.elements.network
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.mobility.IMobilityModel;
+	import com.bienvisto.util.log;
 
 	/**
-	 * NodeManager.as
+	 * NodeContainer.as
 	 * 	Manages all the nodes (basic pooling). 
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class Nodes extends TraceSource implements ISimulationObject
+	public final class NodeContainer extends TraceSource implements ISimulationObject
 	{
 		/**
 		 * Constructor
 		 */ 
-		public function Nodes(mobilityModel:IMobilityModel)
+		public function NodeContainer(mobilityModel:IMobilityModel)
 		{
 			super("Node Properties", "np");
 			this.mobilityModel = mobilityModel;
@@ -71,6 +72,7 @@ package com.bienvisto.elements.network
 		 */ 
 		override public function update(params:Vector.<String>):void
 		{
+;
 			// Format: nr <id> <role> <ipv4Address> <macAddress>
 			var id:int = int(params[0]);
 			var role:String = params[1];
@@ -83,6 +85,8 @@ package com.bienvisto.elements.network
 			node.macAddress = macAddress;
 			
 			node.role = role;
+			
+			log("Updated node", node.toString());
 		}
 		
 		/**
