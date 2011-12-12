@@ -62,8 +62,9 @@ package com.bienvisto.view.components
 			// graphics.moveTo(cx, cy);
 			
 			if (selected) {
-				graphics.drawCircle(cx, cy, radius);
+				
 			}
+			graphics.drawCircle(cx, cy, radius);
 			graphics.endFill();
 			
 			// cacheAsBitmap = true;
@@ -81,7 +82,7 @@ package com.bienvisto.view.components
 		 */ 
 		public function update():void
 		{
-			// this.x = node.
+			// this.x = node.mobilityModel.getWaypoint(
 		}
 		
 		/**

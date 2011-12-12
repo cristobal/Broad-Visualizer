@@ -44,7 +44,7 @@ package com.bienvisto.view
 		/**
 		 * @private
 		 */ 
-		private var timerDelay:uint = 100;
+		private var timerDelay:uint = 250;
 		
 		/**
 		 * @private
@@ -144,21 +144,24 @@ package com.bienvisto.view
 			}
 		}
 
+		
 		/**
 		 * Background process
 		 */ 
 		private function process():void
 		{
+		
 			if (nodeContainer) {
 				
 				// add nodes
 				var nodes:Vector.<Node> = nodeContainer.nodes;
 				var flag:Boolean;
 				var node:Node, canvasNode:CanvasNode;
+				
 				for (var i:int = 0, l:int = nodes.length; i < l; i++) {
 					node = nodes[i];
 					flag = true;
-					for (var j:int = 0, n:int = _canvasNodes.length; j++;) {
+					for (var j:int = 0, n:int = _canvasNodes.length; j < n;j++) {
 						canvasNode = _canvasNodes[j];
 						if (canvasNode.node.id == node.id) {
 							flag = false;
@@ -169,17 +172,19 @@ package com.bienvisto.view
 					if (flag) {
 						canvasNode = new CanvasNode(node);
 						_canvasNodes.push(canvasNode);
-						trace("add child with node", node.id);
 						canvas.addChild(canvasNode);
 					}
 					
 				}
-				
+				if (timer.currentCount == 2) {
+					//timer.stop();
+				}
+			
 				// remove nodes that no longer are in user
-/*				for (i = _canvasNodes.length; i--;) {
+				for (i = _canvasNodes.length; i--;) {
 					canvasNode = _canvasNodes[i]; 
 					flag = true;
-					for (j = 0, n = nodes.length; j++;) {
+					for (j = 0, n = nodes.length; j < n; j++) {
 						node = nodes[j];
 						if (node.id == canvasNode.node.id) {
 							flag = false;
@@ -193,7 +198,7 @@ package com.bienvisto.view
 						canvasNode.destroy();
 						canvasNode = null;
 					}
-				}*/
+				}
 			}
 		}
 		

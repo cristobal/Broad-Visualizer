@@ -8,6 +8,7 @@ package com.bienvisto.elements.network
 	import com.bienvisto.elements.transmissions.Transmission;
 	import com.bienvisto.util.sprintf;
 
+	// TODO: Set current point in time waypoint position…
 	// TODO: Add some memoization for total like for a set of interval of time to store.
 	
 	/**
