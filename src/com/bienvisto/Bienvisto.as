@@ -15,7 +15,9 @@ package com.bienvisto
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
 	import flash.net.FileReference;
+	import flash.utils.Timer;
 	
 	import spark.components.Application;
 
@@ -64,10 +66,12 @@ package com.bienvisto
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
+			simulation.addEventListener(TimerEvent.TIMER, handleSimulationTimer);
+			simulation.addEventListener(TimerEvent.TIMER_COMPLETE, handleSimulationTimerComplete);
 			
 			mobilityModel = new WaypointMobilityModel();
-			nodeContainer   = new NodeContainer(mobilityModel);
-			mobility = new Mobility(nodeContainer, mobilityModel);
+			nodeContainer = new NodeContainer(mobilityModel);
+			mobility 	  = new Mobility(nodeContainer, mobilityModel);
 			transmissions = new Transmissions(nodeContainer);
 			
 			simulation.addSimulationObject(nodeContainer);
@@ -87,12 +91,13 @@ package com.bienvisto
 			view = window.visualizerView;
 			view.setNodeContainer(nodeContainer);
 			
-			// 2.  
+			// 2.
 			
 			// 2. Append drawing managers
 /*			view.addDrawingManager(
 				new NodesDrawingManager()
 			);*/
+			
 			// view.addDrawingManager(
 			//	new TopologyDrawingManager()
 			// );
@@ -109,7 +114,35 @@ package com.bienvisto
 		private function bindWindow(window:ApplicationWindow):void
 		{
 			window.menu.browseFile.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
+			window.playback.playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
 		}
+		
+		
+		/**
+		 * Handle browse file click
+		 * 
+		 * @param event
+		 */ 
+		private function handleBrowseFileClick(event:MouseEvent):void
+		{
+			reader.browse();
+		}
+		
+		/**
+		 * Handle play button click
+		 * 
+		 * @param event
+		 */ 
+		private function handlePlayButtonClick(event:MouseEvent):void
+		{	
+			if (!simulation.running) {
+				simulation.start();
+			}
+			else {
+				simulation.pause();
+			}
+		}
+		
 		
 		/**
 		 * Handle simulation ready
@@ -133,15 +166,26 @@ package com.bienvisto
 			// Global Reset
 		}
 		
-		
 		/**
-		 * Handle browse file click
+		 * Handle simulation timer
 		 * 
 		 * @param event
 		 */ 
-		private function handleBrowseFileClick(event:MouseEvent):void
+		private function handleSimulationTimer(event:TimerEvent):void
 		{
-			reader.browse();
+			var time:uint = simulation.time; 
+			window.playback.setTime(time);
+		}
+		
+		/**
+		 * Handle simulation timer complete
+		 * 
+		 * @param event
+		 */ 
+		private function handleSimulationTimerComplete(event:TimerEvent):void
+		{
+			var timer:Timer = Timer(event.target);
+			trace("timer complete", timer.delay, timer.repeatCount);
 		}
 	}
 }

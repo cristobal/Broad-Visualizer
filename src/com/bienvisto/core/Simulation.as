@@ -6,6 +6,17 @@ package com.bienvisto.core
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
+	
+	/**
+	 * @public
+	 */ 
+	[Event(name="timer", type="flash.events.TimerEvent")]
+
+	/**
+	 * @public
+	 */ 
+	[Event(name="timerComplete", type="flash.events.TimerEvent")]
+	
 	/**
 	 * Simulation.as
 	 * 
@@ -22,26 +33,27 @@ package com.bienvisto.core
 		//
 		//-------------------------------------------------------------------------
 		/**
-		 * @public
+		 * @Event
 		 */ 
-		[Event(name="ready", type="Event")]
+		[Event(name="ready", type="flash.events.Event")]
 		public static const READY:String = "ready";
 		
 		/**
-		 * @public
+		 * @Event
 		 */ 
-		[Event(name="reset", type="Event")]
+		[Event(name="reset", type="flash.events.Event")]
 		public static const RESET:String = "reset";
-
+		
 		//--------------------------------------------------------------------------
 		//
 		// Class variables
 		//
 		//-------------------------------------------------------------------------
+		
 		/**
-		 * @private 
+		 * @private
 		 */ 
-		private static var defaultUpdateRate:uint = 30;
+		private static var timerDelay:Number = 100;
 		
 		//--------------------------------------------------------------------------
 		//
@@ -100,46 +112,39 @@ package com.bienvisto.core
 		}
 		
 		/**
+		 * @readonly running
+		 */ 
+		public function get running():Boolean
+		{
+			return timer.running;
+		}
+		
+		/**
+		 * @reaonly time
+		 */ 
+		public function get time():uint
+		{
+			return uint(timer.currentCount * timer.delay);
+		}
+		
+		/**
 		 * Set duration
 		 * 
 		 * @param value 
 		 */ 
 		private function setDuration(value:uint):void
 		{
+
 			_duration = value;
 			invalidate();
 		}
 		
 		/**
-		 * @private
+		 * @readonly repeatCount
 		 */ 
-		private var _updateRate:uint = defaultUpdateRate;
-		
-		/**
-		 * @readonly duration
-		 */ 
-		public function get updateRate():uint
+		private function get repeatCount():int
 		{
-			return _updateRate;
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param value 
-		 */ 
-		private function setUpdateRate(value:uint):void
-		{
-			_updateRate = value;
-		}
-		
-		/**
-		 * @private timerDelay
-		 */
-		private function get timerDelay():Number 
-		{
-			return _duration / 1000;
+			return duration / 10;
 		}
 		
 		//--------------------------------------------------------------------------
@@ -147,20 +152,29 @@ package com.bienvisto.core
 		// Methods
 		//
 		//-------------------------------------------------------------------------
+		/**
+		 * Setup
+		 */ 
 		private function setup():void
 		{
 			simulationObjects = new Vector.<ISimulationObject>();
-			
-			timer = new Timer(timerDelay);
+
+			timer = new Timer(timerDelay, repeatCount);
 			timer.addEventListener(TimerEvent.TIMER, handleTimer);
 		}
 		
+		/**
+		 * Invalidate
+		 */ 
 		private function invalidate():void
 		{
 			// if this is a new simulation then do a global reset
 			if (!firstRun) {
 				dispatchEvent(new Event(RESET));
 			}
+			
+			
+			timer.repeatCount = repeatCount;			
 			
 			
 			dispatchEvent(new Event(READY));
@@ -203,8 +217,7 @@ package com.bienvisto.core
 			if (timer.running) {
 				return;
 			}
-
-			timer.delay = timerDelay; // update timerDelay in case it has changed
+			
 			timer.start();
 		}
 		
@@ -224,6 +237,19 @@ package com.bienvisto.core
 		public function jumpTo(time:uint):void
 		{
 			
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void
+		{
+			if ((type == TimerEvent.TIMER) || (type == TimerEvent.TIMER_COMPLETE)) {
+				timer.addEventListener(type, listener, useCapture, priority, useWeakReference);	
+			}
+			else {
+				super.addEventListener(type, listener, useCapture, priority, useWeakReference);
+			}
 		}
 		
 		/**
@@ -248,8 +274,20 @@ package com.bienvisto.core
 			var elapsed:uint = timer.delay * timer.currentCount;
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
+				simulationObject = simulationObjects[i];
 				simulationObject.onTimeUpdate(elapsed);
 			}
+		}
+		
+		/**
+		 * Handle timer complete
+		 * 
+		 * @param event
+		 */ 
+		private function handleTimerComplete(event:TimerEvent):void
+		{
+			// forward the complete event
+			// dispatchEvent(event);
 		}
 	}
 }

@@ -23,7 +23,7 @@ package com.bienvisto.view
 	public final class VisualizerView extends Group
 	{	
 		/**
-		 * 
+		 * VisualizerView
 		 */ 
 		public function VisualizerView()
 		{
@@ -176,9 +176,6 @@ package com.bienvisto.view
 					}
 					
 				}
-				if (timer.currentCount == 2) {
-					//timer.stop();
-				}
 			
 				// remove nodes that no longer are in user
 				for (i = _canvasNodes.length; i--;) {
@@ -220,6 +217,33 @@ package com.bienvisto.view
 				canvasNode.update();
 			}
 		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Timer
+		//
+		//--------------------------------------------------------------------------
+		
+		public function start():void
+		{
+			
+		}
+		
+		public function pause():void
+		{
+			
+		}
+		
+		public function stop():void
+		{
+			
+		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Events
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Handle timer

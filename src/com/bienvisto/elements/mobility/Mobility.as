@@ -37,7 +37,6 @@ package com.bienvisto.elements.mobility
 		 */ 
 		override public function update(params:Vector.<String>):void
 		{
-			
 			// FORMAT: cc <node id> <time> <pos_x> <pos_y> <vel_x> <vel_y>
 			var id:int = int(params[0]);
 			var point:Waypoint = model.getWaypoint(params);
