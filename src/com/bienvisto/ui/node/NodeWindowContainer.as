@@ -349,7 +349,7 @@ package com.bienvisto.ui.node
 					vx = String(selectedNode.direction.x);
 					vy = String(selectedNode.direction.y);
 					
-					var table:RoutingTable = selectedNode.node.routingTable;
+					var table:RoutingTable; // = selectedNode.node.routingTable;
 					if (table) {
 						var value:String = "";
 						for each(var entry:RoutingTableEntry in table.entries) {
@@ -360,10 +360,10 @@ package com.bienvisto.ui.node
 					}
 				}
 				else if (metrics.visible) {
-					bufferSize = String(selectedNode.node.bufferSize);
-					txTotal = String(selectedNode.node.transmissionsTotal);
-					rxTotal = String(selectedNode.node.receptionsTotal);
-					dxTotal = String(selectedNode.node.dropsTotal);
+					//  bufferSize = String(selectedNode.node.bufferSize);
+					// txTotal = String(selectedNode.node.transmissionsTotal);
+					// rxTotal = String(selectedNode.node.receptionsTotal);
+					// dxTotal = String(selectedNode.node.dropsTotal);
 					// sxTotal = String(selectedNode.node.sequencesSentTotal);
 					// sdTotal = String(selectedNode.node.sequencesDropTotal);
 				}

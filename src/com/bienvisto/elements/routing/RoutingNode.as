@@ -100,7 +100,7 @@ package com.bienvisto.elements.routing
 		 */
 		public function updateGraphics(table:RoutingTable):void
 		{
-			node.routingTable = table;
+			// node.routingTable = table;
 			
 			graphics.clear(); // Clean all lines from previous drawings
 			

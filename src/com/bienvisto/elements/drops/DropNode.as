@@ -36,7 +36,7 @@ package com.bienvisto.elements.drops
 		{
 			var np:PacketDrop = new PacketDrop(ms, id_);
 			keypoints_.push(np);
-			node.addDrop(ms);
+			// node.addDrop(ms);
 			
 			return np;
 		}

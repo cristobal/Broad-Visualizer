@@ -2,13 +2,15 @@ package com.bienvisto.view
 {
 	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.network.NodeContainer;
-	import com.bienvisto.view.components.CanvasNode;
+	import com.bienvisto.view.components.NodeSprite;
+	import com.bienvisto.view.components.ViewComponent;
 	import com.bienvisto.view.drawing.IDrawingManager;
 	
 	import flash.display.Graphics;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	import flash.utils.getTimer;
 	
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
@@ -33,190 +35,81 @@ package com.bienvisto.view
 		
 		/**
 		 * @private
-		 */  
-		private var canvas:UIComponent;
+		 */ 
+		private var _viewComponents:Vector.<ViewComponent> = new Vector.<ViewComponent>();
 		
 		/**
-		 * @private
+		 * @readonly viewComponents
 		 */ 
-		private var timer:Timer;
-		
-		/**
-		 * @private
-		 */ 
-		private var timerDelay:uint = 250;
-		
-		/**
-		 * @private
-		 */ 
-		private var nodeContainer:NodeContainer;
-		
-		/**
-		 * @private
-		 */ 
-		private var _canvasNodes:Vector.<CanvasNode> = new Vector.<CanvasNode>();
-		
-		/**
-		 * @readonly canvasNodes
-		 */ 
-		public function get canvasNodes():Vector.<CanvasNode>
+		public function get viewComponents():Vector.<ViewComponent>
 		{
-			return _canvasNodes.concat(); // return shallow copy	
+			return  _viewComponents;
 		}
 		
 		/**
 		 * @private
 		 */ 
-		private var _managers:Vector.<IDrawingManager> = new Vector.<IDrawingManager>();
+		private var _time:uint = 0;
 		
-		/**
-		 * @readonly managers
-		 */ 
-		public function get managers():Vector.<IDrawingManager>
+		public function get time():uint
 		{
-			return _managers.concat(); // return shallow copy
+			return _time;
+		}
+		
+		public function setTime(time:uint):void
+		{
+			_time = time;
 		}
 		
 		/**
 		 * Setup
 		 */ 
 		private function setup():void
-		{
-			canvas = new UIComponent();
-			addElement(IVisualElement(canvas));
-			
-			timer = new Timer(timerDelay);
-			timer.addEventListener(TimerEvent.TIMER, handleTimer);
-			// timer.start();
-			
+		{	
 			addEventListener(Event.ENTER_FRAME, handleEnterFrame);
 		}
 		
 		/**
-		 * Set node container
-		 * 
-		 * @param nodes
-		 */ 
-		public function setNodeContainer(nodeContainer:NodeContainer):void
-		{
-			this.nodeContainer = nodeContainer;
-			invalidate();
-		}
-		
-		/**
-		 * Inavlidate
-		 */ 
-		private function invalidate():void
-		{
-			if (timer.running) {
-				timer.stop();
-			}
-			
-			// NOTE: Add additional code logic here
-			
-			timer.start();
-		}
-		
-		/**
-		 * Add drawing manager
+		 * Add a view component
 		 * 
 		 * @param item
 		 */ 
-		public function addDrawingManager(item:IDrawingManager):void
+		public function addViewComponent(item:ViewComponent):void
 		{
-			_managers.push(item);
+			_viewComponents.push(item);
+			addElement(item);
 		}
 		
+		
 		/**
-		 * Remove drawing manager
+		 * Remove view component
 		 * 
 		 * @param item
 		 */ 
-		public function removeDrawingManager(item:IDrawingManager):void
+		private function removeViewComponent(item:ViewComponent):void
 		{
-			var manager:IDrawingManager;
-			for (var i:int = _managers.length; i--;) {
-				manager = _managers[i];
-				if (manager === item) {
-					_managers.splice(i, 1);
-					break;
-				}
-			}
-		}
-
-		
-		/**
-		 * Background process
-		 */ 
-		private function process():void
-		{
-		
-			if (nodeContainer) {
-				
-				// add nodes
-				var nodes:Vector.<Node> = nodeContainer.nodes;
-				var flag:Boolean;
-				var node:Node, canvasNode:CanvasNode;
-				
-				for (var i:int = 0, l:int = nodes.length; i < l; i++) {
-					node = nodes[i];
-					flag = true;
-					for (var j:int = 0, n:int = _canvasNodes.length; j < n;j++) {
-						canvasNode = _canvasNodes[j];
-						if (canvasNode.node.id == node.id) {
-							flag = false;
-							break;
-						}
-					}
-					
-					if (flag) {
-						canvasNode = new CanvasNode(node);
-						_canvasNodes.push(canvasNode);
-						canvas.addChild(canvasNode);
-					}
-					
-				}
-			
-				// remove nodes that no longer are in user
-				for (i = _canvasNodes.length; i--;) {
-					canvasNode = _canvasNodes[i]; 
-					flag = true;
-					for (j = 0, n = nodes.length; j < n; j++) {
-						node = nodes[j];
-						if (node.id == canvasNode.node.id) {
-							flag = false;
-							break;
-						}
-					}
-					
-					if (flag) {
-						_canvasNodes.splice(i, 1);
-						canvas.removeChild(canvasNode);
-						canvasNode.destroy();
-						canvasNode = null;
-					}
+			var view:ViewComponent;
+			for (var i:int = _viewComponents.length; i--;) {
+				item = _viewComponents[i];
+				if (view === item) {
+					_viewComponents.splice(i, 1);
+					removeChild(view);
 				}
 			}
 		}
 		
 		/**
 		 * Update
-		 * 
 		 */ 
 		private function update():void
-		{
-			var graphics:Graphics = canvas.graphics;
-			// canvas.cacheAsBitmap = false;
-/*			graphics.clear();
-			for each (var manager:IDrawingManager in managers) {
-				manager.update(graphics, nodes);
-			}*/
-			// canvas.cacheAsBitmap = true;
-			
-			for each (var canvasNode:CanvasNode in _canvasNodes) {
-				canvasNode.update();
+		{	
+			var viewComponent:ViewComponent;
+			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
+				viewComponent = _viewComponents[i];
+				viewComponent.update(time);
 			}
 		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -245,13 +138,6 @@ package com.bienvisto.view
 		//
 		//--------------------------------------------------------------------------
 		
-		/**
-		 * Handle timer
-		 */ 
-		private function handleTimer(event:TimerEvent):void
-		{
-			process();
-		}
 		
 		/**
 		 * Handle enter frame
@@ -260,6 +146,7 @@ package com.bienvisto.view
 		 */ 
 		private function handleEnterFrame(event:Event):void
 		{
+			var time:int = getTimer();
 			update();
 		}
 	}

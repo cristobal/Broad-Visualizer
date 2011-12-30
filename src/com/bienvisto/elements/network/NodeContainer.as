@@ -2,7 +2,6 @@ package com.bienvisto.elements.network
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.mobility.IMobilityModel;
 	import com.bienvisto.util.log;
 
 	/**
@@ -16,16 +15,10 @@ package com.bienvisto.elements.network
 		/**
 		 * Constructor
 		 */ 
-		public function NodeContainer(mobilityModel:IMobilityModel)
+		public function NodeContainer()
 		{
 			super("Node Properties", "np");
-			this.mobilityModel = mobilityModel;
 		}
-		
-		/**
-		 * @private
-		 */ 
-		private var mobilityModel:IMobilityModel;
 		
 		/**
 		 * @private
@@ -38,6 +31,14 @@ package com.bienvisto.elements.network
 		public function get nodes():Vector.<Node>
 		{
 			return _nodes.concat(); // Returns a shallow copy.
+		}
+		
+		/**
+		 * @readonly size
+		 */ 
+		public function get size():int 
+		{
+			return int(_nodes.length);	
 		}
 		
 		/**
@@ -60,7 +61,6 @@ package com.bienvisto.elements.network
 			
 			if (!flag) {
 				node = new Node(id);
-				node.mobilityModel = mobilityModel;
 				_nodes.push(node);	
 			}
 			

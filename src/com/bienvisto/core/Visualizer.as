@@ -5,9 +5,8 @@ package com.bienvisto.core
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
 	import com.bienvisto.elements.SequencesManager;
-	import com.bienvisto.elements.buffer.Buffer;
-	import com.bienvisto.elements.drops.Drops;
-	import com.bienvisto.elements.receptions.Receptions;
+	import com.bienvisto.elements.drops.DropsElementBase;
+	import com.bienvisto.elements.receptions.ReceptionsElementBase;
 	import com.bienvisto.elements.node.Properties;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.sequences.SequencesRecv;
@@ -507,16 +506,16 @@ package com.bienvisto.core
 			topology = new Topology(this, canvasTopLayer_);
 			
 			_roles = new Properties(this, canvasBottomLayer_);
-			_nodeManager = new NodeContainer(null);
+			_nodeManager = new NodeContainer();
 			_sequencesManager = new SequencesManager();
 			
 			elements_ = new Vector.<ElementBase>();
 			elements_.push(_roles);
 			elements_.push(new Routing(this, canvasBottomLayer_));
 			elements_.push(new TransmissionsElementBase(this, canvasTopLayer_));
-			elements_.push(new Receptions(this, canvasBottomLayer_));
-			elements_.push(new Drops(this, null));
-			elements_.push(new Buffer(this, canvasTopLayer_));
+			elements_.push(new ReceptionsElementBase(this, canvasBottomLayer_));
+			elements_.push(new DropsElementBase(this, null));
+			// elements_.push(new BufferElementBase(this, canvasTopLayer_));
 			elements_.push(new SequencesSent(this));
 			elements_.push(new SequencesRecv(this));
 			

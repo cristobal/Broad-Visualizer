@@ -1,137 +1,117 @@
 package com.bienvisto.elements.receptions
 {
-	import com.bienvisto.util.Tools;
-	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.events.TimedEvent;
-	import com.bienvisto.core.events.TraceLoadEvent;
-	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
+	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.Packet;
+	import com.bienvisto.elements.network.PacketStats;
 	
-	import flash.display.Sprite;
-
-
+	import flash.utils.Dictionary;
+	import flash.utils.getTimer;
+	
 	/**
-	 * Class responsible of parsing the "receptions" block of the trace to
-	 * visualize and of actually displaying the receptions in the simulation
-	 */
-	public class Receptions extends ElementBase
+	 * Receptions.as
+	 * 	A trace source subclass which parses all the trace sources 
+	 *  for the mac receptions event type in the simulations.
+	 * 
+	 * @author Miguel Santirso
+	 * @author Cristobal Dabed
+	 */  
+	public final class Receptions extends TraceSource implements ISimulationObject
 	{
-
-		/**
-		 * Array of Node. Each node stores the info about its movement
-		 */
-		protected var nodes_:Array;
+		public function Receptions(nodeContainer:NodeContainer)
+		{
+			super("Mac Receptions", "mr"); // mac receptions
+			
+			this.nodeContainer = nodeContainer;
+		}
 		
-		protected var packetsReceived_:VariablePacketsReceived;
-
 		/**
-		 * Constructor of the class
+		 * @private
+		 */ 
+		private var nodeContainer:NodeContainer;
+		
+		/**
+		 * @private
 		 * 
-		 * @param visualizer Reference to the visualizer
-		 */
-		public function Receptions(visualizer:Visualizer, canvas:Sprite)
+		 */ 
+		private var collections:Dictionary = new Dictionary();
+		
+		/**
+		 * @override
+		 */ 
+		override public function update(params:Vector.<String>):void
 		{
-			super(visualizer, canvas);
+			// mr <node id> <time> <packet_size> <last_hop_id> <next_hop_id>
+			var id:int 		= int(params[0]);
+			var time:uint 	= uint(params[1]);
+			var size:Number = uint(params[2]);
+			var from:int 	= int(params[3]);
+			var to:int 		= int(params[4]);
 			
-			nodes_ = new Array();
-			
-			packetsReceived_ = new VariablePacketsReceived();
-		}
-
-
-		/**
-		 * Tries to free all used memory. Use only when an instance of this
-		 * class is not needed anymore.
-		 */
-		public override function cleanUp():void
-		{
-			super.cleanUp();
-			nodes_ = null;
-		}
-
-
-
-		/**
-		 * @inheritDoc
-		 */
-		public override function get name():String
-		{
-			return "Mac Receptions";
-		}
-		/**
-		 * @inheritDoc
-		 */
-		public override function get lineType():String
-		{
-			return "mr"; // mac receptions
-		}
-
-
-
-		/**
-		 * Function called when a STEP event is raised. Updates the status of
-		 * the transmissions data and modifies the appearance of the nodes 
-		 * according to what they are transmitting
-		 */
-		public override function update(e:TimedEvent):void
-		{
-			if (!visible_)
-				return;
-			
-			// Update all nodes
-			for each(var node:ReceptionNode in nodes_)
-			{
-				// Check if the node is added to the canvas, add it if it's not
-				if (!this.contains(node))
-				{
-					this.addChild(node);
-				}
-				
-				// Update the node. We pass the total amount of milliseconds 
-				// elapsed since the beginning of the simulation
-				node.goTo(e.elapsed);
+			var node:Node = nodeContainer.getNode(id);
+			var packet:Packet = new Packet(time, from, to, size);
+			var collection:ReceptionCollection;
+			if (!(id in collections)) {
+				collection = new ReceptionCollection(node);
+				collections[id] = collection;
 			}
-		}
-
-
-		/**
-		 * @inheritDoc
-		 */
-		protected override function loadNewLine(params:Array):void
-		{
-			// Get receptions data
-			var id:int = params[0];
-			var milliseconds:uint = params[1];
-			var size:Number = params[2];
-			var source:int = params.length > 3 ? params[3] : -1;
-			var destination:int = params.length > 4 ? params[4] : -1;
-			
-			// Check if this is a new node
-			if (nodes_[id] == null)
-			{
-				// Get the reference to the real node
-				var node:Node = visualizer_.nodeManager.getNode(id);
-				
-				// If it is, we create it
-				var newNode:ReceptionNode = new ReceptionNode(id, node);
-				
-				// ...and we add it to the nodes list
-				nodes_[id] = newNode;
+			else {
+				collection = ReceptionCollection(collections[id]);
 			}
 			
-			// Create the new keypoint
-			var newKeypoint:Reception = new Reception(milliseconds, id,
-				source, destination, size);
-			
-			// Add the new keypoint to the node
-			nodes_[id].addReception(newKeypoint);
-			
-			// Add the new waypoint to the variables that will be displayed 
-			// in the statistics window
-			packetsReceived_.addKeypoint(newKeypoint);
+			collection.add(packet);
 		}
-
-
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Sample packet statts
+		 * 
+		 * @param node
+		 * @param time
+		 * @param windowSize The window size of packets to highlit in ms
+		 */ 
+		public function samplePacketStats(node:Node, time:uint, windowSize:uint):PacketStats
+		{
+			var packetStats:PacketStats;
+			var id:int = node.id;
+			
+			if (id in collections) {
+				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
+				packetStats = collection.samplePacketStats(time, windowSize);
+			}
+			
+			return packetStats;
+		}
+		
+		/**
+		 * Get packets
+		 * 
+		 * @param node
+		 */ 
+		public function getPackets(node:Node):Vector.<Packet>
+		{
+			var packets:Vector.<Packet>;
+			var id:int = node.id;
+			
+			if (id in collections) {
+				var collection:AggregateCollection = AggregateCollection(collections[id]);
+				packets = Vector.<Packet>(collection.items);
+			}
+			
+			return packets;
+		}
+		
 	}
 }

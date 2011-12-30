@@ -3,7 +3,7 @@ package com.bienvisto.view.overlays
 	import com.bienvisto.elements.network.NodeContainer;
 	
 	import mx.core.FlexSprite;
-	import com.bienvisto.view.components.CanvasNode;
+	import com.bienvisto.view.components.NodeSprite;
 	
 	public class OverlayView extends FlexSprite
 	{
@@ -12,7 +12,7 @@ package com.bienvisto.view.overlays
 			super();
 		}
 		
-		public function update(nodes:Vector.<CanvasNode>):void
+		public function update(nodes:Vector.<NodeSprite>):void
 		{
 			throw new Error("Subclass must override this function!");
 		}

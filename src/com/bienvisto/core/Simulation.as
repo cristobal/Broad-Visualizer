@@ -5,6 +5,7 @@ package com.bienvisto.core
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	import flash.utils.getTimer;
 	
 	
 	/**
@@ -101,7 +102,7 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var _duration:uint;
+		private var _duration:uint = 0;
 		
 		/**
 		 * @readonly duration
@@ -120,11 +121,21 @@ package com.bienvisto.core
 		}
 		
 		/**
+		 * @private
+		 */ 
+		private var _time:int = 0;
+		
+		/**
 		 * @reaonly time
 		 */ 
 		public function get time():uint
 		{
-			return uint(timer.currentCount * timer.delay);
+			return _time;
+		}
+		
+		private function setTime(value:uint):void
+		{
+			_time = value;
 		}
 		
 		/**
@@ -144,7 +155,7 @@ package com.bienvisto.core
 		 */ 
 		private function get repeatCount():int
 		{
-			return duration / 10;
+			return duration / timerDelay;
 		}
 		
 		//--------------------------------------------------------------------------
@@ -208,7 +219,7 @@ package com.bienvisto.core
 			}
 		}
 			
-		
+		private var startTime:int;
 		/**
 		 * Start
 		 */ 
@@ -219,6 +230,7 @@ package com.bienvisto.core
 			}
 			
 			timer.start();
+			startTime = getTimer();
 		}
 		
 		/**
@@ -262,6 +274,7 @@ package com.bienvisto.core
 			// FORMAT: s <duration> 
 			var duration:uint = uint(params[0]);
 			setDuration(duration);	
+			
 		}
 		
 		/**
@@ -271,7 +284,20 @@ package com.bienvisto.core
 		 */ 
 		private function handleTimer(event:TimerEvent):void
 		{
-			var elapsed:uint = timer.delay * timer.currentCount;
+			// var elapsed:uint = timer.delay * timer.currentCount;
+			//  adjust time for the real elapsed system time with getTimer()
+			var elapsed:int = getTimer() - startTime;
+			var time:uint = 0;
+			if (elapsed >= duration) {
+				timer.stop();
+				time = duration;
+			}
+			else {
+				// adjust time
+				time = elapsed - (elapsed % 100);
+			}
+			setTime(time);
+			
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
 				simulationObject = simulationObjects[i];
@@ -286,6 +312,7 @@ package com.bienvisto.core
 		 */ 
 		private function handleTimerComplete(event:TimerEvent):void
 		{
+			trace("total time elapsed:", getTimer() - startTime);
 			// forward the complete event
 			// dispatchEvent(event);
 		}

@@ -1,15 +1,25 @@
 package com.bienvisto
 {
 	import com.bienvisto.core.Simulation;
+	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.parser.TraceSourceParser;
+	import com.bienvisto.elements.buffer.Buffers;
+	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
-	import com.bienvisto.elements.mobility.model.WaypointMobilityModel;
+	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
 	import com.bienvisto.view.VisualizerView;
-	import com.bienvisto.view.drawing.NodesDrawingManager;
+	import com.bienvisto.view.components.GridView;
+	import com.bienvisto.view.components.NodeView;
+	import com.bienvisto.view.drawing.NodeBufferDrawingManager;
+	import com.bienvisto.view.drawing.NodeDropsDrawingManager;
+	import com.bienvisto.view.drawing.NodeMobilityDrawingManager;
+	import com.bienvisto.view.drawing.NodeReceptionsDrawingManager;
+	import com.bienvisto.view.drawing.NodeTransmissionsDrawingManager;
 	
 	import flash.errors.IOError;
 	import flash.events.Event;
@@ -40,7 +50,9 @@ package com.bienvisto
 			bindWindow(window);
 			
 			this.app 	= app;
+			this.app.frameRate = 24;
 			this.window = window; 
+			// trace("frameRate", app.frameRate);
 		}
 		
 		private var app:Application;
@@ -49,11 +61,12 @@ package com.bienvisto
 		private var view:VisualizerView;
 		
 		private var simulation:Simulation;
-		private var mobilityModel:WaypointMobilityModel;
 		private var nodeContainer:NodeContainer;
 		private var mobility:Mobility;
 		private var transmissions:Transmissions;
-		
+		private var receptions:Receptions;
+		private var drops:Drops;
+		private var buffers:Buffers;
 		
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
@@ -63,20 +76,26 @@ package com.bienvisto
 		 */ 
 		private function setup(window:ApplicationWindow):void
 		{
+			
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
 			simulation.addEventListener(TimerEvent.TIMER, handleSimulationTimer);
 			simulation.addEventListener(TimerEvent.TIMER_COMPLETE, handleSimulationTimerComplete);
 			
-			mobilityModel = new WaypointMobilityModel();
-			nodeContainer = new NodeContainer(mobilityModel);
-			mobility 	  = new Mobility(nodeContainer, mobilityModel);
+			nodeContainer = new NodeContainer();
+			mobility 	  = new Mobility(nodeContainer);
 			transmissions = new Transmissions(nodeContainer);
-			
+			receptions	  = new Receptions(nodeContainer);
+			drops		  = new Drops(nodeContainer);
+			buffers		  = new Buffers(nodeContainer);
+				
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
 			simulation.addSimulationObject(transmissions);
+			simulation.addSimulationObject(receptions);
+			simulation.addSimulationObject(drops);
+			simulation.addSimulationObject(buffers);
 			
 			reader = new FileReferenceReader();
 			parser = new TraceSourceParser(reader);
@@ -85,25 +104,42 @@ package com.bienvisto
 			parser.addTraceSource(nodeContainer);
 			parser.addTraceSource(mobility);
 			parser.addTraceSource(transmissions);
+			parser.addTraceSource(receptions);
+			parser.addTraceSource(drops);
+			parser.addTraceSource(buffers);
 			
 			// Setup the view
 			// 1. Append nodes
 			view = window.visualizerView;
-			view.setNodeContainer(nodeContainer);
 			
-			// 2.
+			// Add views
+			// 2. The grid
+			// 3. The nodes
+			view.addViewComponent(
+				new GridView()
+			);
 			
-			// 2. Append drawing managers
-/*			view.addDrawingManager(
-				new NodesDrawingManager()
-			);*/
+			var nodeView:NodeView = new NodeView(nodeContainer)
+			view.addViewComponent(nodeView);
 			
-			// view.addDrawingManager(
-			//	new TopologyDrawingManager()
-			// );
+			// Node view append drawing managers
+			// 3. Topology 
+			nodeView.addDrawingManager(
+				new NodeMobilityDrawingManager(mobility)
+			);
+			nodeView.addDrawingManager(
+				new NodeReceptionsDrawingManager(receptions)
+			);
+			nodeView.addDrawingManager(
+				new NodeTransmissionsDrawingManager(transmissions)
+			);
+			nodeView.addDrawingManager(
+				new NodeDropsDrawingManager(drops)
+			);
+			nodeView.addDrawingManager(
+				new NodeBufferDrawingManager(buffers)
+			);
 			
-			// 3. Append components
-			// view.addComponent()…;
 		}
 		
 		/**
@@ -175,6 +211,7 @@ package com.bienvisto
 		{
 			var time:uint = simulation.time; 
 			window.playback.setTime(time);
+			view.setTime(time);
 		}
 		
 		/**
@@ -185,7 +222,7 @@ package com.bienvisto
 		private function handleSimulationTimerComplete(event:TimerEvent):void
 		{
 			var timer:Timer = Timer(event.target);
-			trace("timer complete", timer.delay, timer.repeatCount);
+			// trace("timer complete", timer.delay, timer.repeatCount);
 		}
 	}
 }

@@ -1,22 +1,36 @@
 package com.bienvisto.elements.mobility
 {
 	import com.bienvisto.core.Vector2D;
+	import com.bienvisto.core.aggregate.Aggregate;
 	
 	/**
-	 * Waypoint2D.as
+	 * Waypoint.as
 	 * 
-	 *
 	 * Stores the position and direction of some node at some point in time
 	 *
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
 	 */ 
-	public final class Waypoint2D extends Waypoint
+	public class Waypoint2D extends Aggregate
 	{
 		public function Waypoint2D(time:uint, position:Vector2D, direction:Vector2D)
 		{
-			super(time, position);
+			super(time);
+			_position = position;
 			_direction = direction;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _position:Vector2D;
+		
+		/**
+		 * @reaonly position
+		 */ 
+		public function get position():Vector2D
+		{
+			return _position;
 		}
 		
 		/**

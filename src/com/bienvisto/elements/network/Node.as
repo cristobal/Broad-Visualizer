@@ -2,8 +2,7 @@ package com.bienvisto.elements.network
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.elements.mobility.IMobilityModel;
-	import com.bienvisto.elements.mobility.Waypoint;
+	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.transmissions.Transmission;
 	import com.bienvisto.util.sprintf;
@@ -16,7 +15,6 @@ package com.bienvisto.elements.network
 	 * 	The common real node reference to be used by sub nodes.
 	 *  
 	 * @author Cristobal Dabed
-	 * @version {{VERSION_NUMBER}}
 	 */ 
 	public class Node
 	{
@@ -26,9 +24,6 @@ package com.bienvisto.elements.network
 		public function Node(id:int)
 		{
 			_id = id;
-			_waypoints = new AggregateCollection();
-			_transmissions = new AggregateCollection();
-			_receptions = new Vector.<Packet>;
 		}
 		
 		/**
@@ -133,162 +128,6 @@ package com.bienvisto.elements.network
 		public function get bufferSize():uint
 		{
 			return _bufferSize;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _transmissions:AggregateCollection;
-		
-		/**
-		 * @readonly transmissions
-		 */ 
-		public function get transmissions():Vector.<Aggregate>
-		{
-			return _transmissions.items;
-		}
-		
-		/**
-		 * @readonly totalTransmissions
-		 */ 
-		public function get transmissionsTotal():uint
-		{	
-			return _transmissions.getTotal(_time);
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _receptions:Vector.<Packet> = null;
-		
-		/**
-		 * @readonly receptions
-		 */ 
-		public function get receptions():Vector.<Packet>
-		{
-			return _receptions.concat(); // return shallow copy
-		}
-		
-		/**
-		 * @readonly receptionsTotal
-		 */ 
-		public function get receptionsTotal():uint
-		{
-			return calculateTotalPackets(_receptions, _time);
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _drops:Vector.<Packet> = null;
-		
-		/**
-		 * @readonly drops
-		 */ 
-		public function get drops():Vector.<Packet>
-		{
-			return _drops.concat(); // return shallow copy
-		}
-		
-		/**
-		 * @readonly dropsTotal
-		 */ 
-		public function get dropsTotal():uint
-		{
-			
-			return calculateTotalPackets(_drops, _time);
-		}
-
-		/**
-		 * @private
-		 */ 
-		private var _routingTable:RoutingTable;
-		
-		/**
-		 * @readwrite routingTable
-		 */ 
-		public function get routingTable():RoutingTable
-		{
-			return _routingTable;
-		}
-		
-		public function set routingTable(value:RoutingTable):void
-		{
-			_routingTable = value;
-		}
-		
-		/**
-		 * @private
-		 */
-		private var _mobilityModel:IMobilityModel;
-		
-		/**
-		 * @readwrite mobilityModel
-		 */ 
-		public function get mobilityModel():IMobilityModel
-		{
-			return _mobilityModel;
-		}
-		
-		public function set mobilityModel(value:IMobilityModel):void
-		{
-			_mobilityModel = value;
-		}
-		
-		
-		/**
-		 * @private
-		 */
-		private var _waypoints:AggregateCollection;
-		
-		/**
-		 * @rea
-		 */ 
-		public function get waypoints():Vector.<Aggregate>
-		{
-			return _waypoints.items;
-		}
-
-		
-		/**
-		 * Add transmission
-		 * 
-		 * @param item
-		 */ 
-		public function addTransmission(item:Transmission):void
-		{
-			_transmissions.add(item);
-		}
-			
-		/**
-		 * Add reception
-		 * 
-		 * @param time
-		 * @param from
-		 */ 
-		public function addReception(time:uint, from:uint, size:uint):void
-		{
-			_receptions.push( new Packet(time, from, id, size) );
-		}
-		
-		/**
-		 * Add drop
-		 * 
-		 * @param time
-		 */ 
-		public function addDrop(time:uint):void
-		{
-			_drops.push( new Packet(time, 0, id, 0) );
-		}
-		
-		/**
-		 * Add waypoint
-		 * 
-		 * @param point
-		 */ 
-		public function addWaypoint(point:Waypoint):void
-		{
-			_waypoints.add(point);
 		}
 		
 		/**

@@ -56,7 +56,7 @@ package com.bienvisto.elements.receptions
 		{
 			keypoints_.push(nr);
 			
-			node.addReception(nr.milliseconds, nr.source, nr.size);
+			//node.addReception(nr.milliseconds, nr.source, nr.size);
 			return nr;
 		}
 		
