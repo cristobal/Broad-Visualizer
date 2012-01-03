@@ -9,17 +9,24 @@ package com.bienvisto
 	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
+	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.sequences.SequencesRecv;
+	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
+	import com.bienvisto.ui.menu.Playback;
 	import com.bienvisto.view.VisualizerView;
 	import com.bienvisto.view.components.GridView;
+	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
-	import com.bienvisto.view.drawing.NodeBufferDrawingManager;
+	import com.bienvisto.view.drawing.NodeBuffersDrawingManager;
 	import com.bienvisto.view.drawing.NodeDropsDrawingManager;
 	import com.bienvisto.view.drawing.NodeMobilityDrawingManager;
 	import com.bienvisto.view.drawing.NodeReceptionsDrawingManager;
+	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
 	import com.bienvisto.view.drawing.NodeTransmissionsDrawingManager;
+	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.errors.IOError;
 	import flash.events.Event;
@@ -67,10 +74,22 @@ package com.bienvisto
 		private var receptions:Receptions;
 		private var drops:Drops;
 		private var buffers:Buffers;
+		private var routing:Routing;
+		private var sequencesSent:SequencesSent;
+		private var sequencesRecv:SequencesRecv;
 		
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
-
+	
+		private var nodeView:NodeView;
+		private var gridView:GridView;
+		private var mobilityDrawingManager:NodeMobilityDrawingManager;
+		private var transmissionsDrawingManager:NodeTransmissionsDrawingManager;
+		private var receptionsDrawingManager:NodeReceptionsDrawingManager;
+		private var dropsDrawingManager:NodeDropsDrawingManager;
+		private var routingDrawingManager:NodeRoutingDrawingManager;
+		private var buffersDrawingManager:NodeBuffersDrawingManager;
+		
 		/**
 		 * Setup
 		 */ 
@@ -89,13 +108,19 @@ package com.bienvisto
 			receptions	  = new Receptions(nodeContainer);
 			drops		  = new Drops(nodeContainer);
 			buffers		  = new Buffers(nodeContainer);
-				
+			routing		  = new Routing(nodeContainer);
+			sequencesSent = new SequencesSent(nodeContainer);
+			sequencesRecv = new SequencesRecv(nodeContainer);
+			
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
 			simulation.addSimulationObject(transmissions);
 			simulation.addSimulationObject(receptions);
 			simulation.addSimulationObject(drops);
 			simulation.addSimulationObject(buffers);
+			simulation.addSimulationObject(routing);
+			simulation.addSimulationObject(sequencesSent);
+			simulation.addSimulationObject(sequencesRecv);
 			
 			reader = new FileReferenceReader();
 			parser = new TraceSourceParser(reader);
@@ -107,6 +132,9 @@ package com.bienvisto
 			parser.addTraceSource(receptions);
 			parser.addTraceSource(drops);
 			parser.addTraceSource(buffers);
+			parser.addTraceSource(routing);
+			parser.addTraceSource(sequencesSent);
+			parser.addTraceSource(sequencesRecv);
 			
 			// Setup the view
 			// 1. Append nodes
@@ -115,31 +143,32 @@ package com.bienvisto
 			// Add views
 			// 2. The grid
 			// 3. The nodes
-			view.addViewComponent(
-				new GridView()
-			);
+			gridView = new GridView();
+			view.addViewComponent(gridView);
 			
-			var nodeView:NodeView = new NodeView(nodeContainer)
+			nodeView = new NodeView(nodeContainer)
 			view.addViewComponent(nodeView);
+			view.setDraggableView(nodeView);
 			
-			// Node view append drawing managers
-			// 3. Topology 
-			nodeView.addDrawingManager(
-				new NodeMobilityDrawingManager(mobility)
-			);
-			nodeView.addDrawingManager(
-				new NodeReceptionsDrawingManager(receptions)
-			);
-			nodeView.addDrawingManager(
-				new NodeTransmissionsDrawingManager(transmissions)
-			);
-			nodeView.addDrawingManager(
-				new NodeDropsDrawingManager(drops)
-			);
-			nodeView.addDrawingManager(
-				new NodeBufferDrawingManager(buffers)
-			);
+			// 3 Append node drawing managers
+			mobilityDrawingManager = new NodeMobilityDrawingManager(mobility);
+			nodeView.addDrawingManager(mobilityDrawingManager);
 			
+			receptionsDrawingManager = new NodeReceptionsDrawingManager(receptions);
+			nodeView.addDrawingManager(receptionsDrawingManager);
+			
+			transmissionsDrawingManager = new NodeTransmissionsDrawingManager(transmissions, nodeView);
+			nodeView.addDrawingManager(transmissionsDrawingManager);
+			
+			dropsDrawingManager = new NodeDropsDrawingManager(drops);
+			nodeView.addDrawingManager(dropsDrawingManager);
+			
+			buffersDrawingManager = new NodeBuffersDrawingManager(buffers);
+			nodeView.addDrawingManager(buffersDrawingManager);
+			
+			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
+			nodeView.addDrawingManager(routingDrawingManager);
+
 		}
 		
 		/**
@@ -149,8 +178,35 @@ package com.bienvisto
 		 */ 
 		private function bindWindow(window:ApplicationWindow):void
 		{
-			window.menu.browseFile.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
-			window.playback.playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
+			window.menu.browseFileButton.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
+			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
+			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
+			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
+			
+			// window menu add toggeable node drawing managers
+			window.menu.addToggeableNodeDrawingManager(buffersDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(transmissionsDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(receptionsDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(dropsDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(routingDrawingManager);
+			
+			// window playback set misc view components
+			window.playback.addZoomView(gridView);
+			window.playback.addZoomView(nodeView);
+			window.playback.setGridView(gridView);
+			window.playback.gridViewVisible = false;
+			
+			// window nodeWindow set the trace source components
+			window.nodeWindow.setMobility(mobility);
+			window.nodeWindow.setBuffers(buffers);
+			window.nodeWindow.setTransmissions(transmissions);
+			window.nodeWindow.setReceptions(receptions);
+			window.nodeWindow.setDrops(drops);
+			window.nodeWindow.setSequencesRecv(sequencesRecv);
+			window.nodeWindow.setSequencesSent(sequencesSent);
+			
+			// window nodeWindow set the node view
+			window.nodeWindow.setNodeView(nodeView);
 		}
 		
 		
@@ -169,7 +225,7 @@ package com.bienvisto
 		 * 
 		 * @param event
 		 */ 
-		private function handlePlayButtonClick(event:MouseEvent):void
+		private function handlePlayButtonStateChange(event:Event):void
 		{	
 			if (!simulation.running) {
 				simulation.start();
@@ -179,6 +235,15 @@ package com.bienvisto
 			}
 		}
 		
+		/**
+		 * Handle playback speed change
+		 * 
+		 * @param event
+		 */ 
+		private function handlePlaybackSpeedChange(event:Event):void
+		{
+			simulation.speed = window.playback.playbackSpeed.value;
+		}
 		
 		/**
 		 * Handle simulation ready
@@ -211,6 +276,7 @@ package com.bienvisto
 		{
 			var time:uint = simulation.time; 
 			window.playback.setTime(time);
+			window.nodeWindow.setTime(time);
 			view.setTime(time);
 		}
 		
@@ -222,7 +288,8 @@ package com.bienvisto
 		private function handleSimulationTimerComplete(event:TimerEvent):void
 		{
 			var timer:Timer = Timer(event.target);
-			// trace("timer complete", timer.delay, timer.repeatCount);
+			trace("timer complete", timer.delay, timer.repeatCount);
+			window.playback.playButtonState = Playback.PLAY;
 		}
 	}
 }

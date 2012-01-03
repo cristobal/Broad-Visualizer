@@ -5,14 +5,6 @@ package com.bienvisto.core
 	import com.bienvisto.core.events.TraceLoadEvent;
 	import com.bienvisto.elements.ElementBase;
 	import com.bienvisto.elements.SequencesManager;
-	import com.bienvisto.elements.drops.DropsElementBase;
-	import com.bienvisto.elements.receptions.ReceptionsElementBase;
-	import com.bienvisto.elements.node.Properties;
-	import com.bienvisto.elements.routing.Routing;
-	import com.bienvisto.elements.sequences.SequencesRecv;
-	import com.bienvisto.elements.sequences.SequencesSent;
-	import com.bienvisto.elements.topology.Topology;
-	import com.bienvisto.elements.transmissions.TransmissionsElementBase;
 	import com.bienvisto.util.Tools;
 	
 	import flash.display.MovieClip;
@@ -150,18 +142,6 @@ package com.bienvisto.core
 		 */
 		protected var variables_:Vector.<VariableBase>;
 		
-		/**
-		 * @private
-		 */ 
-		private var _roles:Properties;
-		
-		/**
-		 * @readonly roles
-		 */ 
-		public function get roles():Properties
-		{	
-			return _roles;
-		}
 		
 		/**
 		 * @private
@@ -194,7 +174,7 @@ package com.bienvisto.core
 		/**
 		 * Topology element
 		 */
-		public static var topology:Topology;
+		// public static var topology:Topology;
 		/**
 		 * Array containing all loaded elements
 		 */
@@ -221,8 +201,8 @@ package com.bienvisto.core
 			
 			trace_ = null;
 			
-			if (topology != null) topology.cleanUp();
-			topology = null;
+			/*if (topology != null) topology.cleanUp();
+			topology = null;*/
 			
 			for (var i:int = 0; i < elements_.length; i++)
 			{
@@ -292,7 +272,7 @@ package com.bienvisto.core
 				
 				// The parseTraceLine_ method is called directly instead of dispatching an event
 				// to improve performance. This is two times faster
-				topology.parseTraceLine(e);
+/*				topology.parseTraceLine(e);*/
 				for (var i:int = 0; i < elements_.length; i++)
 					elements_[i].parseTraceLine(e);
 			}
@@ -503,21 +483,21 @@ package com.bienvisto.core
 			addChild(canvasBottomLayer_);
 			addChild(canvasTopLayer_);
 			
-			topology = new Topology(this, canvasTopLayer_);
+/*			topology = new Topology(this, canvasTopLayer_);*/
 			
-			_roles = new Properties(this, canvasBottomLayer_);
+			// _roles = new Properties(this, canvasBottomLayer_);
 			_nodeManager = new NodeContainer();
 			_sequencesManager = new SequencesManager();
 			
 			elements_ = new Vector.<ElementBase>();
-			elements_.push(_roles);
-			elements_.push(new Routing(this, canvasBottomLayer_));
-			elements_.push(new TransmissionsElementBase(this, canvasTopLayer_));
-			elements_.push(new ReceptionsElementBase(this, canvasBottomLayer_));
-			elements_.push(new DropsElementBase(this, null));
+			// elements_.push(_roles);
+			// elements_.push(new RoutingElementBase(this, canvasBottomLayer_));
+			// elements_.push(new TransmissionsElementBase(this, canvasTopLayer_));
+			// elements_.push(new ReceptionsElementBase(this, canvasBottomLayer_));
+			// elements_.push(new DropsElementBase(this, null));
 			// elements_.push(new BufferElementBase(this, canvasTopLayer_));
-			elements_.push(new SequencesSent(this));
-			elements_.push(new SequencesRecv(this));
+			// elements_.push(new SequencesSentElementBase(this));
+			// elements_.push(new SequencesRecvElementBase(this));
 			
 			zoom_ = 1.0;
 			

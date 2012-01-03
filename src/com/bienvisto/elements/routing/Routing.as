@@ -1,125 +1,102 @@
 package com.bienvisto.elements.routing
 {
-	import com.bienvisto.core.Vector2D;
-	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.events.TimedEvent;
-	import com.bienvisto.core.events.TraceLoadEvent;
-	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.util.Tools;
+	import com.bienvisto.elements.network.NodeContainer;
 	
-	import flash.display.Sprite;
-
-
-	/**
-	 * Class responsible of parsing the "routing" block of the trace to
-	 * visualize and of actually displaying routing information (links between
-	 * nodes)
-	 */
-	public class Routing extends ElementBase
+	import flash.utils.Dictionary;
+	
+	public final class Routing extends TraceSource implements ISimulationObject
 	{
-
+		public function Routing(nodeContainer:NodeContainer)
+		{
+			super("Routing", "rc");
+			
+			this.nodeContainer = nodeContainer;
+		}
+		
 		/**
-		 * Array of Node. Each node stores an array of routing tables
-		 */
-		protected var nodes_:Array;
-
-
+		 * @private
+		 */ 
+		private var nodeContainer:NodeContainer;
+		
 		/**
-		 * Constructor of the class
+		 * @private
+		 */ 
+		private var collections:Dictionary = new Dictionary();
+		
+		/**
+		 * Update
 		 * 
-		 * @param visualizer Reference to the visualizer
-		 */
-		public function Routing(visualizer:Visualizer, canvas:Sprite)
+		 * @params 
+		 */ 
+		override public function update(params:Vector.<String>):void
 		{
-			super(visualizer, canvas);
+
+			// Format: rc <node_id> <node_id2> <node_id3> …
+			var id:int = int(params[0]);
+			var time:uint = uint(params[1]);
+			var entries:Vector.<RoutingTableEntry> = parseEntries(params[2]);
 			
-			nodes_ = new Array();
-		}
-
-
-		/**
-		 * Tries to free all used memory. Use only when an instance of this
-		 * class is not needed anymore.
-		 */
-		public override function cleanUp():void
-		{
-			super.cleanUp();
-			
-			nodes_ = null;
-		}
-
-
-		/**
-		 * @inheritDoc
-		 */
-		public override function get name():String
-		{
-			return "Routing";
-		}
-		/**
-		 * @inheritDoc
-		 */
-		public override function get lineType():String
-		{
-			return "rc"; // route change
-		}
-
-
-		/**
-		 * Function called when a STEP event is raised. This means that all 
-		 * links will be updated
-		 */
-		public override function update(e:TimedEvent):void
-		{
-			if (!visible_)
-				return;
-			
-			if (e.elapsed == 0) return;
-			
-			// Update all nodes
-			for each(var node:RoutingNode in nodes_)
-			{
-				// Check if the node is added to the canvas, add it if it's not
-				if (!this.contains(node))
-				{
-					this.addChild(node);
-				}
-				
-				// Update the node. We pass the total amount of milliseconds 
-				// elapsed since the beginning of the simulation
-				node.goTo(e.elapsed);
+			var node:Node 		   = nodeContainer.getNode(id);
+			var table:RoutingTable = new RoutingTable(time, node, entries);
+			var collection:RoutingCollection;
+			if (!(id in collections)) {
+				collection = new RoutingCollection();
+				collections[id] = collection;
 			}
+			else {
+				collection = RoutingCollection(collections[id]);
+			}
+			//trace("id", id, "new table on time", time, "entries", entries.length);			
+			collection.add(table);
 		}
-
-
+		
 		/**
-		 * @inheritDoc
-		 */
-		protected override function loadNewLine(params:Array):void
+		 * Parse entries
+		 * 
+		 * @param table
+		 */ 
+		private function parseEntries(table:String):Vector.<RoutingTableEntry>
 		{
-			// Get waypoint data
-			var nodeId:int = params[0];
-			var milliseconds:uint = params[1];
-			var table:String = params[2];
+			var entries:Vector.<RoutingTableEntry> = new Vector.<RoutingTableEntry>();
+			var entry:RoutingTableEntry;
+			var args:Array = table.split(",");
 			
-			// Check if this is a new node
-			if (nodes_[nodeId] == null)
-			{
-				// If it is, we create it
-				var node:Node = visualizer_.nodeManager.getNode(nodeId);
-				var newNode:RoutingNode = new RoutingNode(nodeId, node);
-
-				// ...and we add it to the nodes list
-				nodes_[nodeId] = newNode;
+			for (var i:int = 0, l:int = args.length; i < l; i += 3) {
+				// The distance is not currently used, always -1
+				entry = new RoutingTableEntry(args[i], args[i+1], args[i + 2]);
+				entries.push(entry);
 			}
 			
-			// Add the new keypoint to the node
-			nodes_[nodeId].addTable(table, milliseconds);
+			return entries;
 		}
-
+		
+	   /**
+		* Find table
+		* 
+		* @param node
+		* @param time
+		*/
+		public function findTable(node:Node, time:uint):RoutingTable
+		{
+			var table:RoutingTable;
+			var id:int = node.id;
+			var collection:RoutingCollection 
+			
+			if (id in collections) {
+				collection = RoutingCollection(collections[id]);
+				table 	   = RoutingTable(collection.findNearest(time));
+			}
+			
+			return table;
+		}
+		
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
 	}
-
 }
-
-

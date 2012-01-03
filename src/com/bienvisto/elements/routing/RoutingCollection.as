@@ -1,13 +1,13 @@
-package com.bienvisto.elements.mobility
+package com.bienvisto.elements.routing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	
 	import flash.utils.Dictionary;
 	
-	public final class MobilityCollection extends AggregateCollection
+	public final class RoutingCollection extends AggregateCollection
 	{
-		public function MobilityCollection()
+		public function RoutingCollection()
 		{
 			super();
 		}
@@ -26,14 +26,12 @@ package com.bienvisto.elements.mobility
 			
 			if (!(time in cache)) {
 				item = super.findNearest(time);
-				if (item) {
-					cache[time] = item;
-				}
+				cache[time] = item;
 			}
-			else {
-				item = cache[time];		
+			else {
+				item = cache[item] as Aggregate;
 			}
-				
+			
 			return item;
 		}
 	}

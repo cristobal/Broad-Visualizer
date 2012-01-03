@@ -6,6 +6,7 @@ package com.bienvisto.elements.transmissions
 	
 	import flash.utils.Dictionary;
 	
+	// TODO: Optimize cache
 	public final class TransmissionCollection extends AggregateCollection
 	{
 		public function TransmissionCollection()
@@ -13,12 +14,34 @@ package com.bienvisto.elements.transmissions
 			super();
 		}
 		
-		
+		/**
+		 * @private
+		 */ 
+		private var itemCache:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
 		 */ 
-		private var cache:Dictionary = new Dictionary();
+		private var packetsCache:Dictionary = new Dictionary();
+		
+		/**
+		 * @override
+		 */ 
+		override public function findNearest(time:uint):Aggregate
+		{
+			var item:Aggregate;
+			if (!(time in itemCache)) {
+				item = super.findNearest(time);
+				if (item) {
+					itemCache[time] = item;
+				}
+			}
+			else {
+				item = itemCache[time];
+			}
+			
+			return item;
+		}
 		
 		/**
 		 * Sample packets
@@ -28,48 +51,22 @@ package com.bienvisto.elements.transmissions
 		 */ 
 		public function samplePackets(time:uint, windowSize:uint):Vector.<Packet>
 		{
-			var packets:Vector.<Packet>;
+			return Vector.<Packet>(super.sampleItems(time, windowSize));
+/*			var packets:Vector.<Packet>;
 			var key:String = String(time) + "," + String(windowSize);
-			if (!(key in cache)) {
-				var item:Aggregate = findNearest(time);
-				if (item && item.time >= time)  {
-					packets = Vector.<Packet>(super.sampleItems(time, windowSize));
+			
+			if (!(key in packetsCache)) {
+				packets = Vector.<Packet>(super.sampleItems(time, windowSize));
+				if (packets && packets.length > 0) {					packetsCache[key] = packets;
 				}
-				cache[key] = packets;
 			}
 				
 			else {
-				packets = cache[key];
+				packets = Vector.<Packet>(packetsCache[key]);
 			}
 			
-			return packets;
+			return packets;*/
 		}
 		
-		private function processPackets(time:uint, windowSize:uint):Vector.<Packet>
-		{
-			var packets:Vector.<Packet> = new Vector.<Packet>();
-			if ((time > 0) && (time <= lastTimeAdded)) {
-				
-				var packet:Packet;
-				var startTime:int = int(time) - int(windowSize);
-				if (startTime < 0) {
-					startTime = 0;
-				}
-				
-				var key:int = findNearestKeyMid(time);
-				var total:int = 0;
-				for (var i:int = key + 1; i--;) {
-					packet = Packet(_items[i]);
-					if (packet.time < startTime) {
-						break;
-					}
-					
-					packets.push(packet);
-					total++;
-				}
-			}
-			
-			return packets;
-		}
 	}
 }

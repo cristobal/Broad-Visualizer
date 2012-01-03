@@ -29,9 +29,8 @@ package com.bienvisto.elements.drops
 		{
 			var samples:Vector.<Aggregate>;
 			var key:String = String(time) + "," + String(windowSize);
-			var item:Aggregate;
 			if (!(key in cache)) {
-				item = findNearest(time);
+				var item:Aggregate = findNearest(time);
 				if (item && item.time >= time) {
 					samples = super.sampleItems(time, windowSize);
 				}

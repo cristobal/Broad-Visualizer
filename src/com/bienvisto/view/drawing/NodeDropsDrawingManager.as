@@ -31,8 +31,39 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var lastTime:uint = 0;
 		
+		/**
+		 * @readonly name
+		 */ 
+		public function get name():String
+		{
+			return "Drops";
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _enabled:Boolean = true;
+		
+		/**
+		 * @readwrite enabled
+		 */ 
+		public function get enabled():Boolean
+		{
+			return _enabled;
+		}
+		
+		public function set enabled(value:Boolean):void
+		{
+			_enabled = value;
+			// invalidate();
+		}
+		
 		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
+			if (!enabled) {
+				return;	
+			}
+			
 			var nodeSprite:NodeSprite;
 			var samples:Vector.<Aggregate>;
 			if (lastTime != time) {

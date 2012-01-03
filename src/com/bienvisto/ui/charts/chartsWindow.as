@@ -164,8 +164,8 @@ protected function updateTime(e:Event):void
 }
 protected function updateSelectedNodes(e:Event):void
 {
-	if (Visualizer.topology != null)
-		selectedNodes = Visualizer.topology.selectedNodes;
+/*	if (Visualizer.topology != null)
+		selectedNodes = Visualizer.topology.selectedNodes;*/
 }
 
 

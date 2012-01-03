@@ -106,12 +106,31 @@ package com.bienvisto.elements.receptions
 			var id:int = node.id;
 			
 			if (id in collections) {
-				var collection:AggregateCollection = AggregateCollection(collections[id]);
+				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
 				packets = Vector.<Packet>(collection.items);
 			}
 			
 			return packets;
 		}
 		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:uint):int
+		{
+			
+			var total:int = 0;
+			var id:int = node.id;
+			
+			if (id in collections) {
+				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
+				total = collection.sampleTotal(time);
+			}
+			
+			return total;
+		}
 	}
 }

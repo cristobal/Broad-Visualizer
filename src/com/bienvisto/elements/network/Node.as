@@ -3,12 +3,7 @@ package com.bienvisto.elements.network
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.routing.RoutingTable;
-	import com.bienvisto.elements.transmissions.Transmission;
 	import com.bienvisto.util.sprintf;
-
-	// TODO: Set current point in time waypoint position…
-	// TODO: Add some memoization for total like for a set of interval of time to store.
 	
 	/**
 	 * Node.as
@@ -128,26 +123,6 @@ package com.bienvisto.elements.network
 		public function get bufferSize():uint
 		{
 			return _bufferSize;
-		}
-		
-		/**
-		 * Calculate total packets
-		 * 	The order of the packets in the vector must linear in time.
-		 *  
-		 * @param packets The vector of packets to count
-		 * @param time 	  Until the time to count
-		 */ 
-		private function calculateTotalPackets(packets:Vector.<Packet>, time:uint):uint 
-		{
-			var total:uint;	
-			for each (var packet:Packet in packets) {
-				if (packet.time > time) {
-					break; // break when the packet time is more.
-				}
-				total++;
-			}
-			
-			return total;
 		}
 		
 		/**

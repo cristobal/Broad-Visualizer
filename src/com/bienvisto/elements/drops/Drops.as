@@ -72,5 +72,26 @@ package com.bienvisto.elements.drops
 			
 			return samples;
 		}
+		
+		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:uint):int
+		{
+			var total:int = 0;
+			var id:int = node.id;
+			
+			if (id in collections) {
+				var collection:DropsCollection = DropsCollection(collections[id]);
+				total = collection.sampleTotal(time);
+			}
+			
+			return total;
+		}
+		
 	}
 }

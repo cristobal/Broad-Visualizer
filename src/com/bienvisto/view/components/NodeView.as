@@ -6,6 +6,12 @@ package com.bienvisto.view.components
 	import com.bienvisto.view.drawing.INodeDrawingManager;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
+	import flash.events.Event;
+	import flash.events.FocusEvent;
+	import flash.events.MouseEvent;
+	import flash.ui.Mouse;
+	import flash.ui.MouseCursor;
+	
 	[Event(name="selected", type="com.bienvisto.view.events.NodeSpriteEvent")]
 	
 	/**
@@ -166,7 +172,7 @@ package com.bienvisto.view.components
 			for (i = 0, l = nodeSprites.length; i < l; i++) {
 				nodeSprite = nodeSprites[i];
 				nodeSprite.update(time);
-				nodeSprite.invalidate();
+				// nodeSprite.invalidate();
 			}
 		}
 		

@@ -19,7 +19,7 @@ package com.bienvisto.elements.buffer
 		/**
 		 * @private
 		 */ 
-		private var cache:Dictionary = new Dictionary();
+		private var bufferCache:Dictionary = new Dictionary();
 		
 		/**
 		 * Find buffer
@@ -30,12 +30,12 @@ package com.bienvisto.elements.buffer
 		{
 			var buffer:Buffer;
 			
-			if (!(time in cache)) {
+			if (!(time in bufferCache)) {
 				buffer = Buffer(findNearest(time));
-				cache[time] = buffer;
+				bufferCache[time] = buffer;
 			}
 			else {
-				buffer = Buffer(cache[time]);
+				buffer = Buffer(bufferCache[time]);
 			}
 			
 			return buffer;

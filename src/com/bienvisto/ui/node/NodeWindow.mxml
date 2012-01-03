@@ -26,7 +26,7 @@
 	
 	<mx:TabNavigator x="0" y="-1" width="398" height="215" borderVisible="true" dropShadowVisible="false">
 		<!-- Node::Properties Tab -->
-		<s:NavigatorContent id="properties" width="100%" height="100%" label="Properties">
+		<s:NavigatorContent id="propertiesContent" width="100%" height="100%" label="Properties">
 			<s:Group x="10">
 				<s:Label styleName="label" text="Role:"  />
 				<s:Label styleName="label" y="20" text="IPv4 Address:" />
@@ -38,7 +38,7 @@
 				<s:Label styleName="label" y="140" x="15" text="vx:" />
 				<s:Label styleName="label" y="160" x="15" text="vy:" />
 			</s:Group>	
-			<s:Group x="100">
+			<s:Group x="100" width="100">
 				<s:Label id="roleValue" y="2" styleName="value" text="–"/>
 				<s:Label id="ipv4AddressValue" styleName="value" y="22" text="00.00.00.00" />
 				<s:Label id="macAddressValue" styleName="value" y="42" text="00:00:00:00:00:00" />
@@ -47,26 +47,23 @@
 				<s:Label id="vxValue" styleName="value" y="142" text="0" /> 
 				<s:Label id="vyValue" styleName="value" y="162" text="0" /> 
 			</s:Group>
-			<s:Group x="220">
-				<s:Label styleName="label" text="Routes" />
-				<s:Scroller x="0" y="15" width="160" height="160" minViewportInset="1" focusEnabled="false">
-					<s:Group>
-						<s:RichText styleName="value" id="routingTableValue" />	
-					</s:Group>
-				</s:Scroller>
-				
-			</s:Group>	
+			<s:Group id="compassGroup" x="250" y="65" width="100" height="100">
+				<s:Label text="N" left="45" />
+				<s:Label text="W" left="0" top="45" />
+				<s:Label text="E" right="0" top="45" />
+				<s:Label text="S" left="45" bottom="0" />
+			</s:Group>
 		</s:NavigatorContent>
 		
 		<!-- Node::Metrics/Statistics Tab -->
-		<s:NavigatorContent id="metrics" width="100%" height="100%" label="Metrics">
+		<s:NavigatorContent id="metricsContent" width="100%" height="100%" label="Metrics">
 			<s:Group x="10">
 				<s:Label styleName="label" text="Buffer size:"  />
 				<s:Label styleName="label" y="20" text="Tx total:" />
 				<s:Label styleName="label" y="40" text="Rx total:" />
 				<s:Label styleName="label" y="60" text="Dx total:" />
 				<s:Label styleName="label" y="80" text="Sx total:" />
-				<s:Label styleName="label" y="100" text="Dx total:" />
+				<s:Label styleName="label" y="100" text="Sr total:" />
 			</s:Group>	
 			<s:Group x="100">
 				<s:Label id="bufferSizeValue" styleName="value" y="2" text="0" />
@@ -74,12 +71,12 @@
 				<s:Label id="rxTotalValue" styleName="value" y="42" text="0" />
 				<s:Label id="dxTotalValue" styleName="value" y="62" text="0" />
 				<s:Label id="sxTotalValue" styleName="value" y="82" text="0" />
-				<s:Label id="sdTotalValue" styleName="value" y="102" text="0" />
+				<s:Label id="srTotalValue" styleName="value" y="102" text="0" />
 			</s:Group>
 		</s:NavigatorContent>
 		
 		<!-- Node::Topolgy/Routing tab-->
-		<s:NavigatorContent width="100%" height="100%" label="Topology">
+		<s:NavigatorContent id="routingContent" width="100%" height="100%" label="Topology">
 
 		</s:NavigatorContent>
 	</mx:TabNavigator>

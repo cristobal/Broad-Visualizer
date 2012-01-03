@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx"
-				   width="100%"
-				   height="30"
-				   backgroundColor="0xF1F1F1"
-				   borderColor="0xCCCCCC">	
-	<s:Group left="5" top="2">	
-		<s:Button id="browseFile" label="Load file" />
-	</s:Group>
-</s:BorderContainer>
+<menu:MenuContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					xmlns:menu="com.bienvisto.ui.menu.*">
+	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="0" paddingLeft="5" />
+		</s:layout>
+		<s:Label text="Toggle Elements:" />	
+		
+	</s:BorderContainer>
+	
+	<s:BorderContainer id="container" width="100%" height="30" backgroundColor="0xF1F1F1" borderColor="0xCCCCCC">
+		<s:Group left="5" top="2">	
+			<s:Button id="browseFileButton" label="Load file" />		
+		</s:Group>
+		<s:Group right="5" top="2">
+			<s:Button id="optionsButton" label="Options" />
+		</s:Group>
+	</s:BorderContainer>
+</menu:MenuContainer>

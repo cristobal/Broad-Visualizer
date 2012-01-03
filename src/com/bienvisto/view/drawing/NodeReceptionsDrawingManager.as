@@ -57,6 +57,43 @@ package com.bienvisto.view.drawing
 		private var lastTime:uint = 0;
 		
 		/**
+		 * @readonly name
+		 */ 
+		public function get name():String
+		{
+			return "Receptions";
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _enabled:Boolean = true;
+		
+		/**
+		 * @readwrite enabled
+		 */ 
+		public function get enabled():Boolean
+		{
+			return _enabled;
+		}
+		
+		public function set enabled(value:Boolean):void
+		{
+			_enabled = value;
+			invalidate();
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			for each(var shape:Shape in shapes) {
+				shape.visible = enabled;
+			}
+		}
+		
+		/**
 		 * Update
 		 * 
 		 * @param time
@@ -85,6 +122,7 @@ package com.bienvisto.view.drawing
 						id = nodeSprite.node.id;
 						if (!(id in shapes)) {
 							shape = new Shape();
+							shape.visible = enabled;
 							nodeSprite.addChildAt(shape, 0);
 							shapes[id] = shape;
 						}

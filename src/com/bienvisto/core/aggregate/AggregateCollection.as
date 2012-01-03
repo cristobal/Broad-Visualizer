@@ -94,10 +94,39 @@ package com.bienvisto.core.aggregate
 		 * @param  time
 		 * @return Returns the total number
 		 */ 
-		public function getTotal(time:uint = uint.MAX_VALUE):Number
+		public function getTotal(time:uint = uint.MAX_VALUE):int
 		{
 			return 0;
 		}
+		
+		/**
+		 * Count total 
+		 * 
+		 * @param  time
+		 * @return Returns the total number
+		 */
+		public function countTotal(time:uint):int
+		{
+			var total:int = 0; 
+			
+			if (time > lastTimeAdded) {
+				total = size;
+			}
+			else if (time > 0) {
+				var item:Aggregate;
+				for (var i:int = 0, l:int = size; i < l; i++) {
+					item = _items[i];
+					if (item.time > time) {
+						break;
+					}
+					total++;
+				}
+			}
+			
+			return total;	
+		}
+		
+		
 		
 		/**
 		 * Sample items
@@ -130,6 +159,17 @@ package com.bienvisto.core.aggregate
 		}
 		
 		/**
+		 * Sample total
+		 * 
+		 * @param time
+		 */ 
+		public function sampleTotal(time:uint):int
+		{
+			var total:int = findNearestKeyMid(time) + 1;
+			return total;
+		}
+		
+		/**
 		 * Find nearest
 		 * 
 		 * @param time
@@ -155,12 +195,21 @@ package com.bienvisto.core.aggregate
 			return item;
 		}
 		
+		/**
+		 * Find nearest key mid
+		 * 
+		 * @param time
+		 */ 
 		public function findNearestKeyMid(time:uint):int 
 		{
 			var total:int = size; 
 			var max:int   = size - 1;
 			var min:int   = 0;
 			var key:int	  = -1;
+			
+			if (size == 0) {
+				return key;
+			}
 			
 			do
 			{

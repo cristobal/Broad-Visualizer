@@ -1,44 +1,53 @@
 package com.bienvisto.elements.routing
 {
-
-	import com.bienvisto.core.Vector2D;
-
-	import com.bienvisto.elements.KeypointBase;
-
-
+	import com.bienvisto.core.aggregate.Aggregate;
+	import com.bienvisto.elements.network.Node;
+	
 	/**
-	 * Stores the routing table of a node at certain time in the simulation
-	 */
-	public class RoutingTable extends KeypointBase
+	 * RoutingTable.as
+	 * 
+	 * 	Stores the routing table of a node at certain time in the simulation
+	 * 
+	 * @author Miguel Santirso
+	 * @author Cristobal Dabed
+	 */ 
+	public final class RoutingTable extends Aggregate
 	{
-
-		/**
-		 * Vector of routing table entries
-		 */
-		protected var entries_:Vector.<RoutingTableEntry>;
-
-
-		/**
-		 * Constructor of the class
-		 *
-		 * @param table Array containing all entries of the table
-		 * @param ms Milliseconds elapsed since the beginning of the simulation
-		 * until the node passed through this waypoint
-		 * @param node Id of the node associated to this keypoint
-		 */
-		public function RoutingTable(entries:Vector.<RoutingTableEntry>, ms:uint, node:int)
+		public function RoutingTable(time:uint, node:Node, entries:Vector.<RoutingTableEntry>)
 		{
-			super (ms, node);
+			super(time);
 			
-			entries_ = entries;
+			_node = node;
+			_entries = entries;
+			if (!_entries) {
+				_entries = new Vector.<RoutingTableEntry>();
+			}
 		}
-
-
+		
 		/**
-		 * Array of all entries in the table. The vector is composed of 
-		 * RoutingTableEntry objects
-		 */
-		public function get entries():Vector.<RoutingTableEntry> { return entries_; }
-
+		 * @private
+		 */ 
+		private var _node:Node;
+		
+		/**
+		 * @readonly node
+		 */ 
+		public function get node():Node
+		{
+			return _node;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _entries:Vector.<RoutingTableEntry>;
+		
+		/**
+		 * @readonly entries
+		 */ 
+		public function get entries():Vector.<RoutingTableEntry>
+		{
+			return _entries;
+		}
 	}
 }

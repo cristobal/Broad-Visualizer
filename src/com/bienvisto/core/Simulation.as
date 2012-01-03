@@ -98,7 +98,44 @@ package com.bienvisto.core
 		// Properties
 		//
 		//-------------------------------------------------------------------------
-
+		
+		/**
+		 * @private
+		 */ 
+		private var _speed:Number = 1.0;
+		
+		/**
+		 * @readwrite speed
+		 */ 
+		public function get speed():Number
+		{
+			return _speed;
+		}
+		
+		public function set speed(value:Number):void
+		{
+			_speed = value;
+			invalidateSpeed();
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _elapsed:Number = 0;
+		
+		/**
+		 * @readonly elapsed
+		 */ 
+		public function get elapsed():Number
+		{
+			return _elapsed;
+		}
+		
+		private function setElapsed(value:Number):void
+		{
+			_elapsed = value;
+		}
+		
 		/**
 		 * @private
 		 */ 
@@ -150,14 +187,6 @@ package com.bienvisto.core
 			invalidate();
 		}
 		
-		/**
-		 * @readonly repeatCount
-		 */ 
-		private function get repeatCount():int
-		{
-			return duration / timerDelay;
-		}
-		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -170,7 +199,7 @@ package com.bienvisto.core
 		{
 			simulationObjects = new Vector.<ISimulationObject>();
 
-			timer = new Timer(timerDelay, repeatCount);
+			timer = new Timer(timerDelay);
 			timer.addEventListener(TimerEvent.TIMER, handleTimer);
 		}
 		
@@ -182,14 +211,22 @@ package com.bienvisto.core
 			// if this is a new simulation then do a global reset
 			if (!firstRun) {
 				dispatchEvent(new Event(RESET));
-			}
-			
-			
-			timer.repeatCount = repeatCount;			
+			}		
 			
 			
 			dispatchEvent(new Event(READY));
 			firstRun = false;
+		}
+		
+		/**
+		 * Invalidate speed
+		 */ 
+		private function invalidateSpeed():void
+		{
+			if (timer.running) {
+			}
+			
+			
 		}
 		
 		/**
@@ -219,7 +256,11 @@ package com.bienvisto.core
 			}
 		}
 			
-		private var startTime:int;
+		/**
+		 * @private
+		 */ 
+		private var updateTime:int;
+		
 		/**
 		 * Start
 		 */ 
@@ -230,7 +271,9 @@ package com.bienvisto.core
 			}
 			
 			timer.start();
-			startTime = getTimer();
+			if (updateTime == 0) {
+				updateTime = getTimer();
+			}
 		}
 		
 		/**
@@ -238,7 +281,8 @@ package com.bienvisto.core
 		 */ 
 		public function pause():void
 		{
-			timer.stop();	
+			timer.stop();
+			updateTime = 0;
 		}
 		
 		/**
@@ -284,37 +328,31 @@ package com.bienvisto.core
 		 */ 
 		private function handleTimer(event:TimerEvent):void
 		{
-			// var elapsed:uint = timer.delay * timer.currentCount;
-			//  adjust time for the real elapsed system time with getTimer()
-			var elapsed:int = getTimer() - startTime;
-			var time:uint = 0;
+			var elapsed:int = (getTimer() - updateTime) * speed;
+			elapsed = this.time + elapsed;
+			var stop:Boolean = false;
 			if (elapsed >= duration) {
 				timer.stop();
-				time = duration;
+				elapsed = duration;
+				stop = true;
 			}
-			else {
-				// adjust time
-				time = elapsed - (elapsed % 100);
-			}
-			setTime(time);
-			
+			setTime(elapsed);
+				
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
 				simulationObject = simulationObjects[i];
 				simulationObject.onTimeUpdate(elapsed);
 			}
+			
+			if (stop) {
+				updateTime = 0;
+				dispatchEvent(new TimerEvent(TimerEvent.TIMER_COMPLETE));
+			}
+			else {
+				updateTime = getTimer();
+			}
+			
 		}
-		
-		/**
-		 * Handle timer complete
-		 * 
-		 * @param event
-		 */ 
-		private function handleTimerComplete(event:TimerEvent):void
-		{
-			trace("total time elapsed:", getTimer() - startTime);
-			// forward the complete event
-			// dispatchEvent(event);
-		}
+
 	}
 }

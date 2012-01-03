@@ -1,88 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" 
-						  xmlns:components="com.bienvisto.ui.components.*" 
-						  width="100%"
-						  height="50"
-						  backgroundColor="0xF1F1F1"
-						  borderColor="0xCCCCCC">
+<menu:PlaybackContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" 
+						xmlns:menu="com.bienvisto.ui.menu.*"
+						backgroundColor="0xF1F1F1"
+						borderColor="0xCCCCCC" creationComplete="initComponent(event)">
 	
 	<fx:Script>
 		<![CDATA[
-			import com.bienvisto.util.sprintf;
-
-			private static var secondsPerMinut:uint = 60;
-			private static var secondsPerHour:uint = 60 * secondsPerMinut;
-
+			import mx.events.FlexEvent;
+			[Event(name="play", type="flash.events.Event")]
+			public static const PLAY:String = "play";
+			
+			[Event(name="pause", type="flash.events.Event")]
+			public static const PAUSE:String = "pause";
+			
+			
 			/**
-			 * Set time
-			 * 
-			 * @param value
+			 * Init component
 			 */ 
-			public function setTime(value:uint):void
+			private function initComponent(event:FlexEvent):void
 			{
-				var text:String = miliSecondsToText(value);
-				timeLabel.text = text;
+				playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
 			}
 			
 			/**
-			 * Set duration
-			 * 
-			 * @param value Total duration value in ms
+			 * @private
 			 */ 
-			public function setDuration(value:uint):void
-			{
-				var text:String = miliSecondsToText(value);
-				durationLabel.text = text;
-			}
+			private var _playButtonState:String = PLAY;
 			
 			/**
-			 * Miliseconds to text
-			 * 
-			 * 
-			 * @param value The amount of ms
-			 * @return The text as a time text in the format hh:mm:ss
+			 * @readwrite playButtonState
 			 */ 
-			private function miliSecondsToText(value:uint):String
+			public function set playButtonState(value:String):void
 			{
-				value = value / 1000;
+				if (!(value == PLAY || value == PAUSE)) {
+					throw(new Error("Invalid playback button state"));
+				}
 				
-				var hours:int = Math.floor(value / secondsPerHour);
-				value -= hours * secondsPerHour;
-				
-				var minutes:int = Math.floor(value / secondsPerMinut);
-				value -= minutes * secondsPerMinut;
-				
-			
-				return sprintf("%02d:%02d:%02d", hours, minutes, value);
+				_playButtonState = value;
+				playButton.label = value.substr(0,1).toUpperCase() + value.substr(1);
 			}
+			
+			public function get playButtonState():String
+			{
+				return _playButtonState;
+			}
+			
+			
+			/**
+			 * Handle play button click
+			 */ 
+			private function handlePlayButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(playButtonState));
+				if (playButtonState == PLAY) {
+					playButtonState = PAUSE;
+				}
+				else {
+					playButtonState = PLAY;
+				}
+			}
+			
 		]]>
 	</fx:Script>
-	<s:layout>
-		<s:VerticalLayout gap="0" paddingTop="0" paddingBottom="0" />
-	</s:layout>
-
-	<s:Group width="100%" height="50">
+	<s:Group width="20%" height="50" top="0">
+		<s:CheckBox id="gridCheckbox" label="Grid" left="5" top="15" />
+	</s:Group>
+	
+	<s:Group width="100%" height="50" top="0" left="20%">
 		<s:layout>
 			<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingTop="0" paddingLeft="20" />
 		</s:layout>
 		
 		<!-- Zoom -->
 		<s:Label>Zoom</s:Label>
-		<s:NumericStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="500" minimum="10" />
+		<menu:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="200" minimum="10" />
 		
 		<!-- playButton -->
 		<s:Button id="playButton" label="Play" />
 		
 		<!-- Playback speed -->
-		<s:NumericStepper id="playbackSpeed" 
+		<menu:IntervalStepper id="playbackSpeed" 
 						  width="45"
-						  value="1.0" 
-						  stepSize="0.5"  
-						  maximum="10.0"
-						  minimum="0.1" />
-						<!-- snapInterval="0.1" -->
+						  value="1"  />
 		
 		<!-- Time slider -->
 		<s:HSlider id="timeSlider" enabled="false" width="300" minimum="0" maximum="1000" />
@@ -93,4 +94,4 @@
 		<s:Label id="durationLabel">00:00:00</s:Label>
 		
 	</s:Group>
-</s:BorderContainer>
+</menu:PlaybackContainer>

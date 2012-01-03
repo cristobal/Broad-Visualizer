@@ -22,6 +22,33 @@ package com.bienvisto.view.drawing
 		private var mobility:Mobility;
 		
 		/**
+		 * @readonly name
+		 */ 
+		public function get name():String
+		{
+			return "Mobility";
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _enabled:Boolean = true;
+		
+		/**
+		 * @readwrite enabled
+		 */ 
+		public function get enabled():Boolean
+		{
+			return _enabled;
+		}
+		
+		public function set enabled(value:Boolean):void
+		{
+			_enabled = value;
+			// invalidate();
+		}
+		
+		/**
 		 * @override
 		 */ 
 		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void

@@ -1,60 +1,74 @@
 package com.bienvisto.elements.sequences
 {
-	import com.bienvisto.core.Visualizer;
-	import com.bienvisto.core.events.TimedEvent;
-	import com.bienvisto.elements.ElementBase;
+	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.parser.TraceSource;
+	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.NodeContainer;
 	
-	import flash.display.Sprite;
+	import flash.utils.Dictionary;
 	
-	public class SequencesRecv extends ElementBase
+	public final class SequencesRecv extends TraceSource implements ISimulationObject
 	{
-		public function SequencesRecv(v:Visualizer, c:Sprite=null)
+		public function SequencesRecv(nodeContainer:NodeContainer)
 		{
-			super(v, c);
+			super("SequencesRecv", "sr");
+			
+			this.nodeContainer = nodeContainer;
 		}
 		
 		/**
 		 * @private
 		 */ 
-		private var sequences:Sequences = new Sequences();
+		private var nodeContainer:NodeContainer;
+		
+		/**
+		 * @private
+		 */ 
+		private var collections:Dictionary = new Dictionary();
 		
 		/**
 		 * @override
 		 */ 
-		public override function get name():String 
+		override public function update(params:Vector.<String>):void
 		{
-			return "SequencesRecv";
-		}
-		
-		/**
-		 * @override
-		 */ 
-		public override function get lineType():String
-		{
-			return "sr"; // sequence recv
-		}
-		
-		/**
-		 * Function called when a STEP event is raised. Updates the status of
-		 * the sequences data and modifies the appearance of the sequences recv 
-		 * according to what has been received.
-		 */
-		public override function update(event:TimedEvent):void
-		{
-			var time:uint = event.elapsed;
-			visualizer_.sequencesManager.update(time, lineType, sequences.getDataForTime(time));
-		}
-		
-		/**
-		 * @override
-		 */ 
-		protected override function loadNewLine(params:Array):void
-		{
-			var id:int = params[0];
-			var time:uint = params[1];
-			var seqNum:uint = params[2];
+			var id:int = int(params[0]);
+			var time:uint = uint(params[1]);
+			var seqNum:uint = uint(params[2]);
+			var sequence:Sequence = new Sequence(time, seqNum);
 			
-			sequences.addData(id, time, seqNum);
+			var collection:SequenceCollection;
+			if (!(id in collections)) {
+				collection = new SequenceCollection();
+				collections[id] = collection;
+			}
+			else {
+				collection = SequenceCollection(collections[id]);
+			}
+			
+			collection.add(sequence);
+		}
+		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:int):int
+		{
+			var id:int = node.id;
+			var total:int = 0;
+			
+			if 	(id in collections) {
+				var collection:SequenceCollection = SequenceCollection(collections[id]);
+				total = collection.sampleTotal(time);
+			}
+			
+			return total;
+		}
+		
+		public function onTimeUpdate(elapsed:uint):void
+		{
 		}
 	}
 }

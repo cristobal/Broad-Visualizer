@@ -1,6 +1,7 @@
 package com.bienvisto.elements.transmissions
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.Node;
@@ -71,6 +72,33 @@ package com.bienvisto.elements.transmissions
 			
 		}
 		
+		/**
+		 * Find nearest
+		 * 
+		 * @param node
+		 * @param time
+		 * @param windowSize
+		 */ 
+		public function findNearest(node:Node, time:uint, windowSize:uint):Aggregate
+		{
+			var id:int = node.id;
+			var item:Aggregate;
+			
+			if (id in collections) {
+				var collection:TransmissionCollection = TransmissionCollection(collections[id]);
+				item = collection.findNearest(time);
+			}
+			
+			return item;
+		}
+		
+		/**
+		 * Sample packets
+		 * 
+		 * @param node
+		 * @param time
+		 * @param windowSize
+		 */ 
 		public function samplePackets(node:Node, time:uint, windowSize:uint):Vector.<Packet>
 		{
 			var packets:Vector.<Packet>;
@@ -83,5 +111,25 @@ package com.bienvisto.elements.transmissions
 			
 			return packets;
 		}
+	
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:uint):int
+		{
+			var total:int = 0;
+			var id:int = node.id;
+			
+			if (id in collections) {
+				var collection:TransmissionCollection = TransmissionCollection(collections[id]);
+				total = collection.sampleTotal(time);
+			}
+			
+			return total;
+		}
+		
 	}
 }

@@ -85,5 +85,25 @@ package com.bienvisto.elements.buffer
 			return buffer;
 		}
 		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:uint):int
+		{
+			var total:uint = 0;
+			var id:int = node.id;
+			var collection:BufferCollection;
+			
+			if (id in collections) {
+				collection = BufferCollection(collections[id]);
+				total = collection.sampleTotal(time);
+			}
+			
+			return total;
+		}
+		
 	}
 }

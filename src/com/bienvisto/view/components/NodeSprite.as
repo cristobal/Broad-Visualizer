@@ -33,7 +33,7 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */
-		private static var radius:uint = 10;
+		private static var defaultRadius:uint = 10;
 		
 		public function NodeSprite(node:Node)
 		{
@@ -43,6 +43,7 @@ package com.bienvisto.view.components
 			_node = node;
 		}
 		
+		private var dirty:Boolean = false;
 		private var color:uint = fillColor;
 		private var shape:Shape;
 		
@@ -54,6 +55,12 @@ package com.bienvisto.view.components
 		public function get cy():Number
 		{
 			return radius;
+		}
+		
+		private var _radius:uint = defaultRadius;
+		public function get radius():uint
+		{
+			return _radius;
 		}
 		
 		
@@ -138,6 +145,7 @@ package com.bienvisto.view.components
 		public function setHighlighted(color:uint = 0xFFF94A):void
 		{
 			this.color = color;
+			this.dirty = true;
 			// invalidate();
 		}
 		
@@ -156,7 +164,10 @@ package com.bienvisto.view.components
 		 */ 
 		public function update(time:uint):void
 		{
-			
+			if (dirty) {
+				invalidate();
+				dirty = false;
+			}
 		}
 		
 		/**
@@ -175,7 +186,7 @@ package com.bienvisto.view.components
 		 */ 
 		private function handleClick(event:MouseEvent):void
 		{
-			// trace("Clicked on node with id", node.id);
+			//trace("Clicked on node with id", node.id);
 			selected = !selected;
 			dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, this));
 		}

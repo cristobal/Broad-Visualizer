@@ -12,14 +12,14 @@ package com.bienvisto.view.drawing
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class NodeBufferDrawingManager implements INodeDrawingManager
+	public final class NodeBuffersDrawingManager implements INodeDrawingManager
 	{
 		/**
 		 * @private
 		 */ 
 		private static var fillColor:uint = 0xAA8888;
 		
-		public function NodeBufferDrawingManager(buffers:Buffers)
+		public function NodeBuffersDrawingManager(buffers:Buffers)
 		{
 			this.buffers = buffers;
 		}
@@ -38,6 +38,43 @@ package com.bienvisto.view.drawing
 		 * @private
 		 */ 
 		private var lastTime:uint = 0;
+		
+		/**
+		 * @readonly name
+		 */ 
+		public function get name():String
+		{
+			return "Buffers";
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _enabled:Boolean = true;
+		
+		/**
+		 * @readwrite enabled
+		 */ 
+		public function get enabled():Boolean
+		{
+			return _enabled;
+		}
+		
+		public function set enabled(value:Boolean):void
+		{
+			_enabled = value;
+			invalidate();
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			for each(var shape:Shape in shapes) {
+				shape.visible = enabled;
+			}
+		}
 		
 		/**
 		 * Update
