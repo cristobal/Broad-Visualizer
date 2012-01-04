@@ -99,8 +99,9 @@ package com.bienvisto
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
+			simulation.addEventListener(Simulation.COMPLETE, handleSimulationComplete);
 			simulation.addEventListener(TimerEvent.TIMER, handleSimulationTimer);
-			simulation.addEventListener(TimerEvent.TIMER_COMPLETE, handleSimulationTimerComplete);
+			
 			
 			nodeContainer = new NodeContainer();
 			mobility 	  = new Mobility(nodeContainer);
@@ -189,6 +190,7 @@ package com.bienvisto
 			window.menu.addToggeableNodeDrawingManager(receptionsDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(dropsDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(routingDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(routingDrawingManager.selectedDrawingManager);
 			
 			// window playback set misc view components
 			window.playback.addZoomView(gridView);
@@ -281,14 +283,13 @@ package com.bienvisto
 		}
 		
 		/**
-		 * Handle simulation timer complete
+		 * Handle simulation complete
 		 * 
 		 * @param event
 		 */ 
-		private function handleSimulationTimerComplete(event:TimerEvent):void
+		private function handleSimulationComplete(event:Event):void
 		{
-			var timer:Timer = Timer(event.target);
-			trace("timer complete", timer.delay, timer.repeatCount);
+			trace("HandleSimulationTimerComplete");
 			window.playback.playButtonState = Playback.PLAY;
 		}
 	}

@@ -13,7 +13,7 @@ package com.bienvisto.elements.routing
 		{
 			super("Routing", "rc");
 			
-			this.nodeContainer = nodeContainer;
+			this.nodeContainer 			  = nodeContainer;
 		}
 		
 		/**
@@ -93,10 +93,26 @@ package com.bienvisto.elements.routing
 			return table;
 		}
 		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
 		public function onTimeUpdate(elapsed:uint):void
 		{
 			
 		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+
 		
 	}
 }

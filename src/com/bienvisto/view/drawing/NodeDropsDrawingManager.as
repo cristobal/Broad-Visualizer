@@ -4,7 +4,12 @@ package com.bienvisto.view.drawing
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.view.components.NodeSprite;
 	
-	public final class NodeDropsDrawingManager implements INodeDrawingManager
+	/**
+	 * NodeDropsDrawingManager.as
+	 * 
+	 * @author Cristobal Dabed
+	 */ 
+	public final class NodeDropsDrawingManager extends NodeDrawingManager
 	{
 		/**
 		 * @private
@@ -16,8 +21,10 @@ package com.bienvisto.view.drawing
 		 */ 
 		private static var highlightColor:uint = 0xff0000;
 		
+		
 		public function NodeDropsDrawingManager(drops:Drops)
 		{
+			super("Drops");
 			this.drops = drops;
 		}
 		
@@ -32,41 +39,17 @@ package com.bienvisto.view.drawing
 		private var lastTime:uint = 0;
 		
 		/**
-		 * @readonly name
+		 * @override
 		 */ 
-		public function get name():String
-		{
-			return "Drops";
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _enabled:Boolean = true;
-		
-		/**
-		 * @readwrite enabled
-		 */ 
-		public function get enabled():Boolean
-		{
-			return _enabled;
-		}
-		
-		public function set enabled(value:Boolean):void
-		{
-			_enabled = value;
-			// invalidate();
-		}
-		
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			if (!enabled) {
 				return;	
 			}
 			
-			var nodeSprite:NodeSprite;
-			var samples:Vector.<Aggregate>;
 			if (lastTime != time) {
+				var nodeSprite:NodeSprite;
+				var samples:Vector.<Aggregate>;
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
 					
@@ -80,6 +63,8 @@ package com.bienvisto.view.drawing
 				}
 				lastTime = time;
 			}
+			
 		}
+		
 	}
 }

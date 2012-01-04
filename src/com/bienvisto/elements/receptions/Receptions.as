@@ -76,6 +76,16 @@ package com.bienvisto.elements.receptions
 		}
 		
 		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
 		 * Sample packet statts
 		 * 
 		 * @param node
@@ -93,24 +103,6 @@ package com.bienvisto.elements.receptions
 			}
 			
 			return packetStats;
-		}
-		
-		/**
-		 * Get packets
-		 * 
-		 * @param node
-		 */ 
-		public function getPackets(node:Node):Vector.<Packet>
-		{
-			var packets:Vector.<Packet>;
-			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
-				packets = Vector.<Packet>(collection.items);
-			}
-			
-			return packets;
 		}
 		
 		/**

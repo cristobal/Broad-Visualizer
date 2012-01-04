@@ -1,7 +1,6 @@
 
 
 import com.bienvisto.Bienvisto;
-import com.bienvisto.elements.ElementBase;
 import com.bienvisto.ui.LoadingWindow;
 import com.bienvisto.ui.charts.ChartsWindow;
 import com.bienvisto.util.FileHelper;
@@ -245,7 +244,7 @@ public function updateGrid():void
  */
 protected function updateVisibleElements():void
 {
-	var elements:Vector.<ElementBase> = v.elements;
+/*	var elements:Vector.<ElementBase> = v.elements;
 	
 	while (visibleElements.numChildren > 0)
 		visibleElements.removeElementAt(0);
@@ -279,7 +278,7 @@ protected function updateVisibleElements():void
 		if (flag) {
 			visibleElements.addElement(auxGroup);
 		}
-	}
+	}*/
 }
 
 

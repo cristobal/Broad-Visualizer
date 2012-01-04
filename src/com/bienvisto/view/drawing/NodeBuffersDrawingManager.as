@@ -12,17 +12,38 @@ package com.bienvisto.view.drawing
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class NodeBuffersDrawingManager implements INodeDrawingManager
+	public final class NodeBuffersDrawingManager extends NodeDrawingManager
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		// Class variables
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * @private
 		 */ 
 		private static var fillColor:uint = 0xAA8888;
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Constructor
+		//
+		//-------------------------------------------------------------------------
 		public function NodeBuffersDrawingManager(buffers:Buffers)
 		{
+			super("buffers");
 			this.buffers = buffers;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -39,50 +60,44 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var lastTime:uint = 0;
 		
-		/**
-		 * @readonly name
-		 */ 
-		public function get name():String
-		{
-			return "Buffers";
-		}
 		
-		/**
-		 * @private
-		 */ 
-		private var _enabled:Boolean = true;
-		
-		/**
-		 * @readwrite enabled
-		 */ 
-		public function get enabled():Boolean
-		{
-			return _enabled;
-		}
-		
-		public function set enabled(value:Boolean):void
-		{
-			_enabled = value;
-			invalidate();
-		}
+		//--------------------------------------------------------------------------
+		//
+		// Methods
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * Invalidate
 		 */ 
-		private function invalidate():void
+		override protected function invalidate():void
 		{
 			for each(var shape:Shape in shapes) {
 				shape.visible = enabled;
 			}
+			
+			super.invalidate();
 		}
 		
 		/**
-		 * Update
+		 * @override
+		 */ 
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		{
+			if ((lastTime != time) && enabled) {
+				draw(time, nodeSprites);
+				
+				lastTime = time;
+			}
+		}
+		
+		/**
+		 * Draw
 		 * 
 		 * @param time
 		 * @param nodeSprites
 		 */ 
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			var nodeSprite:NodeSprite;
 			var shape:Shape;
@@ -126,6 +141,7 @@ package com.bienvisto.view.drawing
 				lastTime = time;
 			}
 		}
+		
 		
 	}
 }

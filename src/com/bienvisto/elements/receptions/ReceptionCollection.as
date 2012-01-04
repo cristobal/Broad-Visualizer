@@ -36,7 +36,8 @@ package com.bienvisto.elements.receptions
 		 */ 
 		public function samplePacketStats(time:uint, windowSize:uint):PacketStats
 		{
-			var packetStats:PacketStats;
+			return processPacketStats(time, windowSize);
+/*			var packetStats:PacketStats;
 			var key:String = String(time) + "," + String(windowSize);
 			if (!(key in spsCache)) {
 				packetStats = processPacketStats(time, windowSize);
@@ -47,7 +48,7 @@ package com.bienvisto.elements.receptions
 				packetStats = PacketStats(spsCache[key]);
 			}
 			
-			return packetStats;	
+			return packetStats;	*/
 		}
 		
 		/**
@@ -84,7 +85,6 @@ package com.bienvisto.elements.receptions
 					}
 				}
 				
-				// }
 				if ((totalOwn +  totalOther)> 0) {
 					packetStats = new PacketStats(node, _items[key].time, totalOwn, totalOther);
 				}

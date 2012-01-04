@@ -29,7 +29,8 @@ package com.bienvisto.elements.transmissions
 		 */ 
 		override public function findNearest(time:uint):Aggregate
 		{
-			var item:Aggregate;
+			return super.findNearest(time);
+/*			var item:Aggregate;
 			if (!(time in itemCache)) {
 				item = super.findNearest(time);
 				if (item) {
@@ -40,7 +41,7 @@ package com.bienvisto.elements.transmissions
 				item = itemCache[time];
 			}
 			
-			return item;
+			return item;*/
 		}
 		
 		/**

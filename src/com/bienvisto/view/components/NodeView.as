@@ -3,7 +3,7 @@ package com.bienvisto.view.components
 	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.view.drawing.IDrawingManager;
-	import com.bienvisto.view.drawing.INodeDrawingManager;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.events.Event;
@@ -31,6 +31,11 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
+		private var lastTime:uint;
+		
+		/**
+		 * @private
+		 */ 
 		private var container:NodeContainer;
 		
 		/**
@@ -46,16 +51,17 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
-		private var managers:Vector.<INodeDrawingManager> = new Vector.<INodeDrawingManager>();
+		private var managers:Vector.<NodeDrawingManager> = new Vector.<NodeDrawingManager>();
 		
 		/**
 		 * Add drawing manager
 		 * 
 		 * @param item
 		 */ 
-		public function addDrawingManager(item:INodeDrawingManager):void
+		public function addDrawingManager(item:NodeDrawingManager):void
 		{
 			managers.push(item);
+			item.addEventListener(Event.CHANGE, handleNodeDrawingManagerChange);
 		}
 		
 		/**
@@ -63,12 +69,13 @@ package com.bienvisto.view.components
 		 * 
 		 * @param item
 		 */ 
-		public function removeDrawingManager(item:INodeDrawingManager):void
+		public function removeDrawingManager(item:NodeDrawingManager):void
 		{
-			var manager:INodeDrawingManager;
+			var manager:NodeDrawingManager;
 			for (var i:int = managers.length; i--;) {
 				manager = managers[i];
 				if (manager === item) {
+					item.removeEventListener(Event.CHANGE, handleNodeDrawingManagerChange);
 					managers.splice(i, 1);
 					break;
 				}
@@ -162,7 +169,7 @@ package com.bienvisto.view.components
 		{
 			checkNodes();
 			
-			var manager:INodeDrawingManager;
+			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
 				manager = managers[i];
 				manager.update(time, nodeSprites);
@@ -174,6 +181,8 @@ package com.bienvisto.view.components
 				nodeSprite.update(time);
 				// nodeSprite.invalidate();
 			}
+			
+			lastTime = time;
 		}
 		
 		
@@ -186,6 +195,18 @@ package com.bienvisto.view.components
 		{
 			updateSelected(event.nodeSprite);
 			dispatchEvent(event); // forward event	
+		}
+		
+		/**
+		 * Handle node drawing manager change
+		 * 
+		 * @param event
+		 */ 
+		private function handleNodeDrawingManagerChange(event:Event):void
+		{
+			update(lastTime);
+			// var item:NodeDrawingManager = NodeDrawingManager(event.target);
+			// item.update(lastTime, nodeSprites);
 		}
 		
 	}

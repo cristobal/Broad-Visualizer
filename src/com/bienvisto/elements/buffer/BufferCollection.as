@@ -19,7 +19,7 @@ package com.bienvisto.elements.buffer
 		/**
 		 * @private
 		 */ 
-		private var bufferCache:Dictionary = new Dictionary();
+		private var cache:Dictionary = new Dictionary();
 		
 		/**
 		 * Find buffer
@@ -28,17 +28,18 @@ package com.bienvisto.elements.buffer
 		 */ 
 		public function findBuffer(time:uint):Buffer
 		{
-			var buffer:Buffer;
+			return Buffer(findNearest(time));
+/*			var buffer:Buffer;
 			
-			if (!(time in bufferCache)) {
+			if (!(time in cache)) {
 				buffer = Buffer(findNearest(time));
-				bufferCache[time] = buffer;
+				cache[time] = buffer;
 			}
 			else {
-				buffer = Buffer(bufferCache[time]);
+				buffer = Buffer(cache[time]);
 			}
 			
-			return buffer;
+			return buffer;*/
 		}
 		
 	}

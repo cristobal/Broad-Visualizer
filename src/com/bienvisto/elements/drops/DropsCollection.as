@@ -27,7 +27,8 @@ package com.bienvisto.elements.drops
 		 */ 
 		override public function sampleItems(time:uint, windowSize:uint):Vector.<Aggregate>
 		{
-			var samples:Vector.<Aggregate>;
+			return super.sampleItems(time, windowSize);time;
+/*			var samples:Vector.<Aggregate>;
 			var key:String = String(time) + "," + String(windowSize);
 			if (!(key in cache)) {
 				var item:Aggregate = findNearest(time);
@@ -39,7 +40,7 @@ package com.bienvisto.elements.drops
 			else {
 				samples = Vector.<Aggregate>(cache[key]);
 			}
-			return samples;
+			return samples;*/
 		}
 		
 	}

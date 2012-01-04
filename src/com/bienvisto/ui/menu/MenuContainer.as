@@ -1,6 +1,6 @@
 package com.bienvisto.ui.menu
 {
-	import com.bienvisto.view.drawing.INodeDrawingManager;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -79,7 +79,7 @@ package com.bienvisto.ui.menu
 		 * 
 		 * @param manager
 		 */ 
-		public function addToggeableNodeDrawingManager(manager:INodeDrawingManager):void
+		public function addToggeableNodeDrawingManager(manager:NodeDrawingManager):void
 		{
 			if (optionsContainer) {
 				var element:CheckBox = new CheckBox();
@@ -136,7 +136,7 @@ package com.bienvisto.ui.menu
 			var name:String = element.label;
 			// trace("handle change for name", name);
 			if (name in managers) {
-				var manager:INodeDrawingManager = INodeDrawingManager(managers[name]);
+				var manager:NodeDrawingManager = NodeDrawingManager(managers[name]);
 				manager.enabled = element.selected;
 			}
 		}

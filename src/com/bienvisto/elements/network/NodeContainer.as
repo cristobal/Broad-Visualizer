@@ -98,5 +98,15 @@ package com.bienvisto.elements.network
 		{
 			
 		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param time
+		 */ 
+		public function setDuration(time:uint):void
+		{
+			
+		}
 	}
 }

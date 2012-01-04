@@ -3,8 +3,6 @@ package com.bienvisto.core
 
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.events.TraceLoadEvent;
-	import com.bienvisto.elements.ElementBase;
-	import com.bienvisto.elements.SequencesManager;
 	import com.bienvisto.util.Tools;
 	
 	import flash.display.MovieClip;
@@ -156,18 +154,6 @@ package com.bienvisto.core
 			return _nodeManager;
 		}
 		
-		/**
-		 * @private
-		 */ 
-		private var _sequencesManager:SequencesManager;
-		
-		/**
-		 * @readonly sequencesManager
-		 */ 
-		public function get sequencesManager():SequencesManager
-		{
-			return _sequencesManager;
-		}
 		
 		
 		// ELEMENTS:
@@ -178,7 +164,7 @@ package com.bienvisto.core
 		/**
 		 * Array containing all loaded elements
 		 */
-		protected var elements_:Vector.<ElementBase> = new Vector.<ElementBase>();
+		protected var elements_:Vector.<Object> = new Vector.<Object>();
 
 
 		public function Visualizer():void
@@ -467,7 +453,7 @@ package com.bienvisto.core
 		/**
 		 * Returns a vector containing elements except the topology element
 		 */
-		public function get elements():Vector.<ElementBase> { return elements_;}
+		public function get elements():Vector.<Object> { return elements_;}
 		
 		/**
 		 * Initializes the visualizer. 
@@ -484,12 +470,8 @@ package com.bienvisto.core
 			addChild(canvasTopLayer_);
 			
 /*			topology = new Topology(this, canvasTopLayer_);*/
-			
-			// _roles = new Properties(this, canvasBottomLayer_);
-			_nodeManager = new NodeContainer();
-			_sequencesManager = new SequencesManager();
-			
-			elements_ = new Vector.<ElementBase>();
+			;
+			                                    
 			// elements_.push(_roles);
 			// elements_.push(new RoutingElementBase(this, canvasBottomLayer_));
 			// elements_.push(new TransmissionsElementBase(this, canvasTopLayer_));

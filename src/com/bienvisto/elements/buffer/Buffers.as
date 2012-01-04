@@ -64,6 +64,15 @@ package com.bienvisto.elements.buffer
 		{
 		}
 		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */ 
+		public function setDuration(duration:uint):void
+		{
+			
+		}
 		
 		/**
 		 * Find buffer

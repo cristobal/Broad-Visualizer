@@ -73,6 +73,17 @@ package com.bienvisto.elements.transmissions
 		}
 		
 		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+
+		
+		/**
 		 * Find nearest
 		 * 
 		 * @param node

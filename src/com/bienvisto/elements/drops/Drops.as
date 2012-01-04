@@ -49,8 +49,23 @@ package com.bienvisto.elements.drops
 			collection.add(item);
 		}
 		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */
 		public function onTimeUpdate(elapsed:uint):void
 		{
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */ 
+		public function setDuration(duration:uint):void
+		{
+			
 		}
 		
 		/**

@@ -18,23 +18,37 @@ package com.bienvisto.view.components
 	public final class NodeSprite extends Sprite
 	{
 		
+		//--------------------------------------------------------------------------
+		//
+		// Class variables
+		//
+		//-------------------------------------------------------------------------
 		/**
 		 * @private
 		 */ 
-		private static var selectedColor:uint 	 = 0xFF6622;
+		private static var selectedColor:uint 	 = 0xFF6622; // 0x00bf00; 
+		
 		/**
 		 * @private
 		 */
 		private static var fillColor:uint 		 = 0x545454;
+		
 		/**
 		 * @private
 		 */
 		private static var highlightedColor:uint = 0xFFF94A;
+		
 		/**
 		 * @private
 		 */
 		private static var defaultRadius:uint = 10;
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Constructor
+		//
+		//-------------------------------------------------------------------------
 		public function NodeSprite(node:Node)
 		{
 			super();
@@ -43,27 +57,61 @@ package com.bienvisto.view.components
 			_node = node;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
+		/**
+		 * @private
+		 */ 
 		private var dirty:Boolean = false;
+		
+		/**
+		 * @private
+		 */
 		private var color:uint = fillColor;
+		
+		/**
+		 * @private
+		 */
 		private var shape:Shape;
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Properties
+		//
+		//-------------------------------------------------------------------------
+		/**
+		 * @readonly cx
+		 */ 
 		public function get cx():Number
 		{
 			return radius;
 		}
 		
+		/**
+		 * @readonly cy
+		 */		
 		public function get cy():Number
 		{
 			return radius;
 		}
 		
+		/**
+		 * @private radius
+		 */
 		private var _radius:uint = defaultRadius;
+		
+		/**
+		 * @readonly radius
+		 */
 		public function get radius():uint
 		{
 			return _radius;
 		}
-		
-		
 		
 		/**
 		 * @private
@@ -84,7 +132,6 @@ package com.bienvisto.view.components
 			invalidate();
 		}
 		
-		
 		/**
 		 * @private
 		 */ 
@@ -97,6 +144,13 @@ package com.bienvisto.view.components
 		{
 			return _node;	
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Methods
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * Setup
@@ -190,5 +244,6 @@ package com.bienvisto.view.components
 			selected = !selected;
 			dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, this));
 		}
+		
 	}
 }

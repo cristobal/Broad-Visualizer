@@ -7,6 +7,7 @@ package com.bienvisto.view.drawing
 	
 	import flash.display.Shape;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
@@ -16,13 +17,30 @@ package com.bienvisto.view.drawing
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class NodeRoutingDrawingManager implements INodeDrawingManager
+	public final class NodeRoutingDrawingManager extends NodeDrawingManager
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		// Constructor
+		//
+		//-------------------------------------------------------------------------
 		public function NodeRoutingDrawingManager(routing:Routing, view:Sprite)
 		{
+			super("Routing");
 			this.routing = routing;
 			this.view = view;
+			
+			view.addChild(routesShape);
+			_selectedDrawingManager.addEventListener(Event.CHANGE, handleSelectedDrawingManagerChange);
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -37,47 +55,63 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
-		private var shapes:Dictionary = new Dictionary();
-	
+		private var routesShape:Shape = new Shape();
+		
 		/**
 		 * @private
 		 */ 
 		private var lastTime:uint = 0;
 		
 		/**
-		 * @readonly name
-		 */ 
-		public function get name():String
-		{
-			return "Routing";
-		}
+		 * @private
+		 */
+		private var drawState:String = "all";
 		
 		/**
 		 * @private
 		 */ 
-		private var _enabled:Boolean = true;
+		private var _selectedDrawingManager:NodeRoutingSelectedDrawingManager = new NodeRoutingSelectedDrawingManager();
+		
 		
 		/**
-		 * @readwrite enabled
+		 * @readonly
 		 */ 
-		public function get enabled():Boolean
+		public function get selectedDrawingManager():NodeRoutingSelectedDrawingManager
 		{
-			return _enabled;
+			return _selectedDrawingManager;
 		}
 		
-		public function set enabled(value:Boolean):void
-		{
-			_enabled = value;
-			invalidate();
-		}
-		
+		//--------------------------------------------------------------------------
+		//
+		// Methods
+		//
+		//-------------------------------------------------------------------------
 		/**
 		 * Invalidate
 		 */ 
-		private function invalidate():void
+		override protected function invalidate():void
 		{
-			for each(var shape:Shape in shapes) {
-				shape.visible = enabled;
+			invalidateState();
+			super.invalidate();
+		}
+		
+		/**
+		 * Invalidate state
+		 */ 
+		private function invalidateState():void
+		{
+			routesShape.visible = enabled || selectedDrawingManager.enabled;
+			drawState = "none";
+			if (routesShape.visible) {
+				if (!enabled && selectedDrawingManager.enabled) {
+					drawState = "selected";
+				}
+				else if (enabled && !selectedDrawingManager.enabled) {
+					drawState = "paths";
+				}
+				else {
+					drawState = "all";
+				}
 			}
 		}
 		
@@ -87,87 +121,152 @@ package com.bienvisto.view.drawing
 		 * @param time
 		 * @param nodeSprites
 		 */ 
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			if (lastTime != time) {
-				var nodeSprite:NodeSprite, nodeSpriteDest:NodeSprite;
-				
-				var spritesCache:Dictionary = new Dictionary();
-				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-					nodeSprite = nodeSprites[i];
-					spritesCache[nodeSprite.node.id] = nodeSprite;
-				}
-				
-				var table:RoutingTable, id:int, shape:Shape;
-				for (i = 0; i < l; i++) {
-					nodeSprite = nodeSprites[i];
-					id = nodeSprite.node.id;
-					
-					if (!(id in shapes)) {
-						shape = new Shape();
-						shape.visible = enabled;
-						view.addChildAt(shape, 0);
-						shapes[id] = shape;
-					}
-					else {
-						shape = Shape(shapes[id]);
-						view.addChildAt(shape, 0); // push to top
-					}
-					
-					table = routing.findTable(nodeSprite.node, time);
-					if (!table) {
-						if ((time % 1000) == 0) {
-							shape.graphics.clear();
-						}
-						continue;
-					}
-					
-					shape.graphics.clear();
-					var entries:Vector.<RoutingTableEntry> = table.entries, entry:RoutingTableEntry;
-					var offset:int  = 10;
-					for (var j:int = 0, n:int = entries.length; j < n; j++) {
-						entry = entries[j];
-						drawPath(nodeSprite, shape, entry, spritesCache, offset);
-					}
-				}
+			if ((lastTime != time) && (drawState != "none")) {
+				draw(time, nodeSprites);
 				
 				lastTime = time;
 			}
 		}
 		
-		
-		public function drawPath(nodeSprite:NodeSprite, shape:Shape, entry:RoutingTableEntry, spritesCache:Dictionary, offset:int):void
+		/**
+		 * Draw
+		 * 
+		 * @param time
+		 * @param nodeSprites
+		 */ 
+		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			var dest:int = entry.destination;
-			var next:int = entry.next;
-			var hops:int = entry.distance;
+			var paths:Dictionary = new Dictionary();
+			var spritesCache:Dictionary = new Dictionary();
 			
-			var nodeSpriteDest:NodeSprite = NodeSprite(spritesCache[next]);
-			
-			if (hops == 1) {
-				nodeSpriteDest = NodeSprite(spritesCache[dest]);
-				// next = -1;
+			var nodeSprite:NodeSprite, table:RoutingTable, entry:RoutingTableEntry, id:int;
+			var args:Array, selected:Boolean, hops:int;
+			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
+				nodeSprite = nodeSprites[i];
+				id		   = nodeSprite.node.id;
+				spritesCache[id] = nodeSprite;
+				
+				table = routing.findTable(nodeSprite.node, time);
+				if (!table) {
+					continue;
+				}
+				selected = nodeSprite.selected;
+				if (selected && (drawState == "paths")) {
+					continue;
+				}
+				else if (!selected && (drawState == "selected")) {
+					continue;
+				}
+				
+				var key:String, keyInv:String;
+				var value:String, flag:Boolean;
+				for (var j:int = 0, n:int = table.entries.length; j < n; j++) {
+					entry = table.entries[j];
+					hops  = entry.distance;
+					args  = [];
+					args.push((selected ? "+" : "-"));
+					args.push(hops);
+					args.push(id);
+					
+					if (hops == 1) {
+						key		= String(id) + "," + String(entry.destination); 
+						keyInv	= String(entry.destination) + "," + String(id); 
+						args.push(entry.destination);
+					}
+					else {
+						key 	= String(id) + "," + String(entry.next);
+						keyInv	= String(entry.next) + "," + String(id); 
+						args.push(entry.next);
+						if (hops == 2) {
+							args.push(entry.destination);
+						}
+					}
+					
+					flag  = (!(key in paths) && !(keyInv in paths)) || (((key in paths) || (keyInv in paths)) && selected);
+					value = args.join(",");
+					
+					if (flag) {
+						paths[key] = value;
+						if (keyInv in paths) {
+							delete paths[keyInv];
+						}
+					}
+				}
 			}
-			else if (next && hops > 2) {
-				nodeSpriteDest =  NodeSprite(spritesCache[next]);
-				// next = -1;
-			}
 			
-			if (nodeSpriteDest) {
-				var origin:Point = new Point(nodeSprite.x + offset, nodeSprite.y + offset);
-				var end:Point = new Point(nodeSpriteDest.x + offset, nodeSpriteDest.y + offset);
-				if (nodeSprite.selected) {
-					shape.graphics.lineStyle(3, 0xff6622);
+			routesShape.graphics.clear();
+			var sid:int, nid:int, did:int;
+			var source:NodeSprite, next:NodeSprite, dest:NodeSprite;
+			var offset:int = 10;
+			for each (var path:String in paths) {
+				args 	 = path.split(",");
+				selected = args[0] == "+";
+				hops     = int(args[1]);
+				sid      = int(args[2]);
+				nid      = int(args[3]);
+				next	 = null;
+				
+				if ((sid in spritesCache) && (nid in spritesCache)) {
+					source = NodeSprite(spritesCache[sid]);
+					next   = NodeSprite(spritesCache[nid]);
+					if ((hops == 2) && selected) {
+						did  = int(args[4]);
+						if (did in spritesCache) {
+							dest = spritesCache[did];
+						}
+					}
+					drawPath(source, next, dest, hops, selected, offset);
+				}
+			}
+		}
+		
+		/**
+		 * Draw path
+		 * 
+		 * @param source
+		 * @param next
+		 * @param dest
+		 * @param offset
+		 */ 
+		private function drawPath(source:NodeSprite, next:NodeSprite, dest:NodeSprite, hops:Number, selected:Boolean, offset:int):void
+		{
+			var sp:Point = new Point(source.x + offset, source.y + offset);
+			var np:Point = new Point(next.x + offset, next.y + offset);
+			var dp:Point;
+			if (dest) {
+				dp = new Point(dest.x + offset, dest.y + offset);
+			}
+			if (selected) {
+				if (hops == 1) {
+					routesShape.graphics.lineStyle(3, 0xff6622); //0x00bf00);
+				}
+				else if (hops == 2) {
+					routesShape.graphics.lineStyle(3, 0xFFF94A); // 0xff6622
 				}
 				else {
-					shape.graphics.lineStyle(1, 0xcccccc);
+					routesShape.graphics.lineStyle(3, 0xff4040);	
 				}
-				shape.graphics.moveTo(origin.x, origin.y);
-/*				if (next) {
-					shape.graphics.lineTo(next.x, next.y);
-				}*/
-				shape.graphics.lineTo(end.x, end.y);
 			}
+			else {
+				routesShape.graphics.lineStyle(1, 0xcccccc);
+			}
+			routesShape.graphics.moveTo(sp.x, sp.y);
+			routesShape.graphics.lineTo(np.x, np.y);
+			if (dp) {
+				routesShape.graphics.lineTo(dp.x, dp.y);
+			}
+		}
+		
+		/**
+		 * Handle selected drawing manager change
+		 * 
+		 * @param event
+		 */ 
+		private function handleSelectedDrawingManagerChange(event:Event):void
+		{
+			invalidateState();
 		}
 	}
 }

@@ -72,9 +72,26 @@ package com.bienvisto.elements.sequences
 			return total;
 		}
 		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
 		public function onTimeUpdate(elapsed:uint):void
 		{
+			
 		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+
 		
 	}
 }

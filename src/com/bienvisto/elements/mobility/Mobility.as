@@ -71,6 +71,16 @@ package com.bienvisto.elements.mobility
 		}
 		
 		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */ 
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
 		 * Find waypoint
 		 * 
 		 * @param id

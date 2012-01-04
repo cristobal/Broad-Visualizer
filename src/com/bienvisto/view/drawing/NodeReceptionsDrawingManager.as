@@ -14,8 +14,15 @@ package com.bienvisto.view.drawing
 	 * 
 	 * @author Cristobal Dabed
 	 */
-	public final class NodeReceptionsDrawingManager implements INodeDrawingManager
+	public final class NodeReceptionsDrawingManager extends NodeDrawingManager
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		// Class variables
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * @private
 		 */ 
@@ -31,6 +38,13 @@ package com.bienvisto.view.drawing
 		 */ 
 		private static var highlightColorOther:uint = 0xFFDA9E;
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Constructor
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * Constructor
 		 * 
@@ -38,8 +52,16 @@ package com.bienvisto.view.drawing
 		 */ 
 		public function NodeReceptionsDrawingManager(receptions:Receptions)
 		{
+			super( "Receptions");
 			this.receptions = receptions;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -56,99 +78,90 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var lastTime:uint = 0;
 		
-		/**
-		 * @readonly name
-		 */ 
-		public function get name():String
-		{
-			return "Receptions";
-		}
 		
-		/**
-		 * @private
-		 */ 
-		private var _enabled:Boolean = true;
-		
-		/**
-		 * @readwrite enabled
-		 */ 
-		public function get enabled():Boolean
-		{
-			return _enabled;
-		}
-		
-		public function set enabled(value:Boolean):void
-		{
-			_enabled = value;
-			invalidate();
-		}
+		//--------------------------------------------------------------------------
+		//
+		// Methods
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * Invalidate
 		 */ 
-		private function invalidate():void
+		override protected function invalidate():void
 		{
 			for each(var shape:Shape in shapes) {
 				shape.visible = enabled;
 			}
+			
+			super.invalidate();
 		}
 		
 		/**
-		 * Update
+		 * @override
+		 */ 
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		{
+			if ((time != lastTime) && enabled) {
+				draw(time, nodeSprites);
+				
+				lastTime = time;
+			}
+		}
+		
+		/**
+		 * Draw 
 		 * 
 		 * @param time
 		 * @param nodeSprites
 		 */ 
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			var nodeSprite:NodeSprite;
 			var packetStats:PacketStats;
 			var id:int;
 			var shape:Shape;
 			
-			if (time != lastTime) {
-				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-					nodeSprite = nodeSprites[i];
+			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
+				nodeSprite = nodeSprites[i];
 				
-					packetStats = receptions.samplePacketStats(nodeSprite.node, time, windowSize);
-					if (packetStats) {
-					
-						// trace(packetStats.node.id, packetStats.totalOther, packetStats.totalOwn);
-						// If the reception is after the moment visualized, we just return
-						if (time < packetStats.time) {
-							return;
-						}
-					
-						id = nodeSprite.node.id;
-						if (!(id in shapes)) {
-							shape = new Shape();
-							shape.visible = enabled;
-							nodeSprite.addChildAt(shape, 0);
-							shapes[id] = shape;
-						}
-						else {
-							shape = Shape(shapes[i]);
-						}
-					
-						var cx:Number = nodeSprite.cx;
-						var cy:Number = nodeSprite.cy;
-						var radius:Number = 9 +  0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
-					
-						shape.graphics.clear();
-					
-						shape.graphics.beginFill(highlightColorOther, 0.5);
-						shape.graphics.drawCircle(cx, cy, radius);
-						shape.graphics.endFill();
-				
-						radius =  9 + 0.5 * packetStats.totalOwn;
-					
-						shape.graphics.beginFill(highlightColor);
-						shape.graphics.drawCircle(cx, cy, radius); 
-						shape.graphics.endFill();
+				packetStats = receptions.samplePacketStats(nodeSprite.node, time, windowSize);
+				if (packetStats) {
+					// trace(packetStats.node.id, packetStats.totalOther, packetStats.totalOwn);
+					// If the reception is after the moment visualized, we just return
+					if (time < packetStats.time) {
+						return;
 					}
+					
+					id = nodeSprite.node.id;
+					if (!(id in shapes)) {
+						shape = new Shape();
+						shape.visible = enabled;
+						nodeSprite.addChildAt(shape, 0);
+						shapes[id] = shape;
+					}
+					else {
+						shape = Shape(shapes[i]);
+					}
+					
+					var cx:Number = nodeSprite.cx;
+					var cy:Number = nodeSprite.cy;
+					var radius:Number = 9 +  0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
+						
+					shape.graphics.clear();
+					
+					shape.graphics.beginFill(highlightColorOther, 0.5);
+					shape.graphics.drawCircle(cx, cy, radius);
+					shape.graphics.endFill();
+						
+					radius =  9 + 0.5 * packetStats.totalOwn;
+						
+					shape.graphics.beginFill(highlightColor);
+					shape.graphics.drawCircle(cx, cy, radius); 
+					shape.graphics.endFill();
 				}
-				lastTime = time;
 			}
+			
 		}
 		
 	}

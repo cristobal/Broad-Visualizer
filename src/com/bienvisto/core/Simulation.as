@@ -41,6 +41,12 @@ package com.bienvisto.core
 		
 		/**
 		 * @Event
+		 */
+		[Event(name="complete", type="flash.events.Event")]
+		public static const COMPLETE:String = "complete";
+		
+		/**
+		 * @Event
 		 */ 
 		[Event(name="reset", type="flash.events.Event")]
 		public static const RESET:String = "reset";
@@ -115,7 +121,6 @@ package com.bienvisto.core
 		public function set speed(value:Number):void
 		{
 			_speed = value;
-			invalidateSpeed();
 		}
 		
 		/**
@@ -213,20 +218,15 @@ package com.bienvisto.core
 				dispatchEvent(new Event(RESET));
 			}		
 			
-			
-			dispatchEvent(new Event(READY));
-			firstRun = false;
-		}
-		
-		/**
-		 * Invalidate speed
-		 */ 
-		private function invalidateSpeed():void
-		{
-			if (timer.running) {
+			var simulationObject:ISimulationObject;
+			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
+				simulationObject = simulationObjects[i];
+				simulationObject.setDuration(duration);
 			}
 			
 			
+			dispatchEvent(new Event(READY));
+			firstRun = false;
 		}
 		
 		/**
@@ -271,6 +271,10 @@ package com.bienvisto.core
 			}
 			
 			timer.start();
+			if (time == duration) {
+				setTime(0); // reset time
+			}
+			
 			if (updateTime == 0) {
 				updateTime = getTimer();
 			}
@@ -346,7 +350,7 @@ package com.bienvisto.core
 			
 			if (stop) {
 				updateTime = 0;
-				dispatchEvent(new TimerEvent(TimerEvent.TIMER_COMPLETE));
+				dispatchEvent(new Event(COMPLETE));
 			}
 			else {
 				updateTime = getTimer();

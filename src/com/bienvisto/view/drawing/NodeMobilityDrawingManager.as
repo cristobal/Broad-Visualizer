@@ -9,10 +9,11 @@ package com.bienvisto.view.drawing
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class NodeMobilityDrawingManager implements INodeDrawingManager
+	public final class NodeMobilityDrawingManager extends NodeDrawingManager
 	{
 		public function NodeMobilityDrawingManager(mobility:Mobility)
 		{
+			super("Mobility");
 			this.mobility = mobility;
 		}
 		
@@ -22,36 +23,9 @@ package com.bienvisto.view.drawing
 		private var mobility:Mobility;
 		
 		/**
-		 * @readonly name
-		 */ 
-		public function get name():String
-		{
-			return "Mobility";
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _enabled:Boolean = true;
-		
-		/**
-		 * @readwrite enabled
-		 */ 
-		public function get enabled():Boolean
-		{
-			return _enabled;
-		}
-		
-		public function set enabled(value:Boolean):void
-		{
-			_enabled = value;
-			// invalidate();
-		}
-		
-		/**
 		 * @override
 		 */ 
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			var nodeSprite:NodeSprite;
 			var waypoint2D:Waypoint2D;

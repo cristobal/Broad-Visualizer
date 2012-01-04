@@ -22,17 +22,21 @@ package com.bienvisto.elements.routing
 		 */ 
 		override public function findNearest(time:uint):Aggregate
 		{
-			var item:Aggregate;
+			return super.findNearest(time);
+/*			var item:Aggregate;
+			
+			
 			
 			if (!(time in cache)) {
 				item = super.findNearest(time);
+				
 				cache[time] = item;
 			}
 			else {
 				item = cache[item] as Aggregate;
 			}
 			
-			return item;
+			return item;*/
 		}
 	}
 }
