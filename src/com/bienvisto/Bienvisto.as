@@ -21,7 +21,9 @@ package com.bienvisto
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
 	import com.bienvisto.view.drawing.NodeBuffersDrawingManager;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	import com.bienvisto.view.drawing.NodeDropsDrawingManager;
+	import com.bienvisto.view.drawing.NodeIDDrawingManager;
 	import com.bienvisto.view.drawing.NodeMobilityDrawingManager;
 	import com.bienvisto.view.drawing.NodeReceptionsDrawingManager;
 	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
@@ -83,6 +85,7 @@ package com.bienvisto
 	
 		private var nodeView:NodeView;
 		private var gridView:GridView;
+		private var nodeIDDrawingManager:NodeDrawingManager;
 		private var mobilityDrawingManager:NodeMobilityDrawingManager;
 		private var transmissionsDrawingManager:NodeTransmissionsDrawingManager;
 		private var receptionsDrawingManager:NodeReceptionsDrawingManager;
@@ -152,6 +155,9 @@ package com.bienvisto
 			view.setDraggableView(nodeView);
 			
 			// 3 Append node drawing managers
+			nodeIDDrawingManager = new NodeIDDrawingManager();
+			nodeView.addDrawingManager(nodeIDDrawingManager);
+			
 			mobilityDrawingManager = new NodeMobilityDrawingManager(mobility);
 			nodeView.addDrawingManager(mobilityDrawingManager);
 			
@@ -185,6 +191,7 @@ package com.bienvisto
 			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
 			
 			// window menu add toggeable node drawing managers
+			window.menu.addToggeableNodeDrawingManager(nodeIDDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(buffersDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(transmissionsDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(receptionsDrawingManager);

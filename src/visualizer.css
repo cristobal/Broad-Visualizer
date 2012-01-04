@@ -14,5 +14,14 @@ global
 	fontFamily: "DejaVuSans";
 	fontName: "DejaVuSansMono";
 	advancedAntiAliasing: true;
+	embedAsCFF: true; 
+}
+
+@font-face {
+	src: url("assets/fonts/dejavu/ttf/DejaVuSansMono.ttf");
+	fontFamily: "DejaVuSansDF3";
+	fontName: "DejaVuSansMonoDF3";
+	advancedAntiAliasing: true;
+	embedAsCFF: false;
 }
 	

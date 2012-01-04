@@ -21,7 +21,7 @@ package com.bienvisto.core
 	/**
 	 * Simulation.as
 	 * 
-	 * A represenation of the simulation.
+	 * A representation of the simulation.
 	 * Also a trace source parser for the simulation properties from the trace file.
 	 * 
 	 * @author Cristobal Dabed
@@ -50,6 +50,7 @@ package com.bienvisto.core
 		 */ 
 		[Event(name="reset", type="flash.events.Event")]
 		public static const RESET:String = "reset";
+		
 		
 		//--------------------------------------------------------------------------
 		//
