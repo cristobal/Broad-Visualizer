@@ -70,7 +70,7 @@ package com.bienvisto.elements.network
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 ;
 			// Format: nr <id> <role> <ipv4Address> <macAddress>
@@ -87,6 +87,8 @@ package com.bienvisto.elements.network
 			node.role = role;
 			
 			log("Updated node", node.toString());
+			
+			return 0;
 		}
 		
 		/**

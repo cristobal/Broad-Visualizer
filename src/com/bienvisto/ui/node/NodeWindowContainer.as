@@ -1,5 +1,7 @@
 package com.bienvisto.ui.node
 {
+	import avmplus.getQualifiedClassName;
+	
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.buffer.Buffers;
@@ -8,6 +10,8 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.receptions.Receptions;
+	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
@@ -18,19 +22,31 @@ package com.bienvisto.ui.node
 	
 	import flash.events.Event;
 	import flash.geom.Point;
+	import flash.utils.Dictionary;
 	
+	import mx.collections.ArrayCollection;
+	import mx.collections.ArrayList;
+	import mx.collections.IList;
+	import mx.collections.ISort;
 	import mx.containers.TabNavigator;
 	import mx.core.FlexShape;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
+	import mx.events.CollectionEvent;
 	import mx.events.FlexEvent;
+	import mx.utils.ObjectProxy;
 	
+	import spark.components.DataGrid;
+	import spark.components.GridColumnHeaderGroup;
 	import spark.components.Group;
 	import spark.components.Label;
 	import spark.components.NavigatorContent;
 	import spark.components.RichText;
 	import spark.components.TitleWindow;
+	import spark.components.gridClasses.GridColumn;
+	import spark.components.gridClasses.GridItemRenderer;
+	import spark.events.GridSelectionEvent;
 	
 	// TODO: Add video sequences sent forward total 
 	// TOOD: Add video sequences drop total 
@@ -107,6 +123,11 @@ package com.bienvisto.ui.node
 		/**
 		 * @public
 		 */ 
+		public var routingDataGrid:DataGrid;
+		
+		/**
+		 * @public
+		 */ 
 		public var bufferSizeValue:Label;
 		
 		/**
@@ -148,6 +169,16 @@ package com.bienvisto.ui.node
 		 * @private
 		 */ 
 		private var selectedNode:NodeSprite = null;
+		
+		/**
+		 * @private
+		 */ 
+		private var elapsed:uint = 0;
+		
+		/**
+		 * @pirvate
+		 */ 
+		private var routingDataGridCache:Dictionary;
 		
 		/**
 		 * @readwrite role
@@ -338,7 +369,11 @@ package com.bienvisto.ui.node
 		
 		private function invalidate():void
 		{
-			updateStats();
+			var value:uint = time - (time % 1000);
+			if (elapsed != value) {
+				elapsed = value;
+				updateStats();
+			}
 		}
 		
 		
@@ -448,6 +483,22 @@ package com.bienvisto.ui.node
 			this.sequencesSent = sequencesSent;
 		}
 		
+		
+		/**
+		 * @private
+		 */ 
+		private var routing:Routing;
+		
+		/**
+		 * Set routing
+		 * 
+		 * @param routing
+		 */ 
+		public function setRouting(routing:Routing):void
+		{
+			this.routing = routing;
+		}
+		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -465,8 +516,7 @@ package com.bienvisto.ui.node
 			propertiesContent.addEventListener(FlexEvent.SHOW, handleNavigatorContentShow);
 			metricsContent.addEventListener(FlexEvent.SHOW, handleNavigatorContentShow);
 			
-			
-			// draw compass
+			routingDataGridCache = new Dictionary();
 			drawCompass();
 		}
 		
@@ -500,6 +550,10 @@ package com.bienvisto.ui.node
 			
 			if (selectedNode) {
 				
+				// store cache
+				storeRoutingDataGridCache();
+				
+				
 				var flag:Boolean = selectedNode.node.id == nodeSprite.node.id;
 				visible = !flag;
 				selectedNode.selected = false;
@@ -521,6 +575,22 @@ package com.bienvisto.ui.node
 			ipv4Address = node.ipv4Address;
 			macAddress = node.macAddress;
 			
+			if (routingDataGrid) {
+				var visibleSortIndicatorIndices:Vector.<int> = null;
+				var item:Object = getItemFromRoutingDataGridCache(node.id);
+				if (item) {
+					visibleSortIndicatorIndices = item.visibleSortIndicatorIndices;
+				}
+				routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices = visibleSortIndicatorIndices;
+				if (routingDataGrid.dataProvider) {
+					routingDataGrid.dataProvider = null;
+					routingDataGrid.selectedItem = null;
+				}
+				
+				
+			}
+			
+			
 			updateStats();	
 		}
 		
@@ -535,11 +605,10 @@ package com.bienvisto.ui.node
 			
 			var node:Node = selectedNode.node;
 			
-			
 			// Update properties
 			if (propertiesContent.visible) {
 				if (mobility) {
-					var waypoint2D:Waypoint2D = mobility.findWaypoint(node, time);
+					var waypoint2D:Waypoint2D = mobility.findWaypoint(node, elapsed);
 					if (waypoint2D) {
 						px = String(selectedNode.x);
 						py = String(selectedNode.y);
@@ -557,7 +626,7 @@ package com.bienvisto.ui.node
 			if (metricsContent.visible) {	
 				var total:int;
 				if (buffers) {
-					var buffer:Buffer = buffers.findBuffer(node, time);
+					var buffer:Buffer = buffers.findBuffer(node, elapsed);
 					if (buffer) {
 						bufferSize = String(buffer.size);
 					}
@@ -567,43 +636,181 @@ package com.bienvisto.ui.node
 				}
 				
 				if (transmissions) {
-					total = transmissions.sampleTotal(node, time);
+					total = transmissions.sampleTotal(node, elapsed);
 					txTotal= String(total);
 				}
 				
 				if (receptions) {
-					total = receptions.sampleTotal(node, time)
+					total = receptions.sampleTotal(node, elapsed)
 					rxTotal = String(total);
 				}
 				
 				if (drops) {
-					total   = drops.sampleTotal(node, time);
+					total   = drops.sampleTotal(node, elapsed);
 					dxTotal = String(total);
 				}
 				
 				if (sequencesSent) {
-					total   = sequencesSent.sampleTotal(node, time);
+					total   = sequencesSent.sampleTotal(node, elapsed);
 					sxTotal = String(total);
 				}
 				if (sequencesRecv) {
-					total   = sequencesRecv.sampleTotal(node, time);
+					total   = sequencesRecv.sampleTotal(node, elapsed);
 					srTotal = String(total);
 				}
 			}
 			
 			// Update Routing
 			if (routingContent.visible) {
-			/*					var table:RoutingTableKeypoint; // = selectedNode.node.routingTable;
-			if (table) {
-			var value:String = "";
-			for each(var entry:RoutingTableEntry in table.entries) {
-			value += entry.toString() + "\n";
+				
+				var table:RoutingTable = routing.resolveTable(node, elapsed);
+				var dataProvider:ArrayCollection = new ArrayCollection();
+				if (table) {
+					var entries:Vector.<RoutingTableEntry> = table.entries;
+					var entry:RoutingTableEntry;
+					var data:ObjectProxy;
+					var item:Object;
+					for (var i:int = 0, l:int = entries.length; i < l; i++) {
+						entry = entries[i];
+						
+						item = {};
+						item.destination = entry.destination;
+						item.distance 	 = entry.distance;
+						item.paths       = parsePaths(entry.paths);
+						item.complete    = entry.complete;
+						item.traceback   = entry.traceback;
+						
+						// trace("item", elapsed, entry.traceback, entry.complete, entry.paths);
+						// data = new ObjectProxy(item);
+						dataProvider.addItem(item);
+					}	
+				}
+				
+				
+				var update:Boolean = true;
+				if (routingDataGrid.dataProvider) {
+					var oDataProvider:ArrayCollection = ArrayCollection(routingDataGrid.dataProvider);
+					if (oDataProvider.length == dataProvider.length) {
+						update = false;
+						var oitem:Object;
+						for (i = oDataProvider.length; i--;) {
+							oitem =oDataProvider.getItemAt(i); 
+							for (var j:int = 0, k:int = dataProvider.length; j < k; j++) {
+								item = dataProvider.getItemAt(j);
+								if (item.destination == oitem.destination) {
+									if ((item.distance != oitem.distance) ||
+										(item.paths    != oitem.paths)    ||
+										(item.complete != oitem.complete) ||
+										(item.traceback != oitem.traceback)) {
+										update = true;
+									}
+									break;	
+								}
+							}
+							
+							if (j == k) {
+								update = true; // no items match update
+							}
+							
+							if (update) {
+								break;
+							}
+						}
+					}
+				}
+				
+				if (update) {
+					// routingDataGridDataProvider = dataProvider;
+					var selectedItem:Object;
+					var sort:ISort;
+					
+					if (oDataProvider) {
+						
+						// Stash old selected item and sort order
+						selectedItem = routingDataGrid.selectedItem;
+						sort = oDataProvider.sort;
+						
+					}
+					// restore from cache
+					else {
+						item = getItemFromRoutingDataGridCache(selectedNode.node.id);
+						if (item) {
+							// Stash old selected item and sort order
+							selectedItem = item.selectedItem;
+							sort         = item.sort;	
+						}
+					}
+					
+					// Restore sort if any and refresh before updatin the dataGrid.dataProvider
+					if (sort) {
+						dataProvider.sort = sort;
+						dataProvider.refresh();
+					}
+					
+					routingDataGrid.dataProvider = dataProvider;	
+					
+					// If selected item loop over items and set the selected if it exists
+					if (selectedItem) {
+						trace("selectedItem was:", selectedItem.destination);
+						for (i = dataProvider.length; i--;) {
+							item = dataProvider.getItemAt(i);
+							if (item.destination == selectedItem.destination) {
+								routingDataGrid.selectedItem = item;
+								break;
+							}
+						}
+					}
+				}
 			}
 			
-			routingTableValue.text = value;
-			}*/
+		}
+		
+		/**
+		 * Parse
+		 */ 
+		private function parsePaths(paths:Vector.<int>):String
+		{
+			return paths ? paths.join(" <–> ").replace(/-1.+?$/, "-1") : "…"; //.replace(/-1.+?$/, "-1");
+		}
+		
+		/**
+		 * Store routing data grid cache
+		 */ 
+		private function storeRoutingDataGridCache():void
+		{
+			var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
+			var id:int = selectedNode.node.id;
+			
+			item.visibleSortIndicatorIndices = routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices;
+			
+			if (routingDataGrid.selectedItem) {
+				item.selectedItem = new ObjectProxy(routingDataGrid.selectedItem);
 			}
 			
+			if (routingDataGrid.dataProvider) {
+				// store in cache
+				item.sort = ArrayCollection(routingDataGrid.dataProvider).sort;	
+			}
+			
+			if (id in routingDataGridCache) {
+				delete routingDataGridCache[id]; // remove old object
+			}
+			routingDataGridCache[id] = item;
+		}
+		
+		/**
+		 * Get time from routing data grid cache
+		 * 
+		 * @param id
+		 */ 
+		private function getItemFromRoutingDataGridCache(id:int):Object
+		{
+			var item:Object = null;
+			if (id in routingDataGridCache) {
+				item = routingDataGridCache[id];
+			}
+			
+			return item;
 		}
 		
 		
@@ -732,6 +939,18 @@ package com.bienvisto.ui.node
 				
 				compassShape.graphics.moveTo(cx, cy);
 				compassShape.graphics.lineTo(dx, dy);
+				
+				var angle:Number  = Math.atan2(dy - cy, dx - cx);
+				var spread:Number = 0.65;
+				var size:Number   = 8;
+				
+				compassShape.graphics.lineStyle(1.5, color);
+				compassShape.graphics.lineTo(dx - Math.cos(angle + spread) * size, dy - Math.sin(angle + spread) * size);
+				compassShape.graphics.moveTo(dx - Math.cos(angle - spread) * size, dy - Math.sin(angle - spread) * size);
+				compassShape.graphics.lineTo(dx, dy);
+				// compassShape.graphics.lineTo(dx - Math.cos(angle + spread) * size, dy - Math.sin(angle + spread) * size);
+				
+				
 			}
 			else {
 				compassShape.graphics.clear();

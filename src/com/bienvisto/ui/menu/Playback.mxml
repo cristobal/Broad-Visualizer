@@ -86,7 +86,7 @@
 						  value="1"  />
 		
 		<!-- Time slider -->
-		<s:HSlider id="timeSlider" enabled="false" width="300" minimum="0" maximum="1000" />
+		<menu:ProgressTimeSlider id="timeSlider" enabled="false" width="300" durationProgressEnabled="true" />
 		
 		<!-- Time display -->
 		<s:Label id="timeLabel">00:00:00</s:Label>

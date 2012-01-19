@@ -42,7 +42,7 @@ package com.bienvisto.elements.receptions
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			// mr <node id> <time> <packet_size> <last_hop_id> <next_hop_id>
 			var id:int 		= int(params[0]);
@@ -63,6 +63,8 @@ package com.bienvisto.elements.receptions
 			}
 			
 			collection.add(packet);
+			
+			return time;
 		}
 		
 		/**

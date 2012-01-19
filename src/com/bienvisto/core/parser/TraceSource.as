@@ -62,13 +62,24 @@ package com.bienvisto.core.parser
 		}
 		
 		/**
+		 * On complete
+		 * 	Will be called when the trace source has completed parsing
+		 */ 
+		public function onComplete():void
+		{
+			
+		}
+		
+		/**
 		 * Called when there are new sources for this eventType
 		 * 
 		 * @param args The params parsed from the trace source
+		 * @return Should return latest parsed time or 0
 		 */ 
-		public function update(params:Vector.<String>):void
+		public function update(params:Vector.<String>):uint
 		{
 			throw new Error("Subclass must override this method");
 		}
+		
 	}
 }

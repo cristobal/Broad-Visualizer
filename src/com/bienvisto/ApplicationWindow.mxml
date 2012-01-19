@@ -1,8 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%" xmlns:menu="com.bienvisto.ui.menu.*" xmlns:view="com.bienvisto.view.*" xmlns:node="com.bienvisto.ui.node.*">
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:menu="com.bienvisto.ui.menu.*" 
+		 xmlns:view="com.bienvisto.view.*" 
+		 xmlns:node="com.bienvisto.ui.node.*"
+		 width="100%" height="100%"
+		 creationComplete="initComponent(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.bienvisto.core.events.TimedEvent;
+			import com.bienvisto.ui.menu.ProgressTimeSlider;
+			
+			import mx.events.FlexEvent;
 
+			/**
+			 * @public
+			 */ 
+			[Event(name="playbackTimerChangeValue", type="com.bienvisto.core.events.TimedEvent")]
+			public static const PLAYBACK_TIMER_CHANGE_VALUE:String = "playbackTimerChangeValue";
+			
+			/**
+			 * @public
+			 */ 
+			[Event(name="playbackTimerChangeStart", type="flash.events.Event")]
+			public static const PLAYBACK_TIMER_CHANGE_START:String = "playbackTimerChangeStart";
+			
+			/**
+		 	 * @public
+			 */ 
+			[Event(name="playbackTimerChangeEnd", type="flash.events.Event")]
+			public static const PLAYBACK_TIMER_CHANGE_END:String   = "playbackChangeEnd";
+			
+			/**
+			 * Init component
+			 * 
+			 * @param event
+			 */ 
+			private function initComponent(event:FlexEvent):void
+			{
+				playback.addEventListener(TimedEvent.ELAPSED, handleProgressSliderChangeValue);
+				playback.timeSlider.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
+				playback.timeSlider.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
+				
+	
+				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadingStart);
+				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadingEnd);
+			}
+			
+			/**
+			 * Handle progress slider change value
+			 * 
+			 * @param event
+			 */ 
+			private function handleProgressSliderChangeValue(event:TimedEvent):void
+			{
+				dispatchEvent(event);
+			}
+			
+			/**
+			 * Handle progress slider change start
+			 * 
+			 * @param event
+			 */ 
+			private function handleProgressSliderChangeStart(event:Event):void
+			{
+				// visualizerView.pause = true;
+				// visualizerView.loaderViewVisible = true;
+				dispatchEvent(new Event(PLAYBACK_TIMER_CHANGE_START));
+			}
+			
+			/**
+			 * Handle progress slider change end
+			 * 
+			 * @param event
+			 */ 
+			private function handleProgressSliderChangeEnd(event:Event):void
+			{
+				// visualizerView.pause = true;
+				// visualizerView.loaderViewVisible = true;
+				dispatchEvent(new Event(PLAYBACK_TIMER_CHANGE_END));
+			}
+			
+			/**
+			 * Handle progress slider loading start
+			 * 
+			 * @param event
+			 */ 
+			private function handleProgressSliderLoadingStart(event:Event):void
+			{
+				trace("handleProgressSliderLoadingStart");
+				visualizerView.loaderViewVisible = true;
+				// trace("loading start");
+			}
+			
+			/**
+			 * Handle progress slider loading end
+			 * 
+			 * @param event
+			 */ 
+			private function handleProgressSliderLoadingEnd(event:Event):void
+			{
+				trace("handleProgressSliderLoadingEnd");
+				visualizerView.loaderViewVisible = false;
+				// trace("loading end");
+			}	
+			
+		]]>
+	</fx:Script>
 	<view:VisualizerView id="visualizerView" />
 	
 	<!-- Top Menu -->

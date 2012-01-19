@@ -37,7 +37,7 @@ package com.bienvisto.elements.mobility
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			// FORMAT: cc <node id> <time> <pos_x> <pos_y> <vel_x> <vel_y>
 			var id:int = int(params[0]);
@@ -58,6 +58,8 @@ package com.bienvisto.elements.mobility
 			
 			
 			collection.add(point);
+			
+			return time;
 		}
 		
 		/**

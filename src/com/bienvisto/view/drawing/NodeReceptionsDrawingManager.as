@@ -141,7 +141,7 @@ package com.bienvisto.view.drawing
 						shapes[id] = shape;
 					}
 					else {
-						shape = Shape(shapes[i]);
+						shape = Shape(shapes[id]);
 					}
 					
 					var cx:Number = nodeSprite.cx;

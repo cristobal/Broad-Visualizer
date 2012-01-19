@@ -31,7 +31,7 @@ package com.bienvisto.elements.drops
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
@@ -47,6 +47,8 @@ package com.bienvisto.elements.drops
 			}
 			
 			collection.add(item);
+			
+			return time;
 		}
 		
 		/**

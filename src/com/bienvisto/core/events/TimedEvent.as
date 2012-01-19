@@ -12,7 +12,10 @@ package com.bienvisto.core.events
 	 */
 	public class TimedEvent extends Event
 	{
-
+		/**
+		 * @public
+		 */ 
+		public static const ELAPSED:String = "elapsed";
 
 		/**
 		 * Constructor of the event.
@@ -38,7 +41,10 @@ package com.bienvisto.core.events
 		public function get elapsed():uint { 
 			return _elapsed; 
 		}
-
+		
+		/**
+		 * @override
+		 */ 
 		public override function clone():Event
 		{
 			return new TimedEvent(type, bubbles, cancelable, elapsed);

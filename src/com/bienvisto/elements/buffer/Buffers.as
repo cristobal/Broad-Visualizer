@@ -34,7 +34,7 @@ package com.bienvisto.elements.buffer
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			// Format: <node id> <time> <new_queue_size>
 			var id:int 	  = int(params[0]);
@@ -53,6 +53,8 @@ package com.bienvisto.elements.buffer
 			}
 			
 			collection.add(buffer);
+			
+			return time;
 		}
 		
 		/**

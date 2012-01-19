@@ -29,7 +29,7 @@ package com.bienvisto.elements.sequences
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
@@ -46,6 +46,8 @@ package com.bienvisto.elements.sequences
 			}
 			
 			collection.add(sequence);
+			
+			return time;
 		}
 		
 		/**

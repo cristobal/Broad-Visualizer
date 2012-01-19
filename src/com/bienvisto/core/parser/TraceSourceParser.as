@@ -1,17 +1,23 @@
 package com.bienvisto.core.parser
 {
+	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.io.FileReader;
 	import com.bienvisto.io.Reader;
 	import com.bienvisto.io.ReaderEvent;
 	
 	import flash.events.Event;
-
+	import flash.events.EventDispatcher;
+	
+	[Event(name="complete", type="flash.events.Event")]
+	
+	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
+	
 	/**
 	 * TraceFileParser.as
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class TraceSourceParser
+	public final class TraceSourceParser extends EventDispatcher
 	{
 		public function TraceSourceParser(reader:Reader)
 		{
@@ -75,12 +81,18 @@ package com.bienvisto.core.parser
 			var source:TraceSource;
 			var params:Vector.<String> = Vector.<String>(event.line.split(" "));
 			var traceSource:String = params.shift();
-			for (var i:uint = 0, l:uint = sources.length; i < l; i++) {
+			var time:uint, maxTime:uint = 0;
+			for (var i:int = 0, l:int = sources.length; i < l; i++) {
 				source = sources[i];
 				if (source.traceSource == traceSource) {
-					source.update(params);
+					time = source.update(params);
+					if (time > maxTime) {
+						dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, time));
+						maxTime = time;
+					}
 				}
 			}
+			
 		}
 		
 		/**
@@ -90,7 +102,13 @@ package com.bienvisto.core.parser
 		 */ 
 		private function handleComplete(event:Event):void
 		{
+			var source:TraceSource;
+			for (var i:uint = 0, l:uint = sources.length; i < l; i++) {
+				source = sources[i];
+				source.onComplete();
+			}
 			
+			dispatchEvent(new Event(Event.COMPLETE));
 		}
 	}
 }

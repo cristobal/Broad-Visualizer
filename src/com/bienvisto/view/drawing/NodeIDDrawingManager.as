@@ -7,22 +7,28 @@ package com.bienvisto.view.drawing
 	import flash.text.TextFormat;
 	import flash.utils.Dictionary;
 
+	/**
+	 * NodeIDDrawingManager.as
+	 * 	Responsible for drawing the textFields
+	 * 
+	 * @author Cristobal Dabed
+	 */ 
 	public final class NodeIDDrawingManager extends NodeDrawingManager
 	{
 		public function NodeIDDrawingManager()
 		{
 			super("Node ID");
-			var fonts:Array = Font.enumerateFonts();
-			for each(var font:Font in fonts) {
-				trace("embedded font:", font.fontName);
-			}
 		}
+		
 		
 		/**
 		 * @private
 		 */ 
 		private var textFields:Dictionary = new Dictionary();
 		
+		/**
+		 * @private
+		 */ 
 		private var textFormat:TextFormat = new TextFormat("DejaVuSansDF3", 13, 0x545454, true);
 		
 		/**
@@ -30,6 +36,10 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var lastTime:uint = 0;
 		
+		
+		/**
+		 * @override
+		 */ 
 		override protected function invalidate():void
 		{
 			for each (var textField:TextField in textFields) {
@@ -57,8 +67,7 @@ package com.bienvisto.view.drawing
 						textField.embedFonts = true;
 						textField.text = "#" + String(id);
 						textField.setTextFormat(textFormat);
-
-						trace("Adding textField with id:", textField.text);
+						
 						nodeSprite.addChild(textField);
 						
 						textFields[id] = textField;

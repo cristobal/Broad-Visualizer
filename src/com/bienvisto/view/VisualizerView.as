@@ -98,7 +98,7 @@ package com.bienvisto.view
 				item = _viewComponents[i];
 				if (view === item) {
 					_viewComponents.splice(i, 1);
-					removeChild(view);
+					removeElement(view);
 				}
 			}
 		}
@@ -108,6 +108,10 @@ package com.bienvisto.view
 		 */ 
 		private function update():void
 		{	
+/*			if (loaderViewVisible) {
+				return;
+			}*/
+			
 			var viewComponent:ViewComponent;
 			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
 				viewComponent = _viewComponents[i];
@@ -122,6 +126,62 @@ package com.bienvisto.view
 		{
 			width  = parent.width;
 			height = parent.height;
+		}
+
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Loader view
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var loaderView:ViewComponent;
+		
+		/**
+		 * @readwrite loaderViewVisible
+		 */ 
+		public function get loaderViewVisible():Boolean
+		{
+			var value:Boolean;
+			
+			if (loaderView) {
+				value = loaderView.visible;
+			}
+			
+			return value;
+		}
+		
+		public function set loaderViewVisible(value:Boolean):void
+		{
+			if (loaderView) {
+				loaderView.visible = value;
+				invalidateLoaderView();
+			}
+		}
+		
+		/**
+		 * Set loader view
+		 * 
+		 * @param view
+		 */ 
+		public function setLoaderView(view:ViewComponent):void
+		{
+			loaderView = view;
+			loaderView.visible = false; // initialize as hidden
+		}
+		
+		/**
+		 * Setup loader view
+		 */ 
+		private function invalidateLoaderView():void
+		{
+			addElementAt(loaderView, numElements - 1);
+			if (parent) {
+				loaderView.setSize(parent.width, parent.height);
+			}
 		}
 		
 		
@@ -237,6 +297,7 @@ package com.bienvisto.view
 			}
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Timer
@@ -258,12 +319,12 @@ package com.bienvisto.view
 			
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Events
 		//
 		//--------------------------------------------------------------------------
-		
 		
 		/**
 		 * Handle enter frame
@@ -281,6 +342,7 @@ package com.bienvisto.view
 		private function handleResize(event:Event):void
 		{
 			invalidate();	
+			invalidateLoaderView();
 		}
 		
 		/**

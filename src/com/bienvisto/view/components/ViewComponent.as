@@ -36,6 +36,18 @@ package com.bienvisto.view.components
 		}
 		
 		/**
+		 * Set size
+		 * 
+		 * @param width
+		 * @param height
+		 */ 
+		public function setSize(width:Number, height:Number):void
+		{
+			this.width  = width;
+			this.height = height;
+		}
+		
+		/**
 		 * Invalidate scale
 		 */ 
 		protected function invalidateScale():void

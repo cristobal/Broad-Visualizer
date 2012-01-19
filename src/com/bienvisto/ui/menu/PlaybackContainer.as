@@ -1,5 +1,6 @@
 package com.bienvisto.ui.menu
 {
+	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.util.sprintf;
 	import com.bienvisto.view.components.GridView;
 	import com.bienvisto.view.components.ViewComponent;
@@ -14,6 +15,8 @@ package com.bienvisto.ui.menu
 	import spark.components.CheckBox;
 	import spark.components.Label;
 	import spark.components.NumericStepper;
+	
+	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
 	
 	/**
 	 * PlaybackContainer.as
@@ -38,6 +41,11 @@ package com.bienvisto.ui.menu
 			super();
 			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
 		}
+		
+		/**
+		 * @public
+		 */
+		public var timeSlider:ProgressTimeSlider;
 		
 		/**
 		 * @public
@@ -166,6 +174,31 @@ package com.bienvisto.ui.menu
 		}
 		
 		/**
+		 * Bind components
+		 */ 
+		protected function bindComponents():void
+		{
+			timeSlider.addEventListener(TimedEvent.ELAPSED, handleProgressSliderChangeValue);
+			// timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
+			// timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
+		}
+		
+		/**
+		 * Set loaded
+		 * 
+		 * @param value
+		 */ 
+		public function setLoaded(value:Number):void
+		{
+			
+			value = int(value);
+			if (value > timeSlider.loaded) {
+				timeSlider.loaded = value;
+			}
+			
+		}
+		
+		/**
 		 * Set time
 		 * 
 		 * @param value
@@ -173,7 +206,9 @@ package com.bienvisto.ui.menu
 		public function setTime(value:uint):void
 		{
 			var text:String = miliSecondsToText(value);
-			timeLabel.text = text;
+			timeLabel.text  = text;
+			
+			timeSlider.time = value / 1000;
 		}
 		
 		/**
@@ -185,6 +220,8 @@ package com.bienvisto.ui.menu
 		{
 			var text:String = miliSecondsToText(value);
 			durationLabel.text = text;
+			timeSlider.duration = value / 1000;
+			timeSlider.enabled  = true;
 		}
 		
 		/**
@@ -206,6 +243,16 @@ package com.bienvisto.ui.menu
 			
 			
 			return sprintf("%02d:%02d:%02d", hours, minutes, value);
+		}
+		
+		/**
+	 	 * Handle progress slider change value
+		 * 
+		 * @param event
+		 */
+		protected function handleProgressSliderChangeValue(event:TimedEvent):void
+		{
+			dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, event.elapsed * 1000));
 		}
 		
 		/**
@@ -237,6 +284,7 @@ package com.bienvisto.ui.menu
 		{
 			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
 			initComponents();
+			bindComponents();
 		}
 		
 	}

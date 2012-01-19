@@ -40,7 +40,7 @@ package com.bienvisto.elements.transmissions
 		/**
 		 * @override
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 						
 			// format: mt <node id> <time> <packet_size> <next_hop_id> 
@@ -60,6 +60,8 @@ package com.bienvisto.elements.transmissions
 			}
 			
 			collection.add(packet);
+			
+			return time;
 		}
 		
 		/**

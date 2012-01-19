@@ -2,6 +2,7 @@ package com.bienvisto
 {
 	import com.bienvisto.core.Simulation;
 	import com.bienvisto.core.aggregate.Aggregate;
+	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.parser.TraceSourceParser;
 	import com.bienvisto.elements.buffer.Buffers;
 	import com.bienvisto.elements.drops.Drops;
@@ -18,6 +19,7 @@ package com.bienvisto
 	import com.bienvisto.ui.menu.Playback;
 	import com.bienvisto.view.VisualizerView;
 	import com.bienvisto.view.components.GridView;
+	import com.bienvisto.view.components.LoaderView;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
 	import com.bienvisto.view.drawing.NodeBuffersDrawingManager;
@@ -61,7 +63,6 @@ package com.bienvisto
 			this.app 	= app;
 			this.app.frameRate = 24;
 			this.window = window; 
-			// trace("frameRate", app.frameRate);
 		}
 		
 		private var app:Application;
@@ -85,6 +86,7 @@ package com.bienvisto
 	
 		private var nodeView:NodeView;
 		private var gridView:GridView;
+		private var loaderView:LoaderView;
 		private var nodeIDDrawingManager:NodeDrawingManager;
 		private var mobilityDrawingManager:NodeMobilityDrawingManager;
 		private var transmissionsDrawingManager:NodeTransmissionsDrawingManager;
@@ -140,6 +142,9 @@ package com.bienvisto
 			parser.addTraceSource(sequencesSent);
 			parser.addTraceSource(sequencesRecv);
 			
+			parser.addEventListener(TimedEvent.ELAPSED, handleParserTimedEventElapsed);
+			parser.addEventListener(Event.COMPLETE, handleParserEventComplete);
+			
 			// Setup the view
 			// 1. Append nodes
 			view = window.visualizerView;
@@ -149,6 +154,9 @@ package com.bienvisto
 			// 3. The nodes
 			gridView = new GridView();
 			view.addViewComponent(gridView);
+			
+			loaderView = new LoaderView();
+			view.setLoaderView(loaderView);
 			
 			nodeView = new NodeView(nodeContainer)
 			view.addViewComponent(nodeView);
@@ -176,6 +184,7 @@ package com.bienvisto
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
 
+			// view.loaderViewVisible = true;
 		}
 		
 		/**
@@ -189,6 +198,7 @@ package com.bienvisto
 			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
 			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
 			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
+			window.addEventListener(ApplicationWindow.PLAYBACK_TIMER_CHANGE_VALUE, handlePlaybackTimerChangeValue);
 			
 			// window menu add toggeable node drawing managers
 			window.menu.addToggeableNodeDrawingManager(nodeIDDrawingManager);
@@ -207,6 +217,7 @@ package com.bienvisto
 			
 			// window nodeWindow set the trace source components
 			window.nodeWindow.setMobility(mobility);
+			window.nodeWindow.setRouting(routing);
 			window.nodeWindow.setBuffers(buffers);
 			window.nodeWindow.setTransmissions(transmissions);
 			window.nodeWindow.setReceptions(receptions);
@@ -296,8 +307,41 @@ package com.bienvisto
 		 */ 
 		private function handleSimulationComplete(event:Event):void
 		{
-			trace("HandleSimulationTimerComplete");
 			window.playback.playButtonState = Playback.PLAY;
 		}
+		
+		/**
+		 * Handle parser timed event elapsed
+		 * 
+		 * @param event
+		 */ 
+		private function handleParserTimedEventElapsed(event:TimedEvent):void
+		{
+			if (simulation.duration > 0) {
+				var value:Number = event.elapsed / simulation.duration * 100;
+				window.playback.setLoaded(value);
+				simulation.setLoaded(value);
+			}
+		}
+		
+		/**
+		 * Handle parser event complete
+		 * 
+		 * @param event
+		 */ 
+		private function handleParserEventComplete(event:Event):void
+		{
+			window.playback.setLoaded(100);	
+			simulation.setLoaded(100);
+		}
+		
+		/**
+		 * Handle playback timer change value
+		 */ 
+		private function handlePlaybackTimerChangeValue(event:TimedEvent):void
+		{
+			simulation.jumpToTime(event.elapsed);
+		}
+		
 	}
 }

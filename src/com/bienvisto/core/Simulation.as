@@ -193,6 +193,66 @@ package com.bienvisto.core
 			invalidate();
 		}
 		
+		/**
+		 * @priavte
+		 */ 
+		private var _loaded:Number = 0;
+		
+		/**
+		 * @readwrite loaded
+		 */ 
+		public function get loaded():Number
+		{
+			return _loaded;
+		}
+		
+		public function setLoaded(value:Number):void
+		{
+			value = int(value);
+			if (value > _loaded) {	
+				if (value < 0) {
+					value = 0;
+				}
+				else if (value > 100) {
+					value = 100;
+				}
+				
+				_loaded = value;
+			}
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _buffering:Boolean;
+		
+		/**
+		 * @readonly buffering
+		 */ 
+		public function get buffering():Boolean
+		{
+			return _buffering;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _bufferTime:uint = 0;
+		
+		/**
+		 * @readonly bufferTime
+		 */ 
+		public function get bufferTime():uint
+		{
+			return _bufferTime;
+		}
+		
+		private function setBuffering(value:Boolean):void
+		{
+			_bufferTime = time; // when we start to buffer and wait
+			_buffering  = value;
+		}
+		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -295,9 +355,15 @@ package com.bienvisto.core
 		 * 
 		 * @param time
 		 */ 
-		public function jumpTo(time:uint):void
+		public function jumpToTime(time:uint):void
 		{
-			
+			var total:Number = (time / duration) * 100;
+			var flag:Boolean = false;
+			if (total > loaded) {
+				flag = true;
+			}
+			setBuffering(flag);
+			setTime(time);
 		}
 		
 		/**
@@ -318,12 +384,13 @@ package com.bienvisto.core
 		 * 
 		 * @param params
 		 */ 
-		override public function update(params:Vector.<String>):void
+		override public function update(params:Vector.<String>):uint
 		{
 			// FORMAT: s <duration> 
 			var duration:uint = uint(params[0]);
 			setDuration(duration);	
 			
+			return time;	
 		}
 		
 		/**
@@ -342,7 +409,12 @@ package com.bienvisto.core
 				stop = true;
 			}
 			setTime(elapsed);
-				
+			
+			
+			if (buffering) {
+				elapsed = bufferTime;
+			}
+			
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
 				simulationObject = simulationObjects[i];

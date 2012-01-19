@@ -17,7 +17,7 @@ package com.bienvisto.elements.routing
 		{
 			super(time);
 			
-			_node = node;
+			_node    = node;
 			_entries = entries;
 			if (!_entries) {
 				_entries = new Vector.<RoutingTableEntry>();
@@ -49,5 +49,6 @@ package com.bienvisto.elements.routing
 		{
 			return _entries;
 		}
+		
 	}
 }
