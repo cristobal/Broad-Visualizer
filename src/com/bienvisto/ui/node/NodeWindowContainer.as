@@ -377,9 +377,8 @@ package com.bienvisto.ui.node
 		
 		private function invalidate():void
 		{
-			var value:uint = time - (time % 100);
-			if (elapsed != value) {
-				elapsed = value;
+			if (elapsed != time) {
+				elapsed = time;
 				updateStats();
 			}
 		}
@@ -546,54 +545,41 @@ package com.bienvisto.ui.node
 		 */ 
 		public function setSelectedNode(nodeSprite:NodeSprite):void 
 		{
-			if (!nodeSprite) {
-				_selectedNode 		  = null;
+			if (nodeSprite) {
+				
+				visible = nodeSprite.selected;
+				_selectedNode = nodeSprite;
+				
+				var node:Node = nodeSprite.node;
+				var value:String = String(node.id);
+				title = "Node  #" + String(node.id);
+				
+				var addressValue:String = "IPv4Address";
+				role = node.role;
+				ipv4Address = node.ipv4Address;
+				macAddress = node.macAddress;
+				
+				if (routingDataGrid) {
+					var visibleSortIndicatorIndices:Vector.<int> = null;
+					var item:Object = getItemFromRoutingDataGridCache(node.id);
+					if (item) {
+						visibleSortIndicatorIndices = item.visibleSortIndicatorIndices;
+					}
+					routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices = visibleSortIndicatorIndices;
+					if (routingDataGrid.dataProvider) {
+						routingDataGrid.dataProvider = null;
+						routingDataGrid.selectedItem = null;
+					}
+				}
+				
+				
+				updateStats();	
+			}
+			else {
+				_selectedNode = null;
 				visible = false;
+
 			}
-/*			if (_selectedNode) {
-				
-				// store cache
-				storeRoutingDataGridCache();
-				
-				
-				var flag:Boolean = _selectedNode.node.id == nodeSprite.node.id;
-				visible = !flag;
-				_selectedNode.selected = false;
-				_selectedNode 		  = null;
-				if (flag) {	
-					return;
-				}
-			}*/
-			
-			visible = nodeSprite.selected;
-			_selectedNode = nodeSprite;
-			
-			var node:Node = nodeSprite.node;
-			var value:String = String(node.id);
-			title = "Node  #" + String(node.id);
-			
-			var addressValue:String = "IPv4Address";
-			role = node.role;
-			ipv4Address = node.ipv4Address;
-			macAddress = node.macAddress;
-			
-			if (routingDataGrid) {
-				var visibleSortIndicatorIndices:Vector.<int> = null;
-				var item:Object = getItemFromRoutingDataGridCache(node.id);
-				if (item) {
-					visibleSortIndicatorIndices = item.visibleSortIndicatorIndices;
-				}
-				routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices = visibleSortIndicatorIndices;
-				if (routingDataGrid.dataProvider) {
-					routingDataGrid.dataProvider = null;
-					routingDataGrid.selectedItem = null;
-				}
-				
-				
-			}
-			
-			
-			updateStats();	
 		}
 		
 		/**
@@ -979,6 +965,8 @@ package com.bienvisto.ui.node
 			visible = false;
 			_selectedNode.selected = false; // deselect current node
 			_selectedNode = null;
+			
+			// dispatchEvent(event); // forward the event
 		}
 		
 		/**

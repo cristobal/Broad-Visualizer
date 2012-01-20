@@ -166,7 +166,21 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var _time:int = 0;
+		private var _internalTime:uint = 0;
+		
+		/**
+		 * @readonly internalTime
+		 */ 
+		public function get internalTime():uint
+		{
+			return _internalTime;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _time:uint = 0;
+		
 		
 		/**
 		 * @reaonly time
@@ -178,7 +192,8 @@ package com.bienvisto.core
 		
 		private function setTime(value:uint):void
 		{
-			_time = value;
+			_time = value - (value % 100); // fix to 100th of a second 
+			_internalTime = value;
 		}
 		
 		/**
@@ -401,7 +416,7 @@ package com.bienvisto.core
 		private function handleTimer(event:TimerEvent):void
 		{
 			var elapsed:int = (getTimer() - updateTime) * speed;
-			elapsed = this.time + elapsed;
+			elapsed = internalTime + elapsed;
 			var stop:Boolean = false;
 			if (elapsed >= duration) {
 				timer.stop();

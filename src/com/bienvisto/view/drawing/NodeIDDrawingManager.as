@@ -20,7 +20,6 @@ package com.bienvisto.view.drawing
 			super("Node ID");
 		}
 		
-		
 		/**
 		 * @private
 		 */ 
@@ -30,11 +29,6 @@ package com.bienvisto.view.drawing
 		 * @private
 		 */ 
 		private var textFormat:TextFormat = new TextFormat("DejaVuSansDF3", 13, 0x545454, true);
-		
-		/**
-		 * @private
-		 */ 
-		private var lastTime:uint = 0;
 		
 		
 		/**
@@ -80,7 +74,7 @@ package com.bienvisto.view.drawing
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			if ((lastTime != time) && enabled) {
+			if (enabled) {
 				var id:int, nodeSprite:NodeSprite, textField:TextField;
 				
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
@@ -100,7 +94,6 @@ package com.bienvisto.view.drawing
 					}
 				}
 				
-				lastTime = time;
 			}
 		}
 	}

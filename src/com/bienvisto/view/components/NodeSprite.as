@@ -80,9 +80,9 @@ package com.bienvisto.view.components
 		
 		/**
 		 * @private
+		 * 	Shape used to draw the node circle
 		 */
 		private var shape:Shape;
-		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -133,8 +133,11 @@ package com.bienvisto.view.components
 		
 		public function set selected(value:Boolean):void
 		{
-			_selected = value;
-			invalidate();
+			if (selected != value) {
+				_selected = value;
+				invalidate();
+				dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, this));
+			}
 		}
 		
 		/**
@@ -153,6 +156,7 @@ package com.bienvisto.view.components
 		public function set selectedOrder(value:int):void
 		{
 			_selectedOrder = value;
+			invalidate();
 		}
 		
 		/**
@@ -184,10 +188,6 @@ package com.bienvisto.view.components
 			addChild(shape);
 			
 			draw();
-			
-			useHandCursor = true;
-			mouseChildren = true;
-			addEventListener(MouseEvent.CLICK, handleClick);
 		}
 		
 		/**
@@ -201,7 +201,6 @@ package com.bienvisto.view.components
 			
 			var cx:Number = radius;
 			var cy:Number = radius;
-			graphics.moveTo(cx, cy);
 			
 			if (selected) {
 				var color:uint = selectedColor;
@@ -210,7 +209,6 @@ package com.bienvisto.view.components
 				}
 				shape.graphics.lineStyle(3, color);
 			}
-			
 			shape.graphics.drawCircle(cx, cy, radius);
 			shape.graphics.endFill();
 			
@@ -257,20 +255,7 @@ package com.bienvisto.view.components
 		 */ 
 		public function destroy():void
 		{
-			removeEventListener(MouseEvent.CLICK, handleClick);
+			
 		}
-		
-		/**
-		 * Handle click
-		 * 
-		 * @param event
-		 */ 
-		private function handleClick(event:MouseEvent):void
-		{
-			//trace("Clicked on node with id", node.id);
-			selected = !selected;
-			dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, this));
-		}
-		
 	}
 }

@@ -4,6 +4,7 @@ package com.bienvisto.view.components
 	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.view.drawing.IDrawingManager;
 	import com.bienvisto.view.drawing.NodeDrawingManager;
+	import com.bienvisto.view.drawing.NodeSelectionDrawingManager;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.events.Event;
@@ -24,6 +25,7 @@ package com.bienvisto.view.components
 		public function NodeView(container:NodeContainer)
 		{
 			super();
+			setup();
 			
 			this.container = container;	
 		}
@@ -38,43 +40,49 @@ package com.bienvisto.view.components
 		 */ 
 		private var container:NodeContainer;
 		
+		/**
+		 * @private
+		 */ 
+		private var nodeSelectionDrawingManager:NodeSelectionDrawingManager;
 		
 		/**
 		 * @private
 		 */ 
-		private var nodeSprites:Vector.<NodeSprite> = new Vector.<NodeSprite>();
+		private var nodeSprites:Vector.<NodeSprite>;
 		
 		/**
 		 * @private
 		 */ 
-		private var managers:Vector.<NodeDrawingManager> = new Vector.<NodeDrawingManager>();
+		private var managers:Vector.<NodeDrawingManager>;
 		
 		/**
-		 * @private
-		 * 	The first selected node sprite
-		 */ 
-		private var _selectedNodeSprite:NodeSprite;
-		
-		/**
-		 * @readonly selectedNodeSprite
+		 * @readwrite selectedNodeSprite
 		 */ 
 		public function get selectedNodeSprite():NodeSprite
 		{
-			return _selectedNodeSprite;
+			return nodeSelectionDrawingManager.selectedNodeSprite;
 		}
 		
 		/**
-		 * @private
-		 * 	The second selected node sprite
-		 */ 
-		private var _selectedNodeSprite2:NodeSprite;
-		
-		/**
-		 * @readonly selectedNodeSprite2
-		 */ 
+		 * @readwrite selectedNodeSprite2
+		 */
 		public function get selectedNodeSprite2():NodeSprite
 		{
-			return _selectedNodeSprite2;
+			return nodeSelectionDrawingManager.selectedNodeSprite2;	
+		}
+		
+		
+		/**
+		 * Setup
+		 */ 
+		private function setup():void
+		{
+			nodeSelectionDrawingManager = new NodeSelectionDrawingManager(this);
+			nodeSprites = new Vector.<NodeSprite>();
+			managers    = new Vector.<NodeDrawingManager>();
+			
+			managers.push(nodeSelectionDrawingManager);
+			nodeSelectionDrawingManager.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSelectionDrawingManagerSelected);
 		}
 		
 		/**
@@ -134,9 +142,10 @@ package com.bienvisto.view.components
 					
 					if (flag) {
 						nodeSprite = new NodeSprite(node);
-						nodeSprite.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);
 						nodeSprites.push(nodeSprite);
 						addChild(nodeSprite);
+						
+						nodeSelectionDrawingManager.addNodeSprite(nodeSprite);
 					}	
 				}
 				
@@ -154,8 +163,9 @@ package com.bienvisto.view.components
 					
 					if (flag) {
 						nodeSprites.splice(i, 1);
-						nodeSprite.removeEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);
 						removeChild(nodeSprite);						
+						nodeSelectionDrawingManager.removeNodeSprite(nodeSprite);
+						
 						nodeSprite.destroy();
 						nodeSprite = null;
 					}
@@ -165,74 +175,6 @@ package com.bienvisto.view.components
 			}
 			
 			count++;
-		}
-		
-		/**
-		 * Update selected
-		 * 
-		 * @param nodeSprite
-		 */ 
-		private function updateSelected(nodeSprite:NodeSprite):void
-		{
-			
-			if (!_selectedNodeSprite && !_selectedNodeSprite2) {
-				_selectedNodeSprite = nodeSprite;
-				_selectedNodeSprite.selectedOrder = 1;
-				_selectedNodeSprite.selected      = true;
-			}
-			else if (_selectedNodeSprite && !_selectedNodeSprite2) {
-				// set sprite 2
-				if (!isSameNodeSprite(_selectedNodeSprite, nodeSprite)) {
-					_selectedNodeSprite2 = nodeSprite;
-					_selectedNodeSprite2.selectedOrder = 2;
-					_selectedNodeSprite2.selected = true;
-				}
-				// remove selected sprite 1
-				else {
-					_selectedNodeSprite.selectedOrder = -1;
-					_selectedNodeSprite.selected = false;
-					_selectedNodeSprite = null;
-				}
-			}
-			else if (_selectedNodeSprite && _selectedNodeSprite2) {
-				// 
-				if (isSameNodeSprite(_selectedNodeSprite, nodeSprite)) {
-					_selectedNodeSprite.selectedOrder = -1;
-					_selectedNodeSprite.selected = false;
-					_selectedNodeSprite = null;
-					
-					// swap node sprites
-					_selectedNodeSprite = _selectedNodeSprite2;
-					_selectedNodeSprite.selectedOrder = 1;
-					_selectedNodeSprite2 = null;
-				}
-				else if (isSameNodeSprite(_selectedNodeSprite2, nodeSprite)) {
-					// remove selected node sprite
-					_selectedNodeSprite2.selectedOrder = -1;
-					_selectedNodeSprite2.selected = false;
-					_selectedNodeSprite2 = null;
-				}
-				else {
-					// swap selected node 2
-					_selectedNodeSprite2.selectedOrder = -1;
-					_selectedNodeSprite2.selected = false;
-					_selectedNodeSprite2 = null;
-					
-					_selectedNodeSprite2 = nodeSprite;
-					_selectedNodeSprite2.selectedOrder = 2;
-					_selectedNodeSprite2.selected = true;
-					
-				}
-			}
-		}
-		
-		/**
-		 * Is same node
-		 * 
-		 */ 
-		private function isSameNodeSprite(node:NodeSprite, node2:NodeSprite):Boolean
-		{
-			return node.node.id == node2.node.id;
 		}
 		
 		/**
@@ -272,13 +214,12 @@ package com.bienvisto.view.components
 		}
 		
 		/**
-		 * Handle sprite selected
+		 * Handle node selection drawing manager selected
 		 * 
 		 * @param event
 		 */ 
-		private function handleNodeSpriteSelected(event:NodeSpriteEvent):void
+		private function handleNodeSelectionDrawingManagerSelected(event:NodeSpriteEvent):void
 		{
-			updateSelected(event.nodeSprite);
 			dispatchEvent(event); // forward event	
 		}
 		

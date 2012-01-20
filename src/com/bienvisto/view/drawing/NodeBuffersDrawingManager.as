@@ -84,7 +84,6 @@ package com.bienvisto.view.drawing
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			time = time - (time % 100); // use 100th of a second only
 			if ((lastTime != time) && enabled) {
 				draw(time, nodeSprites);
 				
