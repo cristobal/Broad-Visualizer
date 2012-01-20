@@ -52,6 +52,11 @@ package com.bienvisto.view.drawing
 			invalidate();
 		}
 		
+		public function set scale(value:Number):void
+		{
+			
+		}
+		
 		/**
 		 * Invalidate
 		 */ 

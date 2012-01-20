@@ -30,6 +30,11 @@ package com.bienvisto.view.components
 		
 		/**
 		 * @private
+		 */ 
+		private static var selectedColorSecond:uint = 0x43C8Ef; //0xA82015;// 0xFFF94A; // 0x00bf00; 
+		
+		/**
+		 * @private
 		 */
 		private static var fillColor:uint 		 = 0x545454;
 		
@@ -135,6 +140,24 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
+		private var _selectedOrder:int = 1;
+		
+		/**
+		 * @readwrite selectedOrder
+		 */ 
+		public function get selectedOrder():int
+		{
+			return _selectedOrder;
+		}
+		
+		public function set selectedOrder(value:int):void
+		{
+			_selectedOrder = value;
+		}
+		
+		/**
+		 * @private
+		 */ 
 		private var _node:Node;
 		
 		/**
@@ -181,7 +204,11 @@ package com.bienvisto.view.components
 			graphics.moveTo(cx, cy);
 			
 			if (selected) {
-				shape.graphics.lineStyle(3, selectedColor);
+				var color:uint = selectedColor;
+				if (selectedOrder == 2) {
+					color = selectedColorSecond;
+				}
+				shape.graphics.lineStyle(3, color);
 			}
 			
 			shape.graphics.drawCircle(cx, cy, radius);

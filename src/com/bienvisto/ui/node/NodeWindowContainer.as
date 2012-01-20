@@ -168,17 +168,25 @@ package com.bienvisto.ui.node
 		/**
 		 * @private
 		 */ 
-		private var selectedNode:NodeSprite = null;
-		
-		/**
-		 * @private
-		 */ 
 		private var elapsed:uint = 0;
 		
 		/**
 		 * @pirvate
 		 */ 
 		private var routingDataGridCache:Dictionary;
+		
+		/**
+		 * @private
+		 */ 
+		private var _selectedNode:NodeSprite = null;
+		
+		/**
+		 * @readwrite selectedNode
+		 */ 
+		public function get selectedNode():NodeSprite
+		{
+			return _selectedNode;
+		}
 		
 		/**
 		 * @readwrite role
@@ -369,7 +377,7 @@ package com.bienvisto.ui.node
 		
 		private function invalidate():void
 		{
-			var value:uint = time - (time % 1000);
+			var value:uint = time - (time % 100);
 			if (elapsed != value) {
 				elapsed = value;
 				updateStats();
@@ -531,40 +539,34 @@ package com.bienvisto.ui.node
 			// rout
 		}
 		
-		
-		/**
-		 * Set node view
-		 * 
-		 * @param view
-		 */ 
-		public function setNodeView(view:NodeView):void
-		{
-			view.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
-		}
-		
 		/**
 		 * Set the current selected node
+		 * 
+		 * @param nodeSprite
 		 */ 
-		protected function setSelectedNode(nodeSprite:NodeSprite):void 
+		public function setSelectedNode(nodeSprite:NodeSprite):void 
 		{
-			
-			if (selectedNode) {
+			if (!nodeSprite) {
+				_selectedNode 		  = null;
+				visible = false;
+			}
+/*			if (_selectedNode) {
 				
 				// store cache
 				storeRoutingDataGridCache();
 				
 				
-				var flag:Boolean = selectedNode.node.id == nodeSprite.node.id;
+				var flag:Boolean = _selectedNode.node.id == nodeSprite.node.id;
 				visible = !flag;
-				selectedNode.selected = false;
-				selectedNode 		  = null;
+				_selectedNode.selected = false;
+				_selectedNode 		  = null;
 				if (flag) {	
 					return;
 				}
-			}
+			}*/
 			
 			visible = nodeSprite.selected;
-			selectedNode = nodeSprite;
+			_selectedNode = nodeSprite;
 			
 			var node:Node = nodeSprite.node;
 			var value:String = String(node.id);
@@ -599,19 +601,19 @@ package com.bienvisto.ui.node
 		 */ 
 		protected function updateStats():void
 		{
-			if (!selectedNode || !initialized) {
+			if (!_selectedNode || !initialized) {
 				return;
 			}
 			
-			var node:Node = selectedNode.node;
+			var node:Node = _selectedNode.node;
 			
 			// Update properties
 			if (propertiesContent.visible) {
 				if (mobility) {
 					var waypoint2D:Waypoint2D = mobility.findWaypoint(node, elapsed);
 					if (waypoint2D) {
-						px = String(selectedNode.x);
-						py = String(selectedNode.y);
+						px = String(_selectedNode.x);
+						py = String(_selectedNode.y);
 						
 						vx = String(waypoint2D.direction.x);
 						vy = String(waypoint2D.direction.y);
@@ -631,7 +633,8 @@ package com.bienvisto.ui.node
 						bufferSize = String(buffer.size);
 					}
 					else {
-						bufferSize = "0";
+						//trace("found no buffer size");
+						bufferSize = "-";
 					}
 				}
 				
@@ -733,7 +736,7 @@ package com.bienvisto.ui.node
 					}
 					// restore from cache
 					else {
-						item = getItemFromRoutingDataGridCache(selectedNode.node.id);
+						item = getItemFromRoutingDataGridCache(_selectedNode.node.id);
 						if (item) {
 							// Stash old selected item and sort order
 							selectedItem = item.selectedItem;
@@ -746,12 +749,10 @@ package com.bienvisto.ui.node
 						dataProvider.sort = sort;
 						dataProvider.refresh();
 					}
-					
 					routingDataGrid.dataProvider = dataProvider;	
 					
 					// If selected item loop over items and set the selected if it exists
 					if (selectedItem) {
-						trace("selectedItem was:", selectedItem.destination);
 						for (i = dataProvider.length; i--;) {
 							item = dataProvider.getItemAt(i);
 							if (item.destination == selectedItem.destination) {
@@ -766,7 +767,7 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
-		 * Parse
+		 * Parse paths
 		 */ 
 		private function parsePaths(paths:Vector.<int>):String
 		{
@@ -779,17 +780,15 @@ package com.bienvisto.ui.node
 		private function storeRoutingDataGridCache():void
 		{
 			var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
-			var id:int = selectedNode.node.id;
+			var id:int = _selectedNode.node.id;
 			
-			item.visibleSortIndicatorIndices = routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices;
-			
-			if (routingDataGrid.selectedItem) {
+			if (routingDataGrid) {
+				item.visibleSortIndicatorIndices = routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices;
 				item.selectedItem = new ObjectProxy(routingDataGrid.selectedItem);
-			}
-			
-			if (routingDataGrid.dataProvider) {
-				// store in cache
-				item.sort = ArrayCollection(routingDataGrid.dataProvider).sort;	
+				if (routingDataGrid.dataProvider) {
+					// store in cache
+					item.sort = ArrayCollection(routingDataGrid.dataProvider).sort;	
+				}
 			}
 			
 			if (id in routingDataGridCache) {
@@ -900,13 +899,9 @@ package com.bienvisto.ui.node
 				var cy:Number  = h / 2;
 				var r:Number   = 33;
 				var color:uint = 0xFF6622;
-				
-				/*				
-				var vx:Number = (direction.x / 1000) * time;
-				var vy:Number = (direction.y / 1000) * time;
-				var dx:Number = position.x + vx;
-				var dy:Number = position.y + vy;
-				*/
+				if (selectedNode && selectedNode.selectedOrder == 2) {
+					color = 0x43c8ef;
+				}
 				
 				var flag:Boolean = false;
 				var sx:int = 0, sy:int = 0;
@@ -948,8 +943,6 @@ package com.bienvisto.ui.node
 				compassShape.graphics.lineTo(dx - Math.cos(angle + spread) * size, dy - Math.sin(angle + spread) * size);
 				compassShape.graphics.moveTo(dx - Math.cos(angle - spread) * size, dy - Math.sin(angle - spread) * size);
 				compassShape.graphics.lineTo(dx, dy);
-				// compassShape.graphics.lineTo(dx - Math.cos(angle + spread) * size, dy - Math.sin(angle + spread) * size);
-				
 				
 			}
 			else {
@@ -984,18 +977,8 @@ package com.bienvisto.ui.node
 		protected function handleClose(event:CloseEvent):void 
 		{
 			visible = false;
-			selectedNode.selected = false; // deselect current node
-			selectedNode = null;
-		}
-		
-		/**
-		 * Handle node sprite selected
-		 * 
-		 * @param event
-		 */ 
-		protected function handleNodeSpriteSelected(event:NodeSpriteEvent):void
-		{
-			setSelectedNode(event.nodeSprite);
+			_selectedNode.selected = false; // deselect current node
+			_selectedNode = null;
 		}
 		
 		/**

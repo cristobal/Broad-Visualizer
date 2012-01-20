@@ -81,7 +81,7 @@
 						sortableColumns="true">
 				<s:columns>
 					<s:ArrayList>
-						<s:GridColumn sortable="true" width="50" dataField="destination" headerText="Dest."></s:GridColumn>
+						<s:GridColumn sortable="true" width="50" dataField="destination" headerText="Dest." ></s:GridColumn>
 						<s:GridColumn sortable="true" width="50" dataField="distance" headerText="Dist."></s:GridColumn>
 						<s:GridColumn sortable="false" width="50" dataField="complete" headerText="All"></s:GridColumn>
 						<s:GridColumn sortable="false" width="50" dataField="traceback" headerText="Tb."></s:GridColumn>

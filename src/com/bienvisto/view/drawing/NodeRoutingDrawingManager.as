@@ -152,7 +152,7 @@ package com.bienvisto.view.drawing
 				if (!table) {
 					continue;
 				}
-				selected = nodeSprite.selected;
+				selected = nodeSprite.selected && (nodeSprite.selectedOrder == 1);
 				if (selected && (drawState == "paths")) {
 					continue;
 				}
@@ -243,7 +243,7 @@ package com.bienvisto.view.drawing
 					routesShape.graphics.lineStyle(3, 0xff6622); //0x00bf00);
 				}
 				else if (hops == 2) {
-					routesShape.graphics.lineStyle(3, 0xFFF94A); // 0xff6622
+					routesShape.graphics.lineStyle(3, 0x43C8Ef); // 0xFFF94A, 0xff6622
 				}
 				else {
 					routesShape.graphics.lineStyle(3, 0xff4040);	

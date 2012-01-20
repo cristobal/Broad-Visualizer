@@ -10,5 +10,6 @@ package com.bienvisto.view.drawing
 		function get name():String;
 		function get enabled():Boolean;
 		function set enabled(value:Boolean):void;
+		function set scale(value:Number):void;
 	}
 }

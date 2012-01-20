@@ -215,18 +215,18 @@ package com.bienvisto
 			window.playback.setGridView(gridView);
 			window.playback.gridViewVisible = false;
 			
-			// window nodeWindow set the trace source components
-			window.nodeWindow.setMobility(mobility);
-			window.nodeWindow.setRouting(routing);
-			window.nodeWindow.setBuffers(buffers);
-			window.nodeWindow.setTransmissions(transmissions);
-			window.nodeWindow.setReceptions(receptions);
-			window.nodeWindow.setDrops(drops);
-			window.nodeWindow.setSequencesRecv(sequencesRecv);
-			window.nodeWindow.setSequencesSent(sequencesSent);
+			// window nodeWindows set the trace source components
+			window.nodeWindows.setMobility(mobility);
+			window.nodeWindows.setRouting(routing);
+			window.nodeWindows.setBuffers(buffers);
+			window.nodeWindows.setTransmissions(transmissions);
+			window.nodeWindows.setReceptions(receptions);
+			window.nodeWindows.setDrops(drops);
+			window.nodeWindows.setSequencesRecv(sequencesRecv);
+			window.nodeWindows.setSequencesSent(sequencesSent);
 			
-			// window nodeWindow set the node view
-			window.nodeWindow.setNodeView(nodeView);
+			// window nodeWindows set the node view
+			window.nodeWindows.setNodeView(nodeView);
 		}
 		
 		
@@ -296,7 +296,7 @@ package com.bienvisto
 		{
 			var time:uint = simulation.time; 
 			window.playback.setTime(time);
-			window.nodeWindow.setTime(time);
+			window.nodeWindows.setTime(time);
 			view.setTime(time);
 		}
 		

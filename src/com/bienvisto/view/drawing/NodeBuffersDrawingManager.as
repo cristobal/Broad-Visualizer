@@ -59,7 +59,7 @@ package com.bienvisto.view.drawing
 		 * @private
 		 */ 
 		private var lastTime:uint = 0;
-		
+	
 		
 		//--------------------------------------------------------------------------
 		//
@@ -84,6 +84,7 @@ package com.bienvisto.view.drawing
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
+			time = time - (time % 100); // use 100th of a second only
 			if ((lastTime != time) && enabled) {
 				draw(time, nodeSprites);
 				
@@ -101,38 +102,22 @@ package com.bienvisto.view.drawing
 		{
 			var nodeSprite:NodeSprite;
 			var shape:Shape;
-			var id:int;
 			var buffer:Buffer;
 			if (time != lastTime) {
 				
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
 					buffer = buffers.findBuffer(nodeSprite.node, time);
-					if (!buffer) {
-						continue;
-					}
+					shape  = getShape(nodeSprite);
+					shape.graphics.clear();
 					
-					if (time < buffer.time) {
+					if (!buffer || time < buffer.time) {	
 						continue;
-					}
-					
-					if (!(id in shapes)) {
-						shape = new Shape();
-						shape.x = nodeSprite.cx;
-						shape.y = nodeSprite.cy;
-						nodeSprite.addChild(shape);
-						
-						shapes[id] = shape;
-					}
-					else {
-						shape = Shape(shapes[id]);
 					}
 					
 					var size:Number = buffer.size;
 					if (size > 0) {
 						var value:Number = size / 100;
-						
-						shape.graphics.clear();
 						shape.graphics.lineStyle(5, fillColor);
 						shape.graphics.lineTo(0, -value);
 					}
@@ -142,6 +127,30 @@ package com.bienvisto.view.drawing
 			}
 		}
 		
+		/**
+		 * Get shape
+		 * 
+		 * @param id
+		 * @param nodeSprite
+		 */ 
+		private function getShape(nodeSprite:NodeSprite):Shape
+		{
+			var shape:Shape;
+			var id:int = nodeSprite.node.id;
+			if (!(id in shapes)) {
+				shape = new Shape();
+				shape.x = nodeSprite.cx;
+				shape.y = nodeSprite.cy;
+				nodeSprite.addChild(shape);
+				
+				shapes[id] = shape;
+			}
+			else {
+				shape = Shape(shapes[id]);
+			}
+			
+			return shape;
+		}
 		
 	}
 }

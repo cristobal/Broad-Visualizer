@@ -40,6 +40,32 @@ package com.bienvisto.view.drawing
 		/**
 		 * @override
 		 */ 
+		override public function set scale(value:Number):void
+		{
+			// Scale up the textfield's if the view size is scaled down
+			var scale:Number = value;
+			if (value < 0.4) {
+				scale = 1 + (1 - value) * 4;		
+			}
+			if (value < 0.7) {
+				scale = 1 + (1 - value) * 3;		
+			}
+			else if (value < 1.0) {
+				scale = 1 + (1 - value) * 2;		
+			}
+			else if (value > 1.0) {
+				scale = 1.0;
+			}
+			
+			for each (var textField:TextField in textFields) {
+				textField.scaleX = scale;
+				textField.scaleY = scale;
+			}
+		}
+		
+		/**
+		 * @override
+		 */ 
 		override protected function invalidate():void
 		{
 			for each (var textField:TextField in textFields) {
