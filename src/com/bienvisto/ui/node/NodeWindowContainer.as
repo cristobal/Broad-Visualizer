@@ -11,6 +11,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.routing.RoutingStatsItem;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.sequences.SequencesRecv;
@@ -54,8 +55,7 @@ package com.bienvisto.ui.node
 	 * NodeWindowContainer
 	 * 	This is the code behind controller class for the NodeWindow.mxml
 	 * 
-	 * @author Cristobal Dabed
-	 * @version {{VERSION_NUMBER}}
+	 * @author Cristobal Dabed}
 	 */ 
 	public class NodeWindowContainer extends TitleWindow
 	{
@@ -64,6 +64,12 @@ package com.bienvisto.ui.node
 			super();
 			bind();	
 		}
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * @public
@@ -108,7 +114,7 @@ package com.bienvisto.ui.node
 		/**
 		 * @public
 		 */ 
-		public var routingTableValue:RichText; 
+		public var tabNavigator:TabNavigator;
 		
 		/**
 		 * @public
@@ -156,6 +162,16 @@ package com.bienvisto.ui.node
 		public var srTotalValue:Label;
 		
 		/**
+		 * @public
+		 */ 
+		public var rtsTotalValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var rtsAvgTotalValue:Label;
+		
+		/**
 		 * @private
 		 */ 
 		public var compassGroup:Group;
@@ -171,9 +187,15 @@ package com.bienvisto.ui.node
 		private var elapsed:uint = 0;
 		
 		/**
-		 * @pirvate
+		 * @private
 		 */ 
-		private var routingDataGridCache:Dictionary;
+		private var routingContentOrderDefaults:Object;
+		
+		//--------------------------------------------------------------------------
+		//
+		// Properties
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -359,6 +381,33 @@ package com.bienvisto.ui.node
 			return srTotalValue.text;
 		}
 		
+		
+		/**
+		 * @readwrite rts total
+		 */ 
+		public function set rtsTotal(value:String):void
+		{
+			rtsTotalValue.text = value;	
+		}
+		
+		public function get rtsTotal():String
+		{
+			return rtsTotalValue.text;
+		}
+		
+		/**
+		 * @readwrite rts avg total
+		 */ 
+		public function set rtsAvgTotal(value:String):void
+		{
+			rtsAvgTotalValue.text = value;	
+		}
+		
+		public function get rtsAvgTotal():String
+		{
+			return rtsAvgTotalValue.text;
+		}
+		
 		/**
 		 * @private
 		 */ 
@@ -372,18 +421,11 @@ package com.bienvisto.ui.node
 		public function setTime(value:uint):void
 		{
 			_time = value;
-			invalidate();
-		}
-		
-		private function invalidate():void
-		{
 			if (elapsed != time) {
 				elapsed = time;
 				updateStats();
 			}
 		}
-		
-		
 		
 		/**
 		 * @private
@@ -506,6 +548,7 @@ package com.bienvisto.ui.node
 			this.routing = routing;
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -520,10 +563,8 @@ package com.bienvisto.ui.node
 			compassShape = new UIComponent();
 			compassGroup.addElement(compassShape);
 			
-			propertiesContent.addEventListener(FlexEvent.SHOW, handleNavigatorContentShow);
-			metricsContent.addEventListener(FlexEvent.SHOW, handleNavigatorContentShow);
-			
-			routingDataGridCache = new Dictionary();
+			tabNavigator.addEventListener(Event.CHANGE, handleTabNavigatorContentChange);
+
 			drawCompass();
 		}
 		
@@ -534,8 +575,48 @@ package com.bienvisto.ui.node
 		{
 			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
 			addEventListener(CloseEvent.CLOSE, handleClose);
+		}
+		
+		/**
+		 * Get settings
+		 */ 
+		public function getSettings():Object
+		{
+			var settings:Object = getDefaultSettings();
 			
-			// rout
+			settings.propertiesContentVisible = propertiesContent.visible;
+			settings.metricsContentVisible    = metricsContent.visible;
+			settings.routingContentVisible    = routingContent.visible;
+			
+			if (routingDataGrid) {
+				var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
+				item.visibleSortIndicatorIndices = routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices;
+				item.selectedItem = new ObjectProxy(routingDataGrid.selectedItem);
+				if (routingDataGrid.dataProvider) {
+					// store in cache
+					item.sort = ArrayCollection(routingDataGrid.dataProvider).sort;	
+				}
+				settings.routingContentOrderDefaults = item;
+			}
+			
+			return settings;
+		}
+		
+		/**
+		 * Get default settings
+		 */ 
+		public function getDefaultSettings():Object
+		{
+			return {
+				propertiesContentVisible: true,
+				metricsContentVisible: false,
+				routingContentVisible: false,
+				routingContentOrderDefaults: {
+					sort: null,
+					selectedItem: null,
+					visibleSortIndicatorIndices: null
+				}
+			};
 		}
 		
 		/**
@@ -543,7 +624,7 @@ package com.bienvisto.ui.node
 		 * 
 		 * @param nodeSprite
 		 */ 
-		public function setSelectedNode(nodeSprite:NodeSprite):void 
+		public function setSelectedNode(nodeSprite:NodeSprite, settings:Object = null):void 
 		{
 			if (nodeSprite) {
 				
@@ -559,11 +640,23 @@ package com.bienvisto.ui.node
 				ipv4Address = node.ipv4Address;
 				macAddress = node.macAddress;
 				
+				if (settings) {
+					if (settings.propertiesContentVisible) {
+						tabNavigator.selectedChild = propertiesContent;
+					}
+					else if (settings.metricsContentVisible) {
+						tabNavigator.selectedChild = metricsContent;
+					}
+					else if (settings.routingContentVisible) {
+						tabNavigator.selectedChild = routingContent;
+					}
+					routingContentOrderDefaults = settings.routingContentOrderDefaults;
+				}
+				
 				if (routingDataGrid) {
 					var visibleSortIndicatorIndices:Vector.<int> = null;
-					var item:Object = getItemFromRoutingDataGridCache(node.id);
-					if (item) {
-						visibleSortIndicatorIndices = item.visibleSortIndicatorIndices;
+					if (routingContentOrderDefaults) {
+						visibleSortIndicatorIndices = routingContentOrderDefaults.visibleSortIndicatorIndices;
 					}
 					routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices = visibleSortIndicatorIndices;
 					if (routingDataGrid.dataProvider) {
@@ -595,161 +688,207 @@ package com.bienvisto.ui.node
 			
 			// Update properties
 			if (propertiesContent.visible) {
-				if (mobility) {
-					var waypoint2D:Waypoint2D = mobility.findWaypoint(node, elapsed);
-					if (waypoint2D) {
-						px = String(_selectedNode.x);
-						py = String(_selectedNode.y);
-						
-						vx = String(waypoint2D.direction.x);
-						vy = String(waypoint2D.direction.y);
-						
-						drawCompassDirection(waypoint2D);
-						
-					}
-				}
+				updateMobilityContent(node);
 			}
 			
 			// Update Metrics
 			if (metricsContent.visible) {	
-				var total:int;
-				if (buffers) {
-					var buffer:Buffer = buffers.findBuffer(node, elapsed);
-					if (buffer) {
-						bufferSize = String(buffer.size);
-					}
-					else {
-						//trace("found no buffer size");
-						bufferSize = "-";
-					}
-				}
-				
-				if (transmissions) {
-					total = transmissions.sampleTotal(node, elapsed);
-					txTotal= String(total);
-				}
-				
-				if (receptions) {
-					total = receptions.sampleTotal(node, elapsed)
-					rxTotal = String(total);
-				}
-				
-				if (drops) {
-					total   = drops.sampleTotal(node, elapsed);
-					dxTotal = String(total);
-				}
-				
-				if (sequencesSent) {
-					total   = sequencesSent.sampleTotal(node, elapsed);
-					sxTotal = String(total);
-				}
-				if (sequencesRecv) {
-					total   = sequencesRecv.sampleTotal(node, elapsed);
-					srTotal = String(total);
-				}
+				updateMetricsContent(node);
 			}
 			
 			// Update Routing
 			if (routingContent.visible) {
-				
-				var table:RoutingTable = routing.resolveTable(node, elapsed);
-				var dataProvider:ArrayCollection = new ArrayCollection();
-				if (table) {
-					var entries:Vector.<RoutingTableEntry> = table.entries;
-					var entry:RoutingTableEntry;
-					var data:ObjectProxy;
-					var item:Object;
-					for (var i:int = 0, l:int = entries.length; i < l; i++) {
-						entry = entries[i];
-						
-						item = {};
-						item.destination = entry.destination;
-						item.distance 	 = entry.distance;
-						item.paths       = parsePaths(entry.paths);
-						item.complete    = entry.complete;
-						item.traceback   = entry.traceback;
-						
-						// trace("item", elapsed, entry.traceback, entry.complete, entry.paths);
-						// data = new ObjectProxy(item);
-						dataProvider.addItem(item);
-					}	
+				updateRoutingContent(node);
+			}
+			
+		}
+		
+		
+		/**
+		 * Update mobility
+		 * 
+		 * @param node
+		 */ 
+		protected function updateMobilityContent(node:Node):void
+		{
+			if (mobility) {
+				var waypoint2D:Waypoint2D = mobility.findWaypoint(node, elapsed);
+				if (waypoint2D) {
+					px = String(_selectedNode.x);
+					py = String(_selectedNode.y);
+					
+					vx = String(waypoint2D.direction.x);
+					vy = String(waypoint2D.direction.y);
+					
+					drawCompassDirection(waypoint2D);
+					
 				}
-				
-				
-				var update:Boolean = true;
-				if (routingDataGrid.dataProvider) {
-					var oDataProvider:ArrayCollection = ArrayCollection(routingDataGrid.dataProvider);
-					if (oDataProvider.length == dataProvider.length) {
-						update = false;
-						var oitem:Object;
-						for (i = oDataProvider.length; i--;) {
-							oitem =oDataProvider.getItemAt(i); 
-							for (var j:int = 0, k:int = dataProvider.length; j < k; j++) {
-								item = dataProvider.getItemAt(j);
-								if (item.destination == oitem.destination) {
-									if ((item.distance != oitem.distance) ||
-										(item.paths    != oitem.paths)    ||
-										(item.complete != oitem.complete) ||
-										(item.traceback != oitem.traceback)) {
-										update = true;
-									}
-									break;	
+			}
+		}
+		
+		/**
+		 * Update metrics conent
+		 * 
+		 * @param node
+		 */ 
+		protected function updateMetricsContent(node:Node):void
+		{
+			var total:int;
+			if (buffers) {
+				var buffer:Buffer = buffers.findBuffer(node, elapsed);
+				if (buffer) {
+					bufferSize = String(buffer.size);
+				}
+				else {
+					bufferSize = "-";
+				}
+			}
+			
+			if (transmissions) {
+				total = transmissions.sampleTotal(node, elapsed);
+				txTotal= String(total);
+			}
+			
+			if (receptions) {
+				total = receptions.sampleTotal(node, elapsed)
+				rxTotal = String(total);
+			}
+			
+			if (drops) {
+				total   = drops.sampleTotal(node, elapsed);
+				dxTotal = String(total);
+			}
+			
+			if (sequencesSent) {
+				total   = sequencesSent.sampleTotal(node, elapsed);
+				sxTotal = String(total);
+			}
+			if (sequencesRecv) {
+				total   = sequencesRecv.sampleTotal(node, elapsed);
+				srTotal = String(total);
+			}
+			
+			if (routing) {
+				var statsItem:RoutingStatsItem = routing.findStatsItem(node, elapsed);
+				if (statsItem) {
+					rtsTotal = String(statsItem.rtsTotal);
+					rtsAvgTotal = String(statsItem.rtsAvgTotal);
+				}
+				else {
+					rtsTotal    = "0";
+					rtsAvgTotal = "0";
+				}
+			}
+		}
+		
+		/**
+		 * Update routing content
+		 * 
+		 * @param node
+		 */ 
+		protected function updateRoutingContent(node:Node):void
+		{
+			if (!routing) {
+				return;
+			}
+			
+			var table:RoutingTable = routing.resolveTable(node, elapsed);
+			var dataProvider:ArrayCollection = new ArrayCollection();
+			if (table) {
+				var entries:Vector.<RoutingTableEntry> = table.entries;
+				var entry:RoutingTableEntry;
+				var data:ObjectProxy;
+				var item:Object;
+				for (var i:int = 0, l:int = entries.length; i < l; i++) {
+					entry = entries[i];
+					
+					item = {};
+					item.destination = entry.destination;
+					item.distance 	 = entry.distance;
+					item.paths       = parsePaths(entry.paths);
+					item.complete    = entry.complete;
+					item.traceback   = entry.traceback;
+					
+					// trace("item", elapsed, entry.traceback, entry.complete, entry.paths);
+					// data = new ObjectProxy(item);
+					dataProvider.addItem(item);
+				}	
+			}
+			
+			
+			var update:Boolean = true;
+			if (routingDataGrid.dataProvider) {
+				var oDataProvider:ArrayCollection = ArrayCollection(routingDataGrid.dataProvider);
+				if (oDataProvider.length == dataProvider.length) {
+					update = false;
+					var oitem:Object;
+					for (i = oDataProvider.length; i--;) {
+						oitem =oDataProvider.getItemAt(i); 
+						for (var j:int = 0, k:int = dataProvider.length; j < k; j++) {
+							item = dataProvider.getItemAt(j);
+							if (item.destination == oitem.destination) {
+								if ((item.distance != oitem.distance) ||
+									(item.paths    != oitem.paths)    ||
+									(item.complete != oitem.complete) ||
+									(item.traceback != oitem.traceback)) {
+									update = true;
 								}
-							}
-							
-							if (j == k) {
-								update = true; // no items match update
-							}
-							
-							if (update) {
-								break;
+								break;	
 							}
 						}
-					}
-				}
-				
-				if (update) {
-					// routingDataGridDataProvider = dataProvider;
-					var selectedItem:Object;
-					var sort:ISort;
-					
-					if (oDataProvider) {
 						
-						// Stash old selected item and sort order
-						selectedItem = routingDataGrid.selectedItem;
-						sort = oDataProvider.sort;
-						
-					}
-					// restore from cache
-					else {
-						item = getItemFromRoutingDataGridCache(_selectedNode.node.id);
-						if (item) {
-							// Stash old selected item and sort order
-							selectedItem = item.selectedItem;
-							sort         = item.sort;	
+						if (j == k) {
+							update = true; // no items match update
 						}
-					}
-					
-					// Restore sort if any and refresh before updatin the dataGrid.dataProvider
-					if (sort) {
-						dataProvider.sort = sort;
-						dataProvider.refresh();
-					}
-					routingDataGrid.dataProvider = dataProvider;	
-					
-					// If selected item loop over items and set the selected if it exists
-					if (selectedItem) {
-						for (i = dataProvider.length; i--;) {
-							item = dataProvider.getItemAt(i);
-							if (item.destination == selectedItem.destination) {
-								routingDataGrid.selectedItem = item;
-								break;
-							}
+						
+						if (update) {
+							break;
 						}
 					}
 				}
 			}
 			
+			if (update) {
+				// routingDataGridDataProvider = dataProvider;
+				var selectedItem:Object;
+				var sort:ISort;
+				
+				if (oDataProvider) {
+					
+					// Stash old selected item and sort order
+					selectedItem = routingDataGrid.selectedItem;
+					sort = oDataProvider.sort;
+					
+				}
+				
+				// restore from cache
+				else {
+					item = getRoutingContentOrderDefaults();
+					if (item) {
+						// Stash old selected item and sort order
+						selectedItem = item.selectedItem;
+						sort         = item.sort;	
+					}
+				}
+				
+				// Restore sort if any and refresh before updatin the dataGrid.dataProvider
+				if (sort) {
+					dataProvider.sort = sort;
+					dataProvider.refresh();
+				}
+				routingDataGrid.dataProvider = dataProvider;	
+				
+				// If selected item loop over items and set the selected if it exists
+				if (selectedItem) {
+					for (i = dataProvider.length; i--;) {
+						item = dataProvider.getItemAt(i);
+						if (item.destination == selectedItem.destination) {
+							routingDataGrid.selectedItem = item;
+							break;
+						}
+					}
+				}
+			}
 		}
 		
 		/**
@@ -761,41 +900,11 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
-		 * Store routing data grid cache
+		 * Get routing 
 		 */ 
-		private function storeRoutingDataGridCache():void
+		private function getRoutingContentOrderDefaults():Object
 		{
-			var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
-			var id:int = _selectedNode.node.id;
-			
-			if (routingDataGrid) {
-				item.visibleSortIndicatorIndices = routingDataGrid.columnHeaderGroup.visibleSortIndicatorIndices;
-				item.selectedItem = new ObjectProxy(routingDataGrid.selectedItem);
-				if (routingDataGrid.dataProvider) {
-					// store in cache
-					item.sort = ArrayCollection(routingDataGrid.dataProvider).sort;	
-				}
-			}
-			
-			if (id in routingDataGridCache) {
-				delete routingDataGridCache[id]; // remove old object
-			}
-			routingDataGridCache[id] = item;
-		}
-		
-		/**
-		 * Get time from routing data grid cache
-		 * 
-		 * @param id
-		 */ 
-		private function getItemFromRoutingDataGridCache(id:int):Object
-		{
-			var item:Object = null;
-			if (id in routingDataGridCache) {
-				item = routingDataGridCache[id];
-			}
-			
-			return item;
+			return routingContentOrderDefaults;
 		}
 		
 		
@@ -970,11 +1079,11 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
-		 * Handle navigator content show
+		 * Handle tab navigator content change 
 		 * 
 		 * @param event
 		 */ 
-		protected function handleNavigatorContentShow(event:FlexEvent):void
+		protected function handleTabNavigatorContentChange(event:Event):void
 		{
 			updateStats();
 		}

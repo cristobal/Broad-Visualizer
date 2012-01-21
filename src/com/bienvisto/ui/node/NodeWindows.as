@@ -90,8 +90,93 @@ package com.bienvisto.ui.node
 		 */ 
 		private function updateSelectedWindows():void
 		{
-			window.setSelectedNode(nodeView.selectedNodeSprite);
-			window2.setSelectedNode(nodeView.selectedNodeSprite2);
+			if (window.selectedNode) {
+				storeWindowSettings(window.selectedNode, window.getSettings());		
+			}
+			if (window2.selectedNode) {
+				storeWindowSettings(window2.selectedNode, window2.getSettings());
+			}
+			
+			
+			var settings:Object
+			
+			// set first window
+			if (!window.selectedNode && !window2.selectedNode && nodeView.selectedNodeSprite) {
+				settings = getWindowSettings(nodeView.selectedNodeSprite);
+				if (!settings) {
+					settings = window.getDefaultSettings();
+				}
+				window.setSelectedNode(nodeView.selectedNodeSprite, settings); 
+			}
+			
+			// swap first window
+			else if (window.selectedNode && nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2) {
+				settings = getWindowSettings(nodeView.selectedNodeSprite);
+				if (!settings) {
+					settings = window.getDefaultSettings();
+				}
+				window.setSelectedNode(nodeView.selectedNodeSprite, settings); 
+				window2.setSelectedNode(null);	
+			}
+			
+			// hide first window
+			else if (window.selectedNode && !window2.selectedNode && !nodeView.selectedNodeSprite) {
+				window.setSelectedNode(null); // hide first window
+			}
+			
+			// set second window
+			else if (window.selectedNode && !window2.selectedNode && nodeView.selectedNodeSprite2) {
+				settings = getWindowSettings(nodeView.selectedNodeSprite2);
+				if (!settings) {
+					settings = window2.getDefaultSettings();
+				}
+				window2.setSelectedNode(nodeView.selectedNodeSprite2);
+			}
+			
+			// swap second window
+			else if  (window.selectedNode && window2.selectedNode && nodeView.selectedNodeSprite2) {
+				settings = getWindowSettings(nodeView.selectedNodeSprite2);
+				if (!settings) {
+					settings = window2.getDefaultSettings();
+				}
+				window2.setSelectedNode(nodeView.selectedNodeSprite2);
+			}
+			
+			// hide second window
+			else if (window.selectedNode && window2.selectedNode && nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2) {
+				window2.setSelectedNode(null);
+			}
+		}
+		
+		/**
+		 * Store window settings
+		 * 
+		 * @param nodeSprite
+		 * @param settings
+		 */ 
+		private function storeWindowSettings(nodeSprite:NodeSprite, settings:Object):void
+		{
+			var id:int = nodeSprite.node.id;
+			if (id in windowsSettings) {
+				delete windowsSettings[id]; // remove old settings
+			}
+			
+			windowsSettings[id] = settings;
+		}
+		
+		/**
+		 * Get window settings
+		 * 
+		 * @param nodeSprite
+		 */ 
+		private function getWindowSettings(nodeSprite:NodeSprite):Object
+		{
+			var settings:Object;
+			var id:int = nodeSprite.node.id;
+			if (id in windowsSettings) {
+				settings = windowsSettings[id];
+			}
+			return settings;
 		}
 		
 		//--------------------------------------------------------------------------

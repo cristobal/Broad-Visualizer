@@ -24,7 +24,7 @@
 	<node:controlBarContent/>
 	
 	
-	<mx:TabNavigator x="0" y="-1" width="448" height="265" borderVisible="true" dropShadowVisible="false">
+	<mx:TabNavigator id="tabNavigator" x="0" y="-1" width="448" height="265" borderVisible="true" dropShadowVisible="false">
 		<!-- Node::Properties Tab -->
 		<s:NavigatorContent id="propertiesContent" width="100%" height="100%" label="Properties">
 			<s:Group x="10">
@@ -73,6 +73,16 @@
 				<s:Label id="sxTotalValue" styleName="value" y="82" text="0" />
 				<s:Label id="srTotalValue" styleName="value" y="102" text="0" />
 			</s:Group>
+			
+			<s:Group x="200">
+				<s:Label styleName="label" text="RtS total:"  />
+				<s:Label styleName="label" y="20" text="RtS Avg 3x:" />
+			</s:Group>	
+			
+			<s:Group x="300">
+				<s:Label id="rtsTotalValue" styleName="value" y="2" text="0" />
+				<s:Label id="rtsAvgTotalValue" styleName="value"  y="22" text="0" />
+			</s:Group>
 		</s:NavigatorContent>
 		
 		<!-- Node::Topolgy/Routing tab-->
@@ -89,7 +99,6 @@
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>
-
 		</s:NavigatorContent>
 	</mx:TabNavigator>
 </node:NodeWindowContainer>

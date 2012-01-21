@@ -7,6 +7,12 @@ package com.bienvisto.elements.routing
 	
 	import flash.utils.Dictionary;
 	
+	/**
+	 * Routing.as
+	 * 
+	 * @author Miguel Santirso
+	 * @author Cristobal Dabed
+	 */ 
 	public final class Routing extends TraceSource implements ISimulationObject
 	{
 		public function Routing(nodeContainer:NodeContainer)
@@ -24,7 +30,22 @@ package com.bienvisto.elements.routing
 		/**
 		 * @private
 		 */ 
+		private var cache:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
 		private var collections:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
+		private var statsCollections:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
+		private var statsItems:Dictionary = new Dictionary();
 		
 		/**
 		 * Update
@@ -37,43 +58,137 @@ package com.bienvisto.elements.routing
 			// Format: rc <node_id> <node_id2> <node_id3> …
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
-			var entries:Vector.<RoutingTableEntry> = parseEntries(params[2]);
+			var entries:Vector.<RoutingTableEntry> = parseEntries(id, time, params[2]);
 			
 			var node:Node 		   = nodeContainer.getNode(id);
 			var table:RoutingTable = new RoutingTable(time, node, entries);
-			var collection:RoutingCollection;
-			if (!(id in collections)) {
-				collection = new RoutingCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = RoutingCollection(collections[id]);
-			}
-			//trace("id", id, "new table on time", time, "entries", entries.length);			
+			var collection:RoutingCollection = getCollection(id);	
 			collection.add(table);
 			
 			return time;
 		}
 		
 		/**
+		 * Get collection
+		 * 
+		 * @param id
+		 */ 
+		private function getCollection(id:int):RoutingCollection
+		{
+			var collection:RoutingCollection;
+			if (!(id in collections)) {
+				collection = new RoutingCollection();	
+				collections[id] = collection;
+			}
+			else {
+				collection = RoutingCollection(collections[id]);
+			}
+			
+			return collection;
+		}
+		
+		/**
+		 * Get stats collection
+		 * 
+		 * @param id
+		 */ 
+		private function getStatsCollection(id:int):RoutingStatsCollection
+		{
+			var statsCollection:RoutingStatsCollection;
+			
+			if (!(id in statsCollections)) {
+				statsCollection = new RoutingStatsCollection();	
+				statsCollections[id] = statsCollection;
+			}
+			else {
+				statsCollection = RoutingStatsCollection(statsCollections[id]);
+			}
+			
+			return statsCollection;
+		}
+		
+		/**
+		 * Get stats item
+		 * 
+		 * @param id
+		 */ 
+		private function getStatsItem(id:int):Object
+		{
+			var item:Object;
+			if (!(id in statsItems)) {
+				item = {rts: false, rtsTotal: 0, rtsAvgTotal: 0};
+				statsItems[id] = item;
+			}
+			else {
+				item = statsItems[id];
+			}
+			
+			return item;
+		}
+		
+		/**
 		 * Parse entries
 		 * 
+		 * @param id
 		 * @param table
 		 */ 
-		private function parseEntries(table:String):Vector.<RoutingTableEntry>
+		private function parseEntries(id:int, time:uint, table:String):Vector.<RoutingTableEntry>
 		{
+			var item:Object = getStatsItem(id);
+			var rts:Boolean    = false;
+			var rtsAvg:Boolean = false;
+			
 			var entries:Vector.<RoutingTableEntry> = new Vector.<RoutingTableEntry>();
 			var entry:RoutingTableEntry;
 			var args:Array = table.split(",");
 			if (args.length >= 3) {
 				for (var i:int = 0, l:int = args.length; i < l; i += 3) {
-					// The distance is not currently used, always -1
 					entry = new RoutingTableEntry(args[i], args[i + 1], args[i + 2]);
+					if (entry.destination == id) {
+						rts = true;
+						continue; // drop destinations to self
+					}
+					
+					if (entry.distance > 2) {
+						rtsAvg = true;
+					}
+					
 					entries.push(entry);
 				}
 			}
 			
+			// Add new stats item 
+			if (rts && !item.rts) {
+				item.rts = true; 
+				item.rtsTotal++; // augment
+				if (rtsAvg) {
+					item.rtsAvgTotal++;
+				}
+				
+				var statsCollection:RoutingStatsCollection = getStatsCollection(id);
+				var statsItem:RoutingStatsItem = new RoutingStatsItem(time, item.rtsTotal, item.rtsAvgTotal);
+				statsCollection.add(statsItem);
+			}
+			// reset
+			else if (!rts && item.rts) {
+				item.rts = false;
+			}
+			
 			return entries;
+		}
+		
+		/**
+		 * Find stats item
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function findStatsItem(node:Node, time:uint):RoutingStatsItem
+		{
+			var collection:RoutingStatsCollection = getStatsCollection(node.id);
+			var itemStats:RoutingStatsItem 		  = RoutingStatsItem(collection.findNearest(time));
+			
+			return itemStats;
 		}
 		
 	   /**
@@ -84,19 +199,11 @@ package com.bienvisto.elements.routing
 		*/
 		public function findTable(node:Node, time:uint):RoutingTable
 		{
-			var table:RoutingTable;
-			var id:int = node.id;
-			var collection:RoutingCollection 
-			
-			if (id in collections) {
-				collection = RoutingCollection(collections[id]);
-				table 	   = RoutingTable(collection.findNearest(time));
-			}
+			var collection:RoutingCollection = getCollection(node.id);
+			var table:RoutingTable 			 = RoutingTable(collection.findNearest(time));
 			
 			return table;
 		}
-		
-		private var cache:Dictionary = new Dictionary();
 		
 		/**
 		 * Resolve table
@@ -266,8 +373,6 @@ package com.bienvisto.elements.routing
 			return traceback;
 		}
 		
-		// private function 
-		
 		/**
 		 * Valid path
 		 * 
@@ -295,6 +400,8 @@ package com.bienvisto.elements.routing
 			
 			return flag;
 		}
+		
+		
 		
 		/**
 		 * On time update
