@@ -48,13 +48,23 @@ package com.bienvisto.elements.routing
 		private var statsItems:Dictionary = new Dictionary();
 		
 		/**
+		 * @private
+		 */ 
+		private var simpleRoutes:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
+		private var simpleRoutesWithNode:Dictionary = new Dictionary();
+		
+		/**
 		 * Update
 		 * 
 		 * @params 
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
-
+			
 			// Format: rc <node_id> <node_id2> <node_id3> …
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
@@ -169,7 +179,7 @@ package com.bienvisto.elements.routing
 				var statsItem:RoutingStatsItem = new RoutingStatsItem(time, item.rtsTotal, item.rtsAvgTotal);
 				statsCollection.add(statsItem);
 			}
-			// reset
+				// reset
 			else if (!rts && item.rts) {
 				item.rts = false;
 			}
@@ -191,12 +201,288 @@ package com.bienvisto.elements.routing
 			return itemStats;
 		}
 		
-	   /**
-		* Find table
-		* 
-		* @param node
-		* @param time
-		*/
+		/**
+		 * find route
+		 * 
+		 * @param time
+		 * @param nodeFrom
+		 * @param nodeTo
+		 */ 
+		public function findCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute>;
+			var key:String = [nodeFrom.id, nodeTo.id, time].join("-");
+			
+			if (!(key in simpleRoutes)) {
+				routes = resolveCompleteRoute(time, nodeFrom, nodeTo);
+				simpleRoutes[key] = routes;
+			}
+			else {
+				routes = Vector.<SimpleRoute>(simpleRoutes[key]);
+			}
+			
+			return routes;
+		}
+		
+		/**
+		 * Resolve route
+		 * 
+		 * @param time
+		 * @param nodeFrom
+		 * @param nodeTo
+		 */ 
+		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute> = new Vector.<SimpleRoute>();
+			
+			var lut:Dictionary = getLUT(time);
+			
+			
+			var from:int = nodeFrom.id;
+			var to:int   = nodeTo.id;
+			
+			var table:RoutingTable = RoutingTable(lut[from]);
+			//trace("resolveCompleteRoute", time, from, table, RoutingCollection(collections[from]).findNearest(time));
+			if (table) {
+				var entries:Vector.<RoutingTableEntry> = table.entries;
+				var entry:RoutingTableEntry;
+				var search:Boolean = false;
+				for (var i:int = 0, l:int = entries.length; i < l; i++) {
+					entry = entries[i];
+					if (entry.destination == to) {	
+						search = true;
+						break;
+					}
+				}
+				
+				if (search) {
+					var route:SimpleRoute;
+					var broken:Boolean;
+					var visited:Dictionary = new Dictionary();
+					while (true) {
+						if (entry.destination == to && entry.distance == 1) {
+							broken = (validPath(from, entry.destination, lut) ? false : true);
+							route  = new SimpleRoute(from, entry.destination, -1, 1, broken); 
+							routes.push(route);
+							break;
+						}
+						visited[from] = true;
+						
+						broken = (validPath(from, entry.next, lut) ? false : true);
+						route  = new SimpleRoute(from, entry.next, -1, 1, broken);
+						routes.push(route);
+						
+						from = entry.next;
+						if (from in visited) {
+							break; // already been here…
+						}
+						
+						table = lut[from];
+						entries = table.entries;
+						search  = false;
+						for (i = 0, l = entries.length; i < l; i++) {
+							entry = entries[i];
+							if (entry.destination == to) {	
+								search = true;
+								break;
+							}
+						}
+						
+						if (!search) {
+							// found no route exit loop
+							break;
+						}
+
+					}
+				}
+			}
+			
+			
+			return routes;
+		}
+		
+		/**
+		 * Find simple routes
+		 * 
+		 * @param time
+		 */ 
+		public function findSimpleRoutes(time:uint):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute>;
+			var key:String = String(time);
+			
+			if (!(key in simpleRoutes)) {
+				routes = resolveSimpleRoutes(time);
+				simpleRoutes[key] = routes;
+			}
+			else {
+				routes = Vector.<SimpleRoute>(simpleRoutes[key]);
+			}
+			
+			
+			return routes;
+		}
+		
+		/**
+		 * Resolve global routes
+		 * 
+		 * @param time
+		 */ 
+		private function resolveSimpleRoutes(time:uint):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute> = new Vector.<SimpleRoute>();
+			
+			var node:Node, nodes:Vector.<Node> = nodeContainer.nodes;
+			
+			var table:RoutingTable;
+			var entry:RoutingTableEntry, entries:Vector.<RoutingTableEntry>;
+			
+			
+			var visited:Dictionary = new Dictionary();
+			var path:String, pathRe:String;
+			var route:SimpleRoute;
+			var from:int, dest:int;
+			
+			var lut:Dictionary = new Dictionary();
+			var collection:RoutingCollection;
+			for each (var id:int in collections) {
+				collection  = RoutingCollection(collections[id]);
+				table	   = RoutingTable(collection.findNearest(time));
+				lut[id]	   = table;
+			}
+			
+			var broken:Boolean;
+			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+				node  = nodes[i];
+				table = findTable(node, time);
+				if (!table) {
+					continue;
+				}
+				
+				from    = node.id;
+				entries = table.entries;
+				for (var j:int = 0, n:int = entries.length; j < n; j++) {
+					entry = entries[j];
+					
+					if (entry.distance == 1) {
+						dest   = entry.destination;
+						path   = [from, entry.destination].join("-");	
+						pathRe = [entry.destination, from].join("-");	
+					}
+					else {
+						dest   = entry.next;
+						path   = [from, entry.next].join("-");	
+						pathRe = [entry.next, from].join("-");	
+					}
+					
+					
+					if (!(path in visited) && !(pathRe in visited)) {
+						
+						visited[path] = true;
+						visited[pathRe] = true;
+						
+						broken = (validPath(from, dest, lut) ? false : true);		
+						route  = new SimpleRoute(from, dest, -1, 1, broken);
+						
+						routes.push(route);
+					}
+				}
+			}
+			
+			return routes;
+		}
+		
+		/**
+		 * Find simple routes with node
+		 *  
+		 * @param time
+		 * @param node
+		 */ 
+		public function findSimpleRoutesWithNode(time:uint, node:Node):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute>;
+			var key:String = [node.id, time].join("-");
+			
+			if (!(key in simpleRoutesWithNode)) {
+				routes = resolveSimpleRoutesWithNode(time, node);
+				simpleRoutes[key] = routes;
+			}
+			else {
+				routes = Vector.<SimpleRoute>(simpleRoutesWithNode[key]);
+			}
+			
+			
+			return routes;
+		}
+		
+		/**
+		 * Resolve simple routes with node
+		 * 
+		 * @param time
+		 * @param node 
+		 */ 
+		private function resolveSimpleRoutesWithNode(time:uint, node:Node):Vector.<SimpleRoute>
+		{
+			var routes:Vector.<SimpleRoute> = findSimpleRoutes(time).concat();
+			
+			var table:RoutingTable;
+			var lut:Dictionary = new Dictionary();
+			var collection:RoutingCollection;
+			for each (var id:int in collections) {
+				collection  = RoutingCollection(collections[id]);
+				table	   = RoutingTable(collection.findNearest(time));
+				lut[id]	   = table;
+			}
+			
+			
+			table   = RoutingTable(lut[id]);
+			if (table) {
+				var entries:Vector.<RoutingTableEntry> = table.entries;
+				var entry:RoutingTableEntry;
+				
+				var path:String, pathRe:String, pathRoute:String;
+				var route:SimpleRoute;
+				var from:int = node.id, dest:int;
+				var broken:Boolean;
+				for (var i:int = 0, l:int = entries.length; i < l; i++) {
+					entry = entries[i];
+					broken = (validPath(from, entry.destination, lut) ? false : true);
+					
+					
+					if (entry.distance == 1) {
+						path   = [from, entry.destination].join("-");	
+						pathRe = [entry.destination, from].join("-");
+					}
+					else {
+						path   = [from, entry.next].join("-");	
+						pathRe = [entry.next, from].join("-");
+					}
+					
+					for (var j:int = routes.length; j--;) {
+						route = routes[j];
+						pathRoute = [route.from, route.destination].join("-");	
+						if (pathRoute == path || pathRoute == pathRe) {
+							routes.splice(j, 1);
+							// break;
+						}
+					}
+					
+					route = new SimpleRoute(from, entry.destination, entry.next, entry.distance, broken);
+					routes.push(route);
+				}
+			}
+			
+			
+			return routes;
+		}
+		
+		
+		/**
+		 * Find table
+		 * 
+		 * @param node
+		 * @param time
+		 */
 		public function findTable(node:Node, time:uint):RoutingTable
 		{
 			var collection:RoutingCollection = getCollection(node.id);
@@ -218,7 +504,7 @@ package com.bienvisto.elements.routing
 			var key:String = String(node.id) + "-" + String(time);
 			if (key in cache) {
 				table = RoutingTable(cache[key]);
-					
+				
 				return table;
 			}
 			
@@ -321,8 +607,8 @@ package com.bienvisto.elements.routing
 					}
 					
 					source = entry.next;
-/*					if (source in visited) {
-						break;
+					/*					if (source in visited) {
+					break;
 					}*/
 					visited[source] = source;
 					table  = RoutingTable(lut[source]);
@@ -388,7 +674,7 @@ package com.bienvisto.elements.routing
 			if (table) {
 				var entries:Vector.<RoutingTableEntry> = table.entries;
 				var entry:RoutingTableEntry;
-			
+				
 				for (var i:int = 0, l:int = entries.length; i < l; i++) {
 					entry = entries[i];
 					if (entry.destination == source && entry.distance == 1) {
@@ -400,8 +686,6 @@ package com.bienvisto.elements.routing
 			
 			return flag;
 		}
-		
-		
 		
 		/**
 		 * On time update
@@ -422,7 +706,27 @@ package com.bienvisto.elements.routing
 		{
 			
 		}
-
+		
+		
+		private function getLUT(time:uint):Dictionary
+		{
+			var lut:Dictionary = new Dictionary();
+			var table:RoutingTable;
+			
+			var collection:RoutingCollection;
+			var id:int;
+			var node:Node;
+			var nodes:Vector.<Node> = nodeContainer.nodes;
+			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+				node = nodes[i];
+				id   = node.id;
+				collection = RoutingCollection(collections[id]);
+				table	   = RoutingTable(collection.findNearest(time));
+				lut[id]	   = table;
+			}
+			
+			return lut;
+		}
 		
 	}
 }

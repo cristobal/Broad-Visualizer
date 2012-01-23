@@ -4,6 +4,7 @@ package com.bienvisto.view.drawing
 	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.network.Packet;
 	import com.bienvisto.elements.transmissions.Transmissions;
+	import com.bienvisto.util.DashedLine;
 	import com.bienvisto.view.components.NodeSprite;
 	
 	import flash.display.Shape;
@@ -227,9 +228,12 @@ package com.bienvisto.view.drawing
 			end.y -= offset * Math.sin(angle);
 			
 			
-			shape.graphics.lineStyle(2, arrowColor);
-			shape.graphics.moveTo(origin.x, origin.y);
-			shape.graphics.lineTo(end.x, end.y);
+			shape.graphics.lineStyle(2.5, arrowColor);
+			DashedLine.moveTo(shape.graphics, origin.x, origin.y);
+			DashedLine.lineTo(shape.graphics, end.x, end.y);
+			
+/*			shape.graphics.moveTo(origin.x, origin.y);
+			shape.graphics.lineTo(end.x, end.y);*/
 			shape.graphics.lineTo(end.x-Math.cos(angle+spread)*size, end.y-Math.sin(angle+spread)*size);
 			shape.graphics.moveTo(end.x-Math.cos(angle-spread)*size, end.y-Math.sin(angle-spread)*size);
 			shape.graphics.lineTo(end.x, end.y);

@@ -26,12 +26,12 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
-		private static var selectedColor:uint 	 = 0xFF6622; // 0x00bf00; 
+		public static var selectedColor:uint 	 = 0xFF6622; // 0x00bf00; 
 		
 		/**
 		 * @private
 		 */ 
-		private static var selectedColorSecond:uint = 0x43C8Ef; //0xA82015;// 0xFFF94A; // 0x00bf00; 
+		public static var selectedColorSecond:uint = 0xFF6622; //0x3385D7; //0x43C8Ef; //0x005CCB; // 0x6383FF; // 0xAA8888; //0x43C8Ef; //0xA82015;// 0xFFF94A; // 0x00bf00; 
 		
 		/**
 		 * @private

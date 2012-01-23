@@ -24,6 +24,7 @@ package com.bienvisto.ui.node
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
+	import flash.utils.setTimeout;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ArrayList;
@@ -48,6 +49,7 @@ package com.bienvisto.ui.node
 	import spark.components.gridClasses.GridColumn;
 	import spark.components.gridClasses.GridItemRenderer;
 	import spark.events.GridSelectionEvent;
+	import spark.events.IndexChangeEvent;
 	
 	// TODO: Add video sequences sent forward total 
 	// TOOD: Add video sequences drop total 
@@ -993,9 +995,9 @@ package com.bienvisto.ui.node
 				var cx:Number  = w / 2;
 				var cy:Number  = h / 2;
 				var r:Number   = 33;
-				var color:uint = 0xFF6622;
+				var color:uint = NodeSprite.selectedColor;
 				if (selectedNode && selectedNode.selectedOrder == 2) {
-					color = 0x43c8ef;
+					color = NodeSprite.selectedColorSecond; // 0x43c8ef;
 				}
 				
 				var flag:Boolean = false;
@@ -1085,7 +1087,9 @@ package com.bienvisto.ui.node
 		 */ 
 		protected function handleTabNavigatorContentChange(event:Event):void
 		{
-			updateStats();
+			setTimeout(function():void{
+				updateStats();
+			}, 10);
 		}
 	}
 }

@@ -1,11 +1,9 @@
 package com.bienvisto.elements.routing
 {
-	import com.bienvisto.util.Tools;
-
 	/**
 	 * A single entry of a routing table
 	 */
-	public final class RoutingTableEntry
+	public class RoutingTableEntry
 	{
 		
 		/**
