@@ -7,6 +7,8 @@ package com.bienvisto.elements.routing
 	
 	import flash.utils.Dictionary;
 	
+	import mx.utils.ObjectProxy;
+	
 	/**
 	 * Routing.as
 	 * 
@@ -234,7 +236,6 @@ package com.bienvisto.elements.routing
 		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):Vector.<SimpleRoute>
 		{
 			var routes:Vector.<SimpleRoute> = new Vector.<SimpleRoute>();
-			
 			var lut:Dictionary = getLUT(time);
 			
 			
@@ -242,7 +243,6 @@ package com.bienvisto.elements.routing
 			var to:int   = nodeTo.id;
 			
 			var table:RoutingTable = RoutingTable(lut[from]);
-			//trace("resolveCompleteRoute", time, from, table, RoutingCollection(collections[from]).findNearest(time));
 			if (table) {
 				var entries:Vector.<RoutingTableEntry> = table.entries;
 				var entry:RoutingTableEntry;
@@ -257,19 +257,16 @@ package com.bienvisto.elements.routing
 				
 				if (search) {
 					var route:SimpleRoute;
-					var broken:Boolean;
 					var visited:Dictionary = new Dictionary();
 					while (true) {
 						if (entry.destination == to && entry.distance == 1) {
-							broken = (validPath(from, entry.destination, lut) ? false : true);
-							route  = new SimpleRoute(from, entry.destination, -1, 1, broken); 
+							route  = new SimpleRoute(from, entry.destination, -1, 1); 
 							routes.push(route);
 							break;
 						}
 						visited[from] = true;
 						
-						broken = (validPath(from, entry.next, lut) ? false : true);
-						route  = new SimpleRoute(from, entry.next, -1, 1, broken);
+						route  = new SimpleRoute(from, entry.next, -1, 1);
 						routes.push(route);
 						
 						from = entry.next;
@@ -292,11 +289,9 @@ package com.bienvisto.elements.routing
 							// found no route exit loop
 							break;
 						}
-
 					}
 				}
 			}
-			
 			
 			return routes;
 		}
@@ -328,7 +323,7 @@ package com.bienvisto.elements.routing
 		 * 
 		 * @param time
 		 */ 
-		private function resolveSimpleRoutes(time:uint):Vector.<SimpleRoute>
+		public function resolveSimpleRoutes(time:uint):Vector.<SimpleRoute>
 		{
 			var routes:Vector.<SimpleRoute> = new Vector.<SimpleRoute>();
 			
@@ -343,13 +338,7 @@ package com.bienvisto.elements.routing
 			var route:SimpleRoute;
 			var from:int, dest:int;
 			
-			var lut:Dictionary = new Dictionary();
-			var collection:RoutingCollection;
-			for each (var id:int in collections) {
-				collection  = RoutingCollection(collections[id]);
-				table	   = RoutingTable(collection.findNearest(time));
-				lut[id]	   = table;
-			}
+			var lut:Dictionary = getLUT(time);
 			
 			var broken:Boolean;
 			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
@@ -380,10 +369,8 @@ package com.bienvisto.elements.routing
 						
 						visited[path] = true;
 						visited[pathRe] = true;
-						
-						broken = (validPath(from, dest, lut) ? false : true);		
-						route  = new SimpleRoute(from, dest, -1, 1, broken);
-						
+							
+						route  = new SimpleRoute(from, dest, -1, 1);
 						routes.push(route);
 					}
 				}
@@ -424,18 +411,10 @@ package com.bienvisto.elements.routing
 		private function resolveSimpleRoutesWithNode(time:uint, node:Node):Vector.<SimpleRoute>
 		{
 			var routes:Vector.<SimpleRoute> = findSimpleRoutes(time).concat();
+			var lut:Dictionary = getLUT(time);
 			
-			var table:RoutingTable;
-			var lut:Dictionary = new Dictionary();
-			var collection:RoutingCollection;
-			for each (var id:int in collections) {
-				collection  = RoutingCollection(collections[id]);
-				table	   = RoutingTable(collection.findNearest(time));
-				lut[id]	   = table;
-			}
-			
-			
-			table   = RoutingTable(lut[id]);
+			var id:int      		 = node.id;
+			var table:RoutingTable   = RoutingTable(lut[id]);
 			if (table) {
 				var entries:Vector.<RoutingTableEntry> = table.entries;
 				var entry:RoutingTableEntry;
@@ -443,11 +422,8 @@ package com.bienvisto.elements.routing
 				var path:String, pathRe:String, pathRoute:String;
 				var route:SimpleRoute;
 				var from:int = node.id, dest:int;
-				var broken:Boolean;
 				for (var i:int = 0, l:int = entries.length; i < l; i++) {
 					entry = entries[i];
-					broken = (validPath(from, entry.destination, lut) ? false : true);
-					
 					
 					if (entry.distance == 1) {
 						path   = [from, entry.destination].join("-");	
@@ -467,15 +443,13 @@ package com.bienvisto.elements.routing
 						}
 					}
 					
-					route = new SimpleRoute(from, entry.destination, entry.next, entry.distance, broken);
+					route = new SimpleRoute(from, entry.destination, entry.next, entry.distance);
 					routes.push(route);
 				}
 			}
 			
-			
 			return routes;
 		}
-		
 		
 		/**
 		 * Find table
@@ -492,172 +466,164 @@ package com.bienvisto.elements.routing
 		}
 		
 		/**
-		 * Resolve table
+		 * Resolve table routes
 		 * 
 		 * @param node
 		 * @param time
 		 */ 
-		public function resolveTable(node:Node, time:uint):RoutingTable
+		public function resolveTableRoutes(node:Node, time:uint):Vector.<SimpleRoute>
 		{
-			var table:RoutingTable;
+			var routes:Vector.<SimpleRoute>;
+			var key:String = [node.id, time].join("-");
 			
-			var key:String = String(node.id) + "-" + String(time);
 			if (key in cache) {
-				table = RoutingTable(cache[key]);
-				
-				return table;
+				routes = Vector.<SimpleRoute>(cache[key]);
+				return routes;
 			}
 			
-			table = findTable(node, time);
 			
+			var lut:Dictionary = getLUT(time);
+			var from:int         = node.id;
+			var table:RoutingTable = RoutingTable(lut[from]);
 			if (table) {
-				var traceback:Boolean;
-				var complete:Boolean;
-				var paths:Vector.<int>;
+				routes = new Vector.<SimpleRoute>();
 				
 				var entries:Vector.<RoutingTableEntry> = table.entries;
 				var entry:RoutingTableEntry;
-				var source:int = node.id;
-				
-				var count:int      = entries.length;
-				var lut:Dictionary = new Dictionary();
-				lut[source] = table;
-				
-				var collection:RoutingCollection;
-				for each (var id:int in collections) {
-					if (id == source) {
-						continue;
-					}
-					
-					collection = collections[id];
-					table	   = RoutingTable(collection.findNearest(time));
-					lut[id]	   = table;
-				}
-				
+				var route:SimpleRoute;
+				var dest:int;
+				var search:Boolean;
+				var paths:Vector.<int>;
 				for (var i:int = 0, l:int = entries.length; i < l; i++) {
 					entry = entries[i];
-					paths = new Vector.<int>();
-					paths.push(source);
-					traceback = resolvePaths(source, entry, paths, lut);			
-					complete  = true;
+					dest  = entry.destination;
 					
-					for (var j:int = paths.length; j--;) {
-						if (paths[j] == -1) {
-							complete = false;
-							break;
-						}
-					}
-					entry.traceback = traceback;
-					entry.complete  = complete;
-					entry.paths	    = paths;
+					route = new SimpleRoute(from, dest, entry.next, entry.distance);
 					
-					
-					entries[i] = entry;
-				}
-				// table.entries = entries;
-				
-			}
-			cache[key] = new RoutingTable(time, node, entries);
-			
-			return cache[key];
-		}
-		
-		/**
-		 * Resolve paths
-		 * 
-		 * @param source
-		 * @param entry
-		 * @param paths
-		 * @param lut
-		 */ 
-		private function resolvePaths(source:int, entry:RoutingTableEntry, paths:Vector.<int>, lut:Dictionary):Boolean
-		{	
-			var traceback:Boolean;
-			
-			if (entry.distance == 1) {
-				paths.push(entry.destination);
-				traceback = validPath(source, entry.destination, lut);
-			}
-			else if (entry.distance == 2) {
-				paths.push(entry.next);
-				paths.push(entry.destination);
-				if (validPath(source, entry.next, lut)) {
-					traceback = validPath(source, entry.destination, lut);
-				}
-			}
-			else {
-				
-				var dest:int = entry.destination;
-				var distance:int = entry.distance;
-				var same:Boolean = source == dest;
-				
-				var flag:Boolean
-				var isDest:Boolean;
-				var table:RoutingTable;
-				var entries:Vector.<RoutingTableEntry>;
-				var visited:Dictionary = new Dictionary();
-				visited[source] = source;
-				visited[dest]	= dest;
-				while(true) {					
-					flag = false;
-					
-					paths.push(entry.next);
-					if (traceback) {
-						traceback = validPath(source, entry.next, lut);
-					}
-					
-					source = entry.next;
-					/*					if (source in visited) {
-					break;
-					}*/
-					visited[source] = source;
-					table  = RoutingTable(lut[source]);
-					if (table) {
-						entries = table.entries;
-						for (var i:int = 0, l:int = entries.length; i < l; i++) {
-							entry = entries[i];
-							isDest = entry.destination == dest;
-							if (same && isDest) {
-								if (entry.distance > 1) {
-									flag = true;
-								}
-							}
-							else if (isDest) {
-								flag = true;
-							}
-							if (flag) {
+					route.complete = true;
+					if (route.distance > 2) {
+						for each (var path:int in route.paths) {
+							if (path < 0) {
+								route.complete = false;
 								break;
 							}
 						}
 					}
 					
-					if (flag) {
-						if (entry.distance == 1) {
+					route.paths     = resolvePaths(from, entry, lut);
+					route.traceback = tracebackPath(from, entry, lut);
+					
+					routes.push(route);
+				}
+				
+				
+				cache[key] = routes;
+			}
+			
+			return routes;
+		}
+		
+		/**
+		 * Resolve paths
+		 * 
+		 * @param from
+		 * @param entry
+		 * @param lut
+		 */ 
+		private function resolvePaths(from:int, entry:RoutingTableEntry, lut:Dictionary):Vector.<int>
+		{
+			var paths:Vector.<int> = new Vector.<int>();
+			var to:int = entry.destination;
+			paths.push(from);
+			
+			if (entry.distance == 2) {
+				paths.push(entry.next);
+			}
+			else if (entry.distance > 2) {
+				var table:RoutingTable;
+				var entry:RoutingTableEntry, entries:Vector.<RoutingTableEntry>;
+				var search:Boolean;
+				var visited:Dictionary = new Dictionary();
+				var next:int;
+				while (true) {
+					if (entry.destination == to && entry.distance == 1) {
+						break;
+					}
+					visited[from] = true;
+					
+					from = entry.next;
+					if (from in visited) {
+						paths.push(-1);
+						break; // already been here…
+					}
+					paths.push(from);
+					
+					table = lut[from];
+					entries = table.entries;
+					search  = false;
+					for (var i:int = 0, l:int = entries.length; i < l; i++) {
+						entry = entries[i];
+						if (entry.destination == to) {	
+							search = true;
 							break;
 						}
 					}
-					else {
+					
+					if (!search) {
+						// found no route exit loop
+						paths.push(-1);
+						break;
+					}
+				}
+			}
+			
+			paths.push(to);
+			
+			return paths;
+		}
+		
+		/**
+		 * Traceback path
+		 * 
+		 * @param from
+		 * @param entry
+		 * @param lut
+		 */
+		private function tracebackPath(from:int, entry:RoutingTableEntry, lut:Dictionary):Boolean
+		{
+			var traceback:Boolean = false;
+			
+			var to:int = entry.destination;
+			var table:RoutingTable  = RoutingTable(lut[to]);
+			if (table) {
+				var entries:Vector.<RoutingTableEntry> = table.entries;
+				var entry:RoutingTableEntry;
+				var search:Boolean = false;
+				for (var i:int = 0, l:int = entries.length; i < l; i++) {
+					entry = entries[i];
+					if (entry.destination == from) {
+						search = true;
 						break;
 					}
 				}
 				
-				
-				if (paths.length < distance) {
-					while (paths.length < distance) {
-						paths.push(-1);
+				if (search) {
+					var paths:Vector.<int> = resolvePaths(to, entry, lut);
+					traceback = true;
+					for each (var path:int in paths) {
+						if (path < 0) {
+							traceback = false;
+							break;
+						}
 					}
-					traceback = false;
 				}
-				
-				paths.push(dest);
-				if (traceback) {
-					traceback = validPath(source, dest, lut);
-				}
-				
 			}
+			
+			
 			
 			return traceback;
 		}
+			
 		
 		/**
 		 * Valid path
@@ -707,22 +673,44 @@ package com.bienvisto.elements.routing
 			
 		}
 		
+		/**
+		 * @private
+		 */ 
+		private var lastLUTTime:Number = -1;
 		
+		/**
+		 * @private
+		 */ 
+		private var lut:Dictionary;
+		
+		/**
+		 * Get lut
+		 * 
+		 * @param time
+		 */ 
 		private function getLUT(time:uint):Dictionary
 		{
-			var lut:Dictionary = new Dictionary();
-			var table:RoutingTable;
 			
-			var collection:RoutingCollection;
-			var id:int;
-			var node:Node;
-			var nodes:Vector.<Node> = nodeContainer.nodes;
-			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
-				node = nodes[i];
-				id   = node.id;
-				collection = RoutingCollection(collections[id]);
-				table	   = RoutingTable(collection.findNearest(time));
-				lut[id]	   = table;
+			if (lastLUTTime != time) {
+				lastLUTTime = time;	
+				lut = null;
+			}
+			
+			if (!lut) {
+				lut = new Dictionary();
+				var table:RoutingTable;
+			
+				var collection:RoutingCollection;
+				var id:int;
+				var node:Node;
+				var nodes:Vector.<Node> = nodeContainer.nodes;
+				for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+					node = nodes[i];
+					id   = node.id;
+					collection = RoutingCollection(collections[id]);
+					table	   = RoutingTable(collection.findNearest(time));
+					lut[id]	   = table;
+				}
 			}
 			
 			return lut;

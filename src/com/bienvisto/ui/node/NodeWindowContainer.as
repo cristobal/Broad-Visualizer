@@ -14,6 +14,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.routing.RoutingStatsItem;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
+	import com.bienvisto.elements.routing.SimpleRoute;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.transmissions.Transmissions;
@@ -794,22 +795,21 @@ package com.bienvisto.ui.node
 				return;
 			}
 			
-			var table:RoutingTable = routing.resolveTable(node, elapsed);
+			var routes:Vector.<SimpleRoute> = routing.resolveTableRoutes(node, elapsed);
 			var dataProvider:ArrayCollection = new ArrayCollection();
-			if (table) {
-				var entries:Vector.<RoutingTableEntry> = table.entries;
-				var entry:RoutingTableEntry;
+			if (routes) {
+				var route:SimpleRoute;
 				var data:ObjectProxy;
 				var item:Object;
-				for (var i:int = 0, l:int = entries.length; i < l; i++) {
-					entry = entries[i];
-					
+				for (var i:int = 0, l:int = routes.length; i < l; i++) {
+					route = routes[i];
 					item = {};
-					item.destination = entry.destination;
-					item.distance 	 = entry.distance;
-					item.paths       = parsePaths(entry.paths);
-					item.complete    = entry.complete;
-					item.traceback   = entry.traceback;
+
+					item.destination = route.destination;
+					item.distance 	 = route.distance;
+					item.paths       = parsePaths(route.paths);
+					item.complete    = route.complete;
+					item.traceback   = route.traceback;
 					
 					// trace("item", elapsed, entry.traceback, entry.complete, entry.paths);
 					// data = new ObjectProxy(item);

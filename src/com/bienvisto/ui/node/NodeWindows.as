@@ -97,8 +97,14 @@ package com.bienvisto.ui.node
 				storeWindowSettings(window2.selectedNode, window2.getSettings());
 			}
 			
+			if (nodeView.selectedNodeSprite && nodeView.selectedNodeSprite2) {
+				setWindowsRTL();
+			}
+			else {
+				setWindowsLTR();
+			}
 			
-			var settings:Object
+			var settings:Object;
 			
 			// set first window
 			if (!window.selectedNode && !window2.selectedNode && nodeView.selectedNodeSprite) {
@@ -295,6 +301,28 @@ package com.bienvisto.ui.node
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
+		//--------------------------------------------------------------------------
+		//
+		// Windows ui 
+		//
+		//-------------------------------------------------------------------------		
+		/**
+		 * Set windows right to left
+		 */ 
+		private function setWindowsRTL():void
+		{
+			window.x  = -(window.width + 10);
+			window2.x = 0; 
+		}
+		
+		/**
+		 * Set windows left to right
+		 */ 
+		private function setWindowsLTR():void
+		{
+			window.x = 0;
+			window2.x = -(window2.width + 10);
+		}
 		
 		//--------------------------------------------------------------------------
 		//

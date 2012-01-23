@@ -24,6 +24,26 @@ package com.bienvisto.view.drawing
 	public final class NodeRoutingDrawingManager extends NodeDrawingManager
 	{
 		
+		/**
+		 * @private
+		 */ 
+		private static var linkColor:uint = 0xCCCCCC;
+		/**
+		 * @private
+		 */
+		private static var oneHopColor:uint = 0xFF6622;// 0xAA8888; //0x43C8EF; //0x00bf00);
+		
+		/**
+		 * @private
+		 */
+		private static var twoHopColor:uint = 0x70FAA3; // 0x43C8EF; // , 0xFFF94A, 0xff6622
+		
+		/**
+		 * @private
+		 */ 
+		private static var threeHopColor:uint = 0xAA8888; //0xff4040;
+		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Constructor
@@ -36,7 +56,8 @@ package com.bienvisto.view.drawing
 			this.view = view;
 			
 			view.addChild(routesShape);
-			_selectedDrawingManager.addEventListener(Event.CHANGE, handleSelectedDrawingManagerChange);
+			_selectedDrawingManager.addEventListener(Event.CHANGE, handleDrawingManagerChange);
+			_betweenNodesDrawingManager.addEventListener(Event.CHANGE, handleDrawingManagerChange);
 		}
 		
 		
@@ -45,6 +66,11 @@ package com.bienvisto.view.drawing
 		// Variables
 		//
 		//-------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var dirty:Boolean;
 		
 		/**
 		 * @private
@@ -71,18 +97,37 @@ package com.bienvisto.view.drawing
 		 */
 		private var drawState:String = "all";
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Properties
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * @private
 		 */ 
 		private var _selectedDrawingManager:NodeRoutingSelectedDrawingManager = new NodeRoutingSelectedDrawingManager();
 		
-		
 		/**
-		 * @readonly
+		 * @readonly selectedDrawingManager
 		 */ 
-		public function get selectedDrawingManager():NodeRoutingSelectedDrawingManager
+		public function get selectedDrawingManager():NodeDrawingManager
 		{
 			return _selectedDrawingManager;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _betweenNodesDrawingManager:NodeRoutingBetweenNodesDrawingManager = new NodeRoutingBetweenNodesDrawingManager();
+		
+		/**
+		 * @readonly betweenNodesDrawingManager
+		 */ 
+		public function get betweenNodesDrawingManager():NodeDrawingManager
+		{
+			return _betweenNodesDrawingManager;
 		}
 		
 		//--------------------------------------------------------------------------
@@ -142,7 +187,7 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			if (view.selectedNodeSprite && view.selectedNodeSprite2) {
+			if ((view.selectedNodeSprite && view.selectedNodeSprite2) && betweenNodesDrawingManager.enabled) {
 				drawSimpleRoutesComplex(time, nodeSprites);
 			}
 			else if (view.selectedNodeSprite) {
@@ -150,6 +195,51 @@ package com.bienvisto.view.drawing
 			}
 			else {
 				drawSimpleRoutes(time, nodeSprites);
+			}
+		}
+		
+		/**
+		 * Draw simple routes
+		 * 
+		 * @param time
+		 * @param nodeSprites
+		 */ 
+		private function drawSimpleRoutes(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		{
+			var drawSimple:Boolean   = drawState != "selected";
+			if (!drawSimple) {
+				clearGraphics();
+				return;
+			}
+			
+			var routes:Vector.<SimpleRoute> = routing.findSimpleRoutes(time);
+			
+			var id:int;
+			var nodeSprite:NodeSprite;
+			var spritesCache:Dictionary = new Dictionary();
+			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
+				nodeSprite = nodeSprites[i];
+				id 		   = nodeSprite.node.id;
+				spritesCache[id] = nodeSprite;
+			}
+			
+			clearGraphics();
+			var from:int, dest:int;
+			var route:SimpleRoute;
+			var fromSprite:NodeSprite, destSprite:NodeSprite;
+			var offset:int = 10
+				
+			for (i = 0, l = routes.length; i < l; i++) {
+				route = routes[i];
+				from  = route.from;
+				dest  = route.destination;
+				
+				fromSprite = NodeSprite(spritesCache[from]);
+				destSprite = NodeSprite(spritesCache[dest]);
+					
+				if (fromSprite && destSprite) {
+					drawSimplePath(fromSprite, destSprite, offset);
+				}
 			}
 		}
 		
@@ -174,8 +264,8 @@ package com.bienvisto.view.drawing
 			}
 			id = node.id;
 			
-			routesShape.graphics.clear();
-			var from:int, next:int, dest:int, broken:Boolean;
+			clearGraphics();
+			var from:int, next:int, dest:int;
 			var route:SimpleRoute;
 			var fromSprite:NodeSprite, nextSprite:NodeSprite, destSprite:NodeSprite;
 			var offset:int = 10;
@@ -189,7 +279,6 @@ package com.bienvisto.view.drawing
 				next  = route.next;
 				dest  = route.destination;
 				hops  = route.distance;
-				broken = route.broken;
 				selected = from == id;
 				if (selected && drawSelected) {
 					fromSprite = NodeSprite(spritesCache[from]);
@@ -197,61 +286,16 @@ package com.bienvisto.view.drawing
 					destSprite = NodeSprite(spritesCache[dest]);
 					
 					if (fromSprite && (nextSprite || destSprite)) {
-						drawSelectedPath(fromSprite, nextSprite, destSprite, hops, broken, offset); 
+						drawSelectedPath(fromSprite, nextSprite, destSprite, hops, offset); // , true for arrow here 
 					}
 				}
 				else if (drawSimple){
 					fromSprite = NodeSprite(spritesCache[from]);
 					destSprite = NodeSprite(spritesCache[dest]);
-				
-					if (fromSprite && destSprite) {
-						drawSimplePath(fromSprite, destSprite, broken, offset);
-					}
-				}
-			}
-		}
-		
-		/**
-		 * Draw simple routes
-		 * 
-		 * @param time
-		 * @param nodeSprites
-		 */ 
-		private function drawSimpleRoutes(time:uint, nodeSprites:Vector.<NodeSprite>):void
-		{
-			var drawSimple:Boolean   = drawState != "selected";
-			if (!drawSimple) {
-				return;
-			}
-			
-			var routes:Vector.<SimpleRoute> = routing.findSimpleRoutes(time);
-			
-			var id:int;
-			var nodeSprite:NodeSprite;
-			var spritesCache:Dictionary = new Dictionary();
-			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-				nodeSprite = nodeSprites[i];
-				id 		   = nodeSprite.node.id;
-				spritesCache[id] = nodeSprite;
-			}
-			
-			routesShape.graphics.clear();
-			var from:int, dest:int, broken:Boolean;
-			var route:SimpleRoute;
-			var fromSprite:NodeSprite, destSprite:NodeSprite;
-			var offset:int = 10
-				
-			for (i = 0, l = routes.length; i < l; i++) {
-				route = routes[i];
-				from  = route.from;
-				dest  = route.destination;
-				broken = route.broken;
-				
-				fromSprite = NodeSprite(spritesCache[from]);
-				destSprite = NodeSprite(spritesCache[dest]);
 					
-				if (fromSprite && destSprite) {
-					drawSimplePath(fromSprite, destSprite, broken, offset);
+					if (fromSprite && destSprite) {
+						drawSimplePath(fromSprite, destSprite, offset);
+					}
 				}
 			}
 		}
@@ -280,39 +324,38 @@ package com.bienvisto.view.drawing
 				spritesCache[id] = nodeSprite;
 			}
 			
-			routesShape.graphics.clear();
+			clearGraphics();
 			if (routesFrom.length == 0) {
 				return;
 			}
 			
-			var from:int, dest:int, broken:Boolean;
+			var from:int, dest:int;
 			var route:SimpleRoute;
 			var fromSprite:NodeSprite, destSprite:NodeSprite;
 			var offset:int = 10;
 			var thickness:Number = 3;
-			var color:uint      = 0xff6622; // 0xAA8888; //0x43C8EF; //0x00bf00);
+			var color:uint      = oneHopColor; 
 			var dashed:Boolean  = false;
 			var hops:uint 		= routesFrom.length;
 			var lastRoute:SimpleRoute = routesFrom[routesFrom.length - 1];
 			var complete:Boolean = lastRoute.destination == nodeTo.id;
 			if (hops == 2 && complete) {
-				color = 0x70FAA3; // 0x43C8EF; // , 0xFFF94A, 0xff6622
+				color = twoHopColor;
 			}
 			else if (hops > 2 || !complete) {
-				color = 0xff4040;
+				color = threeHopColor;
 			}
 			
 			for (i = 0, l = routesFrom.length; i < l; i++) {
 				route = routesFrom[i];
 				from  = route.from;
 				dest  = route.destination;
-				broken = route.broken;
 				
 				fromSprite = NodeSprite(spritesCache[from]);
 				destSprite = NodeSprite(spritesCache[dest]);
 				
 				if (fromSprite && destSprite) {
-					drawSimplePath(fromSprite, destSprite, broken, offset, thickness, color, false, true);
+					drawSimplePath(fromSprite, destSprite, offset, thickness, color, false, true);
 				}
 			}
 			
@@ -323,7 +366,7 @@ package com.bienvisto.view.drawing
 				destSprite = NodeSprite(spritesCache[dest]);
 				
 				if (fromSprite && destSprite) {
-					drawSimplePath(fromSprite, destSprite, broken, offset, thickness, color, true, true);
+					drawSimplePath(fromSprite, destSprite, offset, thickness, color, true, true);
 				}
 			}
 			
@@ -333,16 +376,14 @@ package com.bienvisto.view.drawing
 		 * Draw simple path
 		 * 
 		 * @param source
-		 * @param dest
-		 * @param broken 
+		 * @param dest 
 		 * @param offset
 		 */ 
-		private function drawSimplePath(source:NodeSprite, dest:NodeSprite, broken:Boolean = false, offset:int = 0, thickness:Number = 1, color:uint = 0xcccccc, dashed:Boolean = false, arrow:Boolean = false):void
+		private function drawSimplePath(source:NodeSprite, dest:NodeSprite, offset:int = 0, thickness:Number = 1, color:uint = 0xcccccc, dashed:Boolean = false, arrow:Boolean = false):void
 		{
 			var from:Point = new Point(source.x + offset, source.y + offset);
 			var to:Point = new Point(dest.x + offset, dest.y + offset);
 
-			// if (broken) drawDashedLine(from, to);
 			if (dashed) {
 				drawDashedLine(from, to, thickness, color);
 			}
@@ -366,9 +407,10 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function drawDashedLine(from:Point, to:Point, thickness:Number = 1, color:uint = 0xcccccc):void
 		{
-			routesShape.graphics.lineStyle(thickness, color); //0x00bf00);
+			routesShape.graphics.lineStyle(thickness, color);
 			DashedLine.moveTo(routesShape.graphics, from.x, from.y);
 			DashedLine.lineTo(routesShape.graphics, to.x, to.y);
+			dirty = true;
 		}
 		
 		/**
@@ -381,9 +423,10 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function drawLine(from:Point, to:Point, thickness:Number = 1, color:uint = 0xcccccc):void
 		{
-			routesShape.graphics.lineStyle(thickness, color); //0x00bf00);
+			routesShape.graphics.lineStyle(thickness, color);
 			routesShape.graphics.moveTo(from.x, from.y);
 			routesShape.graphics.lineTo(to.x, to.y);
+			dirty = true;
 		}
 		
 		/**
@@ -396,12 +439,13 @@ package com.bienvisto.view.drawing
 		 */
 		private function drawLines(from:Point, points:Vector.<Point>,  thickness:Number = 1, color:uint = 0xcccccc):void
 		{
-			routesShape.graphics.lineStyle(thickness, color); //0x00bf00);
+			routesShape.graphics.lineStyle(thickness, color);
 			routesShape.graphics.moveTo(from.x, from.y);
 			
 			for each (var point:Point in points) {
 				routesShape.graphics.lineTo(point.x, point.y);
 			}
+			dirty = true;
 		}
 		
 		/**
@@ -411,10 +455,9 @@ package com.bienvisto.view.drawing
 		 * @param next
 		 * @param dest
 		 * @param hops
-		 * @param broken
 		 * @param offset
 		 */ 
-		private function drawSelectedPath(source:NodeSprite, next:NodeSprite, dest:NodeSprite, hops:Number, broken:Boolean = false, offset:int = 0):void
+		private function drawSelectedPath(source:NodeSprite, next:NodeSprite, dest:NodeSprite, hops:Number, offset:int = 0, arrow:Boolean = false):void
 		{
 			var from:Point = new Point(source.x + offset, source.y + offset);
 			var to:Point   = new Point(dest.x + offset, dest.y + offset);
@@ -424,30 +467,26 @@ package com.bienvisto.view.drawing
 				nextPoint = new Point(next.x + offset, next.y + offset);	
 			}
 			
-			var thicknes:Number = 3;
-			var color:uint      = 0xff6622; //0x00bf00);
-			var dashed:Boolean  = false;
-			if (hops == 2) {
-				color = 0x70FAA3; //0x43C8EF; // 0xFFF94A, 0xff6622
+			var thickness:Number = 3;
+			var color:uint      = oneHopColor;
+			
+			if (hops == 1) {
+				drawLine(from, to, thickness, color);
+			}
+			else if (hops == 2) {
+				color = twoHopColor;
+				drawLines(from, Vector.<Point>([nextPoint, to]), thickness, color);
 			}
 			else if (hops > 2) {
-				color = 0xff4040;
-				
-				to        = nextPoint;
-				nextPoint = null;
-				dashed    = true;
+				color = threeHopColor;
+				drawLine(from, nextPoint, thickness, color);
+				drawDashedLine(nextPoint, to, thickness, color);
 			}
 			
-			if (nextPoint) {
-				drawLines(from, Vector.<Point>([nextPoint, to]), thicknes, color);
-			}
-			else {
-				if (dashed) {
-					drawDashedLine(from, to, thicknes, color);
-				}
-				else {
-					drawLine(from, to, thicknes, color);
-				}
+			if (arrow) {
+				var start:Point = (nextPoint ? nextPoint : from)
+				var end:Point   = to;
+				drawArrow(start, end, thickness + 0.5, color, offset);
 			}
 		}
 		
@@ -474,15 +513,30 @@ package com.bienvisto.view.drawing
 			routesShape.graphics.lineTo(dx - Math.cos(angle + spread) * size, dy - Math.sin(angle + spread) * size);
 			routesShape.graphics.moveTo(dx - Math.cos(angle - spread) * size, dy - Math.sin(angle - spread) * size);
 			routesShape.graphics.lineTo(dx, dy);
+			
+			dirty = true;
 		}
+		
+		/**
+		 * Clear graphics
+		 */ 
+		private function clearGraphics():void
+		{
+			if (dirty) {
+				routesShape.graphics.clear();
+				dirty = false;
+			}
+		}
+		
 		/**
 		 * Handle selected drawing manager change
 		 * 
 		 * @param event
 		 */ 
-		private function handleSelectedDrawingManagerChange(event:Event):void
+		private function handleDrawingManagerChange(event:Event):void
 		{
 			invalidateState();
 		}
+		
 	}
 }

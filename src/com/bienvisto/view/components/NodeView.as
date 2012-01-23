@@ -48,12 +48,21 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
-		private var nodeSprites:Vector.<NodeSprite>;
+		private var managers:Vector.<NodeDrawingManager>;
+		
 		
 		/**
 		 * @private
 		 */ 
-		private var managers:Vector.<NodeDrawingManager>;
+		private var _nodeSprites:Vector.<NodeSprite>;
+		
+		/**
+		 * @readonly nodeSprites
+		 */ 
+		public function get nodeSprites():Vector.<NodeSprite>
+		{
+			return _nodeSprites.concat();
+		}
 		
 		/**
 		 * @readwrite selectedNodeSprite
@@ -78,7 +87,7 @@ package com.bienvisto.view.components
 		private function setup():void
 		{
 			nodeSelectionDrawingManager = new NodeSelectionDrawingManager(this);
-			nodeSprites = new Vector.<NodeSprite>();
+			_nodeSprites = new Vector.<NodeSprite>();
 			managers    = new Vector.<NodeDrawingManager>();
 			
 			managers.push(nodeSelectionDrawingManager);
@@ -132,8 +141,8 @@ package com.bienvisto.view.components
 				for (var i:int = 0, l:int = nodes.length; i < l; i++) {
 					node = nodes[i];
 					flag = true;
-					for (var j:int = 0, n:int = nodeSprites.length; j < n;j++) {
-						nodeSprite = nodeSprites[j];
+					for (var j:int = 0, n:int = _nodeSprites.length; j < n;j++) {
+						nodeSprite = _nodeSprites[j];
 						if (nodeSprite.node.id == node.id) {
 							flag = false;
 							break;
@@ -142,7 +151,7 @@ package com.bienvisto.view.components
 					
 					if (flag) {
 						nodeSprite = new NodeSprite(node);
-						nodeSprites.push(nodeSprite);
+						_nodeSprites.push(nodeSprite);
 						addChild(nodeSprite);
 						
 						nodeSelectionDrawingManager.addNodeSprite(nodeSprite);
@@ -150,8 +159,8 @@ package com.bienvisto.view.components
 				}
 				
 				// Remove nodes that no longer are in use
-				for (i = nodeSprites.length; i--;) {
-					nodeSprite = nodeSprites[i];
+				for (i = _nodeSprites.length; i--;) {
+					nodeSprite = _nodeSprites[i];
 					flag = true;
 					for (j = 0, n = nodes.length; j < n; j++) {
 						node = nodes[j];
@@ -162,7 +171,7 @@ package com.bienvisto.view.components
 					}
 					
 					if (flag) {
-						nodeSprites.splice(i, 1);
+						_nodeSprites.splice(i, 1);
 						removeChild(nodeSprite);						
 						nodeSelectionDrawingManager.removeNodeSprite(nodeSprite);
 						
@@ -187,12 +196,12 @@ package com.bienvisto.view.components
 			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
 				manager = managers[i];
-				manager.update(time, nodeSprites);
+				manager.update(time, _nodeSprites);
 			}
 			
 			var nodeSprite:NodeSprite;
-			for (i = 0, l = nodeSprites.length; i < l; i++) {
-				nodeSprite = nodeSprites[i];
+			for (i = 0, l = _nodeSprites.length; i < l; i++) {
+				nodeSprite = _nodeSprites[i];
 				nodeSprite.update(time);
 				// nodeSprite.invalidate();
 			}

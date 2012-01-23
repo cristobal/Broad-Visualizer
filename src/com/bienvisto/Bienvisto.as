@@ -8,9 +8,13 @@ package com.bienvisto
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.Waypoint2D;
+	import com.bienvisto.elements.network.Node;
 	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.routing.RoutingTable;
+	import com.bienvisto.elements.routing.RoutingTableEntry;
+	import com.bienvisto.elements.routing.SimpleRoute;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.transmissions.Transmissions;
@@ -100,7 +104,6 @@ package com.bienvisto
 		 */ 
 		private function setup(window:ApplicationWindow):void
 		{
-			
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
@@ -208,6 +211,7 @@ package com.bienvisto
 			window.menu.addToggeableNodeDrawingManager(dropsDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(routingDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(routingDrawingManager.selectedDrawingManager);
+			window.menu.addToggeableNodeDrawingManager(routingDrawingManager.betweenNodesDrawingManager);
 			
 			// window playback set misc view components
 			window.playback.addZoomView(gridView);
@@ -227,8 +231,43 @@ package com.bienvisto
 			
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);
+			
+			window.playback.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
+				debug();
+			});
 		}
 		
+		private function debug():void
+		{
+			var time:uint = simulation.time;
+			var node:Node = nodeView.selectedNodeSprite.node;
+			
+/*			trace("Routes:");
+			for each (var route:SimpleRoute in routes) {
+				trace("\t", route);
+			}
+			trace("\n");*/
+
+/*			routes = routing.findSimpleRoutes(time);
+			trace("SimpleRoutes");
+			for each (var route:SimpleRoute in routes) {
+				trace("\t", route);
+			}
+			
+			routes = routing.resolveSimpleRoutes(time);
+			trace("SimpleRoutes - Resolved");
+			for each (route in routes) {
+				trace("\t", route);
+			}
+			*/
+			var table:RoutingTable = routing.findTable(node, time);
+			var entries:Vector.<RoutingTableEntry> = table.entries;
+			trace("TableEntries for node - ", node.id);
+			for each (var entry:RoutingTableEntry in entries) {
+				trace("\t", entry);
+			}
+			
+		}
 		
 		/**
 		 * Handle browse file click
@@ -342,6 +381,7 @@ package com.bienvisto
 		{
 			simulation.jumpToTime(event.elapsed);
 		}
+		
 		
 	}
 }

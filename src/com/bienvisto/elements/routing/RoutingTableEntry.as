@@ -62,60 +62,6 @@ package com.bienvisto.elements.routing
 		{ 
 			return _distance; 
 		}
-
-		/**
-		 * @private
-		 */
-		private var _complete:Boolean;
-		
-		/**
-		 * @readwrite complete
-		 */ 
-		public function get complete():Boolean
-		{
-			return _complete;
-		}
-		
-		public function set complete(value:Boolean):void
-		{
-			_complete = value;
-		}
-		
-		/**
-		 * @private
-		 */
-		private var _traceback:Boolean;
-		
-		/**
-		 * @readwrite traceback
-		 */ 
-		public function get traceback():Boolean
-		{
-			return _traceback;
-		}
-		
-		public function set traceback(value:Boolean):void
-		{
-			_traceback = value;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _paths:Vector.<int>;
-		
-		/**
-		 * @readwrite paths
-		 */ 
-		public function get paths():Vector.<int>
-		{
-			return _paths;
-		}
-		
-		public function set paths(value:Vector.<int>):void
-		{
-			_paths = value;	
-		}
 		
 		/**
 		 * To string
