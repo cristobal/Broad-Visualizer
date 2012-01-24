@@ -1,6 +1,7 @@
 package com.bienvisto.view.drawing
 {
 	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
@@ -31,17 +32,17 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */
-		private static var oneHopColor:uint = 0xFF6622;// 0xAA8888; //0x43C8EF; //0x00bf00);
+		private static var oneHopColor:uint = 0xFF6622;
 		
 		/**
 		 * @private
 		 */
-		private static var twoHopColor:uint = 0x70FAA3; // 0x43C8EF; // , 0xFFF94A, 0xff6622
+		private static var twoHopColor:uint = 0x70FAA3;
 		
 		/**
 		 * @private
 		 */ 
-		private static var threeHopColor:uint = 0xAA8888; //0xff4040;
+		private static var threeHopColor:uint = 0xAA8888; 
 		
 		
 		//--------------------------------------------------------------------------
@@ -188,7 +189,7 @@ package com.bienvisto.view.drawing
 		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			if ((view.selectedNodeSprite && view.selectedNodeSprite2) && betweenNodesDrawingManager.enabled) {
-				drawSimpleRoutesComplex(time, nodeSprites);
+				drawRoutesBetweenNodes(time, nodeSprites);
 			}
 			else if (view.selectedNodeSprite) {
 				drawSimpleRoutesSingle(time, nodeSprites);
@@ -213,15 +214,7 @@ package com.bienvisto.view.drawing
 			}
 			
 			var routes:Vector.<SimpleRoute> = routing.findSimpleRoutes(time);
-			
-			var id:int;
-			var nodeSprite:NodeSprite;
-			var spritesCache:Dictionary = new Dictionary();
-			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-				nodeSprite = nodeSprites[i];
-				id 		   = nodeSprite.node.id;
-				spritesCache[id] = nodeSprite;
-			}
+			var spritesCache:Dictionary = getSpritesCache(time, nodeSprites);
 			
 			clearGraphics();
 			var from:int, dest:int;
@@ -229,7 +222,7 @@ package com.bienvisto.view.drawing
 			var fromSprite:NodeSprite, destSprite:NodeSprite;
 			var offset:int = 10
 				
-			for (i = 0, l = routes.length; i < l; i++) {
+			for (var i:int = 0, l:int = routes.length; i < l; i++) {
 				route = routes[i];
 				from  = route.from;
 				dest  = route.destination;
@@ -254,26 +247,23 @@ package com.bienvisto.view.drawing
 			var node:Node = view.selectedNodeSprite.node;
 			var routes:Vector.<SimpleRoute> = routing.findSimpleRoutesWithNode(time, node);
 			
-			var id:int;
-			var nodeSprite:NodeSprite;
-			var spritesCache:Dictionary = new Dictionary();
-			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-				nodeSprite = nodeSprites[i];
-				id 		   = nodeSprite.node.id;
-				spritesCache[id] = nodeSprite;
-			}
-			id = node.id;
+			var spritesCache:Dictionary = getSpritesCache(time, nodeSprites);
+			
 			
 			clearGraphics();
+			
+			var id:int = node.id;
+			
 			var from:int, next:int, dest:int;
 			var route:SimpleRoute;
 			var fromSprite:NodeSprite, nextSprite:NodeSprite, destSprite:NodeSprite;
 			var offset:int = 10;
 			var selected:Boolean;
 			var hops:int = 0;
+			
 			var drawSelected:Boolean = drawState != "paths";
 			var drawSimple:Boolean   = drawState != "selected";
-			for (i = 0, l = routes.length; i < l; i++) {
+			for (var i:int = 0, l:int = routes.length; i < l; i++) {
 				route = routes[i];
 				from  = route.from;
 				next  = route.next;
@@ -301,74 +291,76 @@ package com.bienvisto.view.drawing
 		}
 		
 		/**
-		 * Draw simple routes complex
+		 * Draw routes between nodes
 		 * 
 		 * @param time
 		 * @param nodeSprites
 		 */ 
-		private function drawSimpleRoutesComplex(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		private function drawRoutesBetweenNodes(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			
 			var nodeFrom:Node = view.selectedNodeSprite.node;
 			var nodeTo:Node   = view.selectedNodeSprite2.node;
 			
-			var routesFrom:Vector.<SimpleRoute> = routing.findCompleteRoute(time, nodeFrom, nodeTo);
-			// var routesTo:Vector.<SimpleRoute>   = routing.findCompleteRoute(time, nodeTo, nodeFrom);
+			var routeFrom:SimpleRoute  = routing.findCompleteRoute(time, nodeFrom, nodeTo);
+			var routeTo:SimpleRoute    = routing.findCompleteRoute(time, nodeTo, nodeFrom);
 			
-			var id:int;
-			var nodeSprite:NodeSprite;
-			var spritesCache:Dictionary = new Dictionary();
-			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-				nodeSprite = nodeSprites[i];
-				id 		   = nodeSprite.node.id;
-				spritesCache[id] = nodeSprite;
-			}
-			
+			var spritesCache:Dictionary = getSpritesCache(time, nodeSprites);
 			clearGraphics();
-			if (routesFrom.length == 0) {
-				return;
+			if (!routeFrom && !routeTo) {
+				return; // no routes
 			}
 			
-			var from:int, dest:int;
-			var route:SimpleRoute;
-			var fromSprite:NodeSprite, destSprite:NodeSprite;
-			var offset:int = 10;
+			if (routeFrom) {
+				drawCompleteRoute(routeFrom, spritesCache);
+			}
+			
+			if (routeTo) {
+				drawCompleteRoute(routeTo, spritesCache);
+			}
+		}
+		
+		/**
+		 * Draw complete route
+		 * 
+		 * @param route
+		 * @param spritesCache
+		 */ 
+		private function drawCompleteRoute(route:SimpleRoute, spritesCache:Dictionary):void
+		{
+			var from:int = route.from;
+			var dest:int = route.destination;
+			var next:int = route.next;
+			
+			var hops:int = route.distance;
+			var offset:Number = 10;
+			var color:uint = oneHopColor;
+
 			var thickness:Number = 3;
-			var color:uint      = oneHopColor; 
-			var dashed:Boolean  = false;
-			var hops:uint 		= routesFrom.length;
-			var lastRoute:SimpleRoute = routesFrom[routesFrom.length - 1];
-			var complete:Boolean = lastRoute.destination == nodeTo.id;
-			if (hops == 2 && complete) {
+			if (hops == 1) {
+				drawSimplePath(NodeSprite(spritesCache[from]), NodeSprite(spritesCache[dest]), offset, thickness, color, false, true);
+			}
+			else if (hops == 2) {
 				color = twoHopColor;
+				drawSimplePath(NodeSprite(spritesCache[from]), NodeSprite(spritesCache[next]), offset, thickness, color, false, true);
+				drawSimplePath(NodeSprite(spritesCache[next]), NodeSprite(spritesCache[dest]), offset, thickness, color, false, true);
 			}
-			else if (hops > 2 || !complete) {
+			else if (hops > 2) {
 				color = threeHopColor;
+				
+				var paths:Vector.<int> = route.paths;
+				for (var i:int = 1, l:int = paths.length - 1; i < l; i++) {
+					next = paths[i];
+					if (next < 0) {
+						break;
+					}
+					drawSimplePath(NodeSprite(spritesCache[from]), NodeSprite(spritesCache[next]), offset, thickness, color, false, true);
+					from = next;
+				}
+				
+				var dashed:Boolean = !route.complete;
+				drawSimplePath(NodeSprite(spritesCache[from]), NodeSprite(spritesCache[dest]), offset, thickness, color, dashed, true);		
 			}
 			
-			for (i = 0, l = routesFrom.length; i < l; i++) {
-				route = routesFrom[i];
-				from  = route.from;
-				dest  = route.destination;
-				
-				fromSprite = NodeSprite(spritesCache[from]);
-				destSprite = NodeSprite(spritesCache[dest]);
-				
-				if (fromSprite && destSprite) {
-					drawSimplePath(fromSprite, destSprite, offset, thickness, color, false, true);
-				}
-			}
-			
-			if (!complete) {
-				from = lastRoute.from;
-				dest = nodeTo.id;
-				fromSprite = NodeSprite(spritesCache[from]);
-				destSprite = NodeSprite(spritesCache[dest]);
-				
-				if (fromSprite && destSprite) {
-					drawSimplePath(fromSprite, destSprite, offset, thickness, color, true, true);
-				}
-			}
 			
 		}
 		
@@ -381,6 +373,10 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function drawSimplePath(source:NodeSprite, dest:NodeSprite, offset:int = 0, thickness:Number = 1, color:uint = 0xcccccc, dashed:Boolean = false, arrow:Boolean = false):void
 		{
+			if (!source && !dest) {
+				return;
+			}
+			
 			var from:Point = new Point(source.x + offset, source.y + offset);
 			var to:Point = new Point(dest.x + offset, dest.y + offset);
 
@@ -527,6 +523,43 @@ package com.bienvisto.view.drawing
 				dirty = false;
 			}
 		}
+		
+		
+		/**
+		 * @private
+		 */ 
+		private var lastSCTime:Number = -1;
+		
+		/**
+		 * @private
+		 */ 
+		private var spritesCache:Dictionary;
+		
+		/**
+		 * Get sprites cache
+		 */ 
+		private function getSpritesCache(time:uint, nodeSprites:Vector.<NodeSprite>):Dictionary
+		{
+			if (lastSCTime != time) {
+				lastSCTime = time;
+				spritesCache = null;
+			}
+			
+			if (!spritesCache) {
+				spritesCache = new Dictionary();
+				
+				var id:int;
+				var nodeSprite:NodeSprite;
+				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
+					nodeSprite = nodeSprites[i];
+					id		   = nodeSprite.node.id;
+					spritesCache[id] = nodeSprite;
+				}
+			}
+			
+			return spritesCache;
+		}
+		
 		
 		/**
 		 * Handle selected drawing manager change

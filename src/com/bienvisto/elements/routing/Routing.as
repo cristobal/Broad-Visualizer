@@ -210,20 +210,20 @@ package com.bienvisto.elements.routing
 		 * @param nodeFrom
 		 * @param nodeTo
 		 */ 
-		public function findCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):Vector.<SimpleRoute>
+		public function findCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):SimpleRoute
 		{
-			var routes:Vector.<SimpleRoute>;
+			var route:SimpleRoute
 			var key:String = [nodeFrom.id, nodeTo.id, time].join("-");
 			
 			if (!(key in simpleRoutes)) {
-				routes = resolveCompleteRoute(time, nodeFrom, nodeTo);
-				simpleRoutes[key] = routes;
+				route = resolveCompleteRoute(time, nodeFrom, nodeTo);
+				simpleRoutes[key] = route;
 			}
 			else {
-				routes = Vector.<SimpleRoute>(simpleRoutes[key]);
+				route = SimpleRoute(simpleRoutes[key]);
 			}
 			
-			return routes;
+			return route;
 		}
 		
 		/**
@@ -233,11 +233,10 @@ package com.bienvisto.elements.routing
 		 * @param nodeFrom
 		 * @param nodeTo
 		 */ 
-		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):Vector.<SimpleRoute>
+		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):SimpleRoute
 		{
-			var routes:Vector.<SimpleRoute> = new Vector.<SimpleRoute>();
+			var route:SimpleRoute;
 			var lut:Dictionary = getLUT(time);
-			
 			
 			var from:int = nodeFrom.id;
 			var to:int   = nodeTo.id;
@@ -249,51 +248,34 @@ package com.bienvisto.elements.routing
 				var search:Boolean = false;
 				for (var i:int = 0, l:int = entries.length; i < l; i++) {
 					entry = entries[i];
-					if (entry.destination == to) {	
+					if (entry.destination == to) {
 						search = true;
 						break;
 					}
 				}
 				
 				if (search) {
-					var route:SimpleRoute;
-					var visited:Dictionary = new Dictionary();
-					while (true) {
-						if (entry.destination == to && entry.distance == 1) {
-							route  = new SimpleRoute(from, entry.destination, -1, 1); 
-							routes.push(route);
-							break;
-						}
-						visited[from] = true;
-						
-						route  = new SimpleRoute(from, entry.next, -1, 1);
-						routes.push(route);
-						
-						from = entry.next;
-						if (from in visited) {
-							break; // already been here…
-						}
-						
-						table = lut[from];
-						entries = table.entries;
-						search  = false;
-						for (i = 0, l = entries.length; i < l; i++) {
-							entry = entries[i];
-							if (entry.destination == to) {	
-								search = true;
+					
+					route = new SimpleRoute(from, to, entry.next, entry.distance);
+					route.paths = resolvePaths(from, entry, lut);
+					
+					route.complete = true;
+					if (route.distance > 2) {
+						for each (var path:int in route.paths) {
+							if (path < 0) {
+								route.complete = false;
 								break;
 							}
 						}
-						
-						if (!search) {
-							// found no route exit loop
-							break;
-						}
 					}
+					
+					
+					// route.traceback = tracebackPath(from, entry, lut);
 				}
+				
 			}
 			
-			return routes;
+			return route;
 		}
 		
 		/**
@@ -499,6 +481,8 @@ package com.bienvisto.elements.routing
 					dest  = entry.destination;
 					
 					route = new SimpleRoute(from, dest, entry.next, entry.distance);
+					route.paths     = resolvePaths(from, entry, lut);
+					route.traceback = tracebackPath(from, entry, lut);
 					
 					route.complete = true;
 					if (route.distance > 2) {
@@ -509,9 +493,6 @@ package com.bienvisto.elements.routing
 							}
 						}
 					}
-					
-					route.paths     = resolvePaths(from, entry, lut);
-					route.traceback = tracebackPath(from, entry, lut);
 					
 					routes.push(route);
 				}
