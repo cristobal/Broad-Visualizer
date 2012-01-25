@@ -33,17 +33,14 @@ package com.bienvisto.view.drawing
 		 * @private
 		 */
 		private static var oneHopColor:uint = 0xFF6622;
-		
 		/**
 		 * @private
 		 */
 		private static var twoHopColor:uint = 0x70FAA3;
-		
 		/**
 		 * @private
 		 */ 
 		private static var threeHopColor:uint = 0xAA8888; 
-		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -359,8 +356,7 @@ package com.bienvisto.view.drawing
 				
 				var dashed:Boolean = !route.complete;
 				drawSimplePath(NodeSprite(spritesCache[from]), NodeSprite(spritesCache[dest]), offset, thickness, color, dashed, true);		
-			}
-			
+			}			
 			
 		}
 		

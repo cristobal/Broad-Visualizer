@@ -76,7 +76,7 @@
 		
 		<!-- Zoom -->
 		<s:Label>Zoom</s:Label>
-		<menu:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="200" minimum="10" />
+		<menu:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="250" minimum="10" />
 		
 		<!-- playButton -->
 		<s:Button id="playButton" label="Play" />

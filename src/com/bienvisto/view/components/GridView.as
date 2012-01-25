@@ -1,6 +1,14 @@
 package com.bienvisto.view.components
 {
 	import flash.events.Event;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
+	
+	import flashx.textLayout.formats.TextAlign;
+	
+	import mx.controls.Label;
+	
+	import spark.components.Application;
 
 	/**
 	 * GridView.as
@@ -23,8 +31,17 @@ package com.bienvisto.view.components
 		/**
 		 * @private
 		 */ 
+		private static var scaleColor:uint = 0x696969;
+		
+		/**
+		 * @private
+		 */ 
 		private static var spacing:uint = 20;
 		
+		/**
+		 * @private
+		 */ 
+		private static var bottomSpacing:uint = 50;
 		
 		public function GridView()
 		{
@@ -33,12 +50,37 @@ package com.bienvisto.view.components
 		}
 		
 		/**
+		 * @private
+		 */ 
+		private var textField:TextField;
+		
+		/**
+		 * @private
+		 */ 
+		private var textFormat:TextFormat;
+		
+		/**
 		 * Setup
 		 */ 
 		private function setup():void
 		{
 			draw();
 			stage.addEventListener(Event.RESIZE, handleResize);	
+			
+			textFormat = new TextFormat("DejaVuSansDF3", 11, scaleColor, true);
+			textFormat.align = TextAlign.RIGHT;
+			
+			textField  = new TextField();
+			textField.embedFonts = true;
+			textField.text = "100 meters";
+			textField.setTextFormat(textFormat);
+			
+			textField.x = 0;
+			textField.width = 146;
+			textField.backgroundColor = 0xFF00FF;
+			textField.background = false;
+			addChild(textField);
+			draw();
 		}
 		
 		/**
@@ -46,9 +88,10 @@ package com.bienvisto.view.components
 		 */ 
 		override public function set scale(value:Number):void
 		{
-			if (value < 0.5) {
-				value = 0.5;
-			}
+			// do not scale this view
+			// if (value < 0.5) {
+			// 	value = 0.5;
+			// }
 			super.scale = value;
 		}
 		
@@ -56,7 +99,8 @@ package com.bienvisto.view.components
 		 * @override
 		 */ 
 		override protected function invalidateScale():void {
-			super.invalidateScale();
+			// do not invalidateScale()
+			// super.invalidateScale();
 			invalidate();
 		}
 		
@@ -76,16 +120,18 @@ package com.bienvisto.view.components
 			var w:Number = parent.width;
 			var h:Number = parent.height;
 			
+			/*
 			if (scale < 1.0) {
 				var factor:Number = 100 * (1.0 - scale);
 				w *= factor;
 				h *= factor;
 			}
+			*/
 			
 			graphics.clear();
 			
 			// draw horizontal lines
-			for (var y:int = -1, pos:int = 0; y < h; y += spacing, pos++) {
+			for (var y:int = -1, pos:int = -1; y < h; y += spacing, pos++) {
 				if (pos % 5 == 0) {
 					graphics.lineStyle(1, thickLineColor, 0.65);
 				}
@@ -98,7 +144,7 @@ package com.bienvisto.view.components
 			}
 			
 			// draw vertical lines
-			pos = 0;
+			pos = -1;
 			for (var x:int = -1; x < w; x += spacing, pos++) {
 				if (pos % 5 == 0) {
 					graphics.lineStyle(1, thickLineColor, 0.65);
@@ -111,6 +157,32 @@ package com.bienvisto.view.components
 				graphics.lineTo(x, h);
 			}
 			
+			
+			// draw vertical line
+			x = spacing;
+			y = h - bottomSpacing;
+			y -= (y % spacing);
+			if ((h - y) < (bottomSpacing + (spacing / 2))) {
+				y -= spacing;
+			}
+			
+			graphics.lineStyle(2, scaleColor);
+			graphics.moveTo(x, y);
+			
+			x += spacing * 5;
+			graphics.lineTo(x, y);
+			
+			graphics.lineStyle(1, scaleColor);
+			
+			y -= spacing / 4;
+			graphics.lineTo(x, y);
+			
+			if (textField) {
+				var meters:int = int(100 * scale);
+				textField.text = [meters, "meters"].join(" ");
+				textField.setTextFormat(textFormat);
+				textField.y    = y - 15;
+			}
 		}
 		
 		/**

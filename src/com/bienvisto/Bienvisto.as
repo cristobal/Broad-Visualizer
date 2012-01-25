@@ -239,33 +239,8 @@ package com.bienvisto
 		
 		private function debug():void
 		{
-			var time:uint = simulation.time;
-			var node:Node = nodeView.selectedNodeSprite.node;
-			
-/*			trace("Routes:");
-			for each (var route:SimpleRoute in routes) {
-				trace("\t", route);
-			}
-			trace("\n");*/
-
-/*			routes = routing.findSimpleRoutes(time);
-			trace("SimpleRoutes");
-			for each (var route:SimpleRoute in routes) {
-				trace("\t", route);
-			}
-			
-			routes = routing.resolveSimpleRoutes(time);
-			trace("SimpleRoutes - Resolved");
-			for each (route in routes) {
-				trace("\t", route);
-			}
-			*/
-			var table:RoutingTable = routing.findTable(node, time);
-			var entries:Vector.<RoutingTableEntry> = table.entries;
-			trace("TableEntries for node - ", node.id);
-			for each (var entry:RoutingTableEntry in entries) {
-				trace("\t", entry);
-			}
+			trace("app WxH:", app.width, app.height);
+			trace("window WxH", window.width, window.height);
 			
 		}
 		

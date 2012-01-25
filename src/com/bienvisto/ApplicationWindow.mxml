@@ -34,6 +34,11 @@
 			public static const PLAYBACK_TIMER_CHANGE_END:String   = "playbackChangeEnd";
 			
 			/**
+			 * @private
+			 */ 	
+			private var resize:Boolean;
+			
+			/**
 			 * Init component
 			 * 
 			 * @param event
@@ -47,6 +52,23 @@
 	
 				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadingStart);
 				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadingEnd);
+				
+				addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+			}
+			
+			override public function invalidateSize():void
+			{
+				if (resize){
+					if (width != parent.width) {
+						width = parent.width;
+					}
+				
+					if (height != parent.height) {
+						height = parent.height;
+					}
+				}
+				
+				super.invalidateSize();
 			}
 			
 			/**
@@ -106,6 +128,29 @@
 				visualizerView.loaderViewVisible = false;
 				// trace("loading end");
 			}	
+			
+			/**
+			 * Handle added to stage
+			 * 
+			 * @param event
+			 */ 
+			private function handleAddedToStage(event:Event):void
+			{
+				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+				stage.addEventListener(Event.RESIZE, handleResize);
+			}
+			
+			/**
+			 * Handle resize
+			 * 
+			 * @param event
+			 */ 
+			private function handleResize(event:Event):void
+			{
+				resize = true;
+				invalidateSize();
+				resize = false;
+			}
 			
 		]]>
 	</fx:Script>

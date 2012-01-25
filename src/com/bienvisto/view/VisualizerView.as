@@ -54,6 +54,9 @@ package com.bienvisto.view
 		 */ 
 		private var _time:uint = 0;
 		
+		/**
+		 * @readwrite time
+		 */ 
 		public function get time():uint
 		{
 			return _time;
@@ -126,6 +129,12 @@ package com.bienvisto.view
 		{
 			width  = parent.width;
 			height = parent.height;
+			
+			var viewComponent:ViewComponent;
+			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
+				viewComponent = _viewComponents[i];
+				viewComponent.invalidateSize();
+			}
 		}
 
 		

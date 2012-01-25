@@ -10,6 +10,7 @@ package com.bienvisto.view.components
 	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
 	
@@ -29,6 +30,16 @@ package com.bienvisto.view.components
 			
 			this.container = container;	
 		}
+		
+		/**
+		 * @private
+		 */ 
+		private var lastRect:Rectangle;
+		
+		/**
+		 * @private
+		 */ 
+		private var lastScale:Number = 1.0;
 		
 		/**
 		 * @private
@@ -92,6 +103,7 @@ package com.bienvisto.view.components
 			
 			managers.push(nodeSelectionDrawingManager);
 			nodeSelectionDrawingManager.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSelectionDrawingManagerSelected);
+			addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 		}
 		
 		/**
@@ -209,16 +221,91 @@ package com.bienvisto.view.components
 			lastTime = time;
 		}
 		
+		override public function set scale(value:Number):void
+		{
+			lastScale = scale;
+			super.scale = value;
+		}
+		
+		
 		/**
 		 * @override
 		 */ 
 		override protected function invalidateScale():void
 		{
 			super.invalidateScale();
+			invalidateScaleCenter(lastScale, scale);
 			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
 				manager = managers[i];
 				manager.scale = scale;
+			}
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override public function invalidateSize():void
+		{
+			super.invalidateSize();
+			invalidateCenter();
+		}
+		
+		private function invalidateCenter():void
+		{
+			// set default center
+			if (x == 0 && y == 0) {
+				x = (parent.width / 4);
+				y = (parent.height / 4);
+			}
+			// else re-center
+			else {
+				var dw:Number = lastRect.width  - parent.width;
+				var dh:Number = lastRect.height - parent.height;
+				
+				trace(lastRect.width, parent.width, dw);
+				trace(lastRect.height, parent.height, dh);
+				
+				x -= dw / 4;
+				y -= dh / 4;
+			}
+			
+			lastRect = new Rectangle(0, 0, parent.width, parent.height);
+		}
+		
+		/**
+		 * Invalidate center
+		 * 
+		 * @param oldScale
+		 * @param newScale
+		 */ 
+		private function invalidateScaleCenter(oldScale:Number, newScale:Number):void
+		{
+			// how much we normally see
+			var w:Number = parent.width;
+			var h:Number = parent.height; 
+			
+			// the current difference
+			var dw:Number = (w * oldScale) - w;
+			var dh:Number = (h * oldScale) - h;
+			
+			var sw:Number = (w * newScale) - w;
+			var sh:Number = (h * newScale) - h;
+			
+			var dx:Number = Math.abs(sw - dw);
+			var dy:Number = Math.abs(sh - dh);
+			
+			if (isNaN(dx) || isNaN(dy)) {
+				return;
+			}
+			
+			if (newScale > oldScale) {
+				x += dx;
+				y += dy;
+			}
+			else {
+				x -= dx;
+				y -= dy;
 			}
 		}
 		
@@ -240,6 +327,12 @@ package com.bienvisto.view.components
 		private function handleNodeDrawingManagerChange(event:Event):void
 		{
 			update(lastTime);
+		}
+		
+		private function handleAddedToStage(event:Event):void
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+			invalidateCenter();
 		}
 		
 	}
