@@ -18,6 +18,14 @@ package com.bienvisto.ui.menu
 	
 	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
 	
+	[Event(name="changeStart", type="flash.events.Event")]
+	
+	[Event(name="changeEnd", type="flash.events.Event")]
+	
+	[Event(name="loadStart", type="flash.events.Event")]
+	
+	[Event(name="loadEnd", type="flash.events.Event")]
+	
 	/**
 	 * PlaybackContainer.as
 	 * 
@@ -82,6 +90,18 @@ package com.bienvisto.ui.menu
 		 * @protected
 		 */ 
 		protected var gridView:ViewComponent;
+		
+		/**
+		 * @readonly buffering
+		 */ 
+		public function get buffering():Boolean
+		{
+			var value:Boolean = false;
+			if (timeSlider) {
+				value = timeSlider.buffering;
+			}
+			return value;
+		}
 
 		/**
 		 * Set zoom view
@@ -179,8 +199,10 @@ package com.bienvisto.ui.menu
 		protected function bindComponents():void
 		{
 			timeSlider.addEventListener(TimedEvent.ELAPSED, handleProgressSliderChangeValue);
-			// timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
-			// timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
+			timeSlider.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
+			timeSlider.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
+			timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
+			timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
 		}
 		
 		/**
@@ -209,6 +231,14 @@ package com.bienvisto.ui.menu
 			timeLabel.text  = text;
 			
 			timeSlider.time = value / 1000;
+		}
+		
+		/**
+		 * Get time
+		 */ 
+		public function getTime():uint
+		{
+			return timeSlider.time * 1000;
 		}
 		
 		/**
@@ -246,16 +276,6 @@ package com.bienvisto.ui.menu
 		}
 		
 		/**
-	 	 * Handle progress slider change value
-		 * 
-		 * @param event
-		 */
-		protected function handleProgressSliderChangeValue(event:TimedEvent):void
-		{
-			dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, event.elapsed * 1000));
-		}
-		
-		/**
 		 * Handle grid checkbox change
 		 * 
 		 * @param event
@@ -286,6 +306,57 @@ package com.bienvisto.ui.menu
 			initComponents();
 			bindComponents();
 		}
+		
+		
+		/**
+		 * Handle progress slider change value
+		 * 
+		 * @param event
+		 */
+		protected function handleProgressSliderChangeValue(event:TimedEvent):void
+		{
+			dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, event.elapsed * 1000));
+		}
+
+		/**
+		 * Handle progress slider change start
+		 * 
+		 * @param event
+		 */ 
+		protected function handleProgressSliderChangeStart(event:Event):void
+		{
+			dispatchEvent(event); // forward the event
+		}
+		
+		/**
+		 * Handle progress slider change end
+		 * 
+		 * @param event
+		 */ 
+		protected function handleProgressSliderChangeEnd(event:Event):void
+		{
+			dispatchEvent(event); // forward the event
+		}
+		
+		/**
+		 * Handle progress slider load start
+		 * 
+		 * @param event
+		 */ 
+		protected function handleProgressSliderLoadStart(event:Event):void
+		{
+			dispatchEvent(event); // forward the event
+		}
+		
+		/**
+		 * Handle progress slider load end
+		 * 
+		 * @param event
+		 */ 
+		protected function handleProgressSliderLoadEnd(event:Event):void
+		{
+			dispatchEvent(event); // forward the event
+		}	
 		
 	}
 }

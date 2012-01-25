@@ -811,8 +811,6 @@ package com.bienvisto.ui.node
 					item.complete    = route.complete;
 					item.traceback   = route.traceback;
 					
-					// trace("item", elapsed, entry.traceback, entry.complete, entry.paths);
-					// data = new ObjectProxy(item);
 					dataProvider.addItem(item);
 				}	
 			}
@@ -851,12 +849,10 @@ package com.bienvisto.ui.node
 			}
 			
 			if (update) {
-				// routingDataGridDataProvider = dataProvider;
 				var selectedItem:Object;
 				var sort:ISort;
 				
 				if (oDataProvider) {
-					
 					// Stash old selected item and sort order
 					selectedItem = routingDataGrid.selectedItem;
 					sort = oDataProvider.sort;
@@ -898,7 +894,7 @@ package com.bienvisto.ui.node
 		 */ 
 		private function parsePaths(paths:Vector.<int>):String
 		{
-			return paths ? paths.join(" <–> ").replace(/-1.+?$/, "-1") : "…"; //.replace(/-1.+?$/, "-1");
+			return paths ? paths.join(" –> ").replace(/-1.+?$/, "-1") : "…";
 		}
 		
 		/**
@@ -997,7 +993,7 @@ package com.bienvisto.ui.node
 				var r:Number   = 33;
 				var color:uint = NodeSprite.selectedColor;
 				if (selectedNode && selectedNode.selectedOrder == 2) {
-					color = NodeSprite.selectedColorSecond; // 0x43c8ef;
+					color = NodeSprite.selectedColorSecond; 
 				}
 				
 				var flag:Boolean = false;
@@ -1074,10 +1070,10 @@ package com.bienvisto.ui.node
 		protected function handleClose(event:CloseEvent):void 
 		{
 			visible = false;
-			_selectedNode.selected = false; // deselect current node
-			_selectedNode = null;
-			
-			// dispatchEvent(event); // forward the event
+			if (_selectedNode) {
+				_selectedNode.selected = false; // deselect current node
+				_selectedNode = null;
+			}
 		}
 		
 		/**

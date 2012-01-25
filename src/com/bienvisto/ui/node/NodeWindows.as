@@ -14,6 +14,7 @@ package com.bienvisto.ui.node
 	
 	import flash.utils.Dictionary;
 	
+	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	
 	import spark.components.Group;
@@ -73,11 +74,13 @@ package com.bienvisto.ui.node
 		{
 			window = new NodeWindow();
 			window.visible = false;
+			window.addEventListener(CloseEvent.CLOSE, handleWindowClose);
 			addElement(window);
 			
 			window2 = new NodeWindow();
 			window2.x = -(window.width + 10);
 			window2.visible = false;
+			window2.addEventListener(CloseEvent.CLOSE, handleWindowClose);
 			addElement(window2);
 			
 			windowsSettings = new Dictionary();
@@ -351,6 +354,16 @@ package com.bienvisto.ui.node
 			updateSelectedWindows();
 			// var nodeSprite:NodeSprite = event.nodeSprite;
 			// window.setSelectedNode(event.nodeSprite);
+		}
+		
+		/**
+		 * Handle window close
+		 * 
+		 * @param event
+		 */ 
+		private function handleWindowClose(event:CloseEvent):void
+		{
+			updateSelectedWindows();
 		}
 	}
 }

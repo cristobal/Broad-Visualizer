@@ -285,13 +285,15 @@ package com.bienvisto.view.components
 			var w:Number = parent.width;
 			var h:Number = parent.height; 
 			
-			// the current difference
+			// diff between how much we used to see now and normally
 			var dw:Number = (w * oldScale) - w;
 			var dh:Number = (h * oldScale) - h;
 			
+			// diff between how much we will see now and normally
 			var sw:Number = (w * newScale) - w;
 			var sh:Number = (h * newScale) - h;
 			
+			// the diff between both
 			var dx:Number = Math.abs(sw - dw);
 			var dy:Number = Math.abs(sh - dh);
 			
@@ -299,10 +301,12 @@ package com.bienvisto.view.components
 				return;
 			}
 			
+			// scale in
 			if (newScale > oldScale) {
 				x += dx;
 				y += dy;
 			}
+			// scale out
 			else {
 				x -= dx;
 				y -= dy;

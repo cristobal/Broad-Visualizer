@@ -14,7 +14,7 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
-		private static var windowSize:uint = 50;
+		private static var windowSize:uint = 100;
 		
 		/**
 		 * @private
@@ -39,7 +39,7 @@ package com.bienvisto.view.drawing
 		private var lastTime:uint = 0;
 		
 		/**
-		 * @override
+		 * @overridej
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
@@ -58,6 +58,7 @@ package com.bienvisto.view.drawing
 						continue;
 					}
 					
+					trace("samples… for node: ", nodeSprite.node.id, "total:", samples.length, time, "vs.", samples[0].time);
 					nodeSprite.setHighlighted(highlightColor);
 					
 				}

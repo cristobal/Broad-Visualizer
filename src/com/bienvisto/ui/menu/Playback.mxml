@@ -9,6 +9,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
+			
 			[Event(name="play", type="flash.events.Event")]
 			public static const PLAY:String = "play";
 			
@@ -47,6 +48,15 @@
 				return _playButtonState;
 			}
 			
+			/**
+			 * @readonly isPlaying
+			 */ 
+			public function get isPlaying():Boolean
+			{
+				return playButtonState == PAUSE;
+			}
+				
+			
 			
 			/**
 			 * Handle play button click
@@ -66,7 +76,6 @@
 	</fx:Script>
 	<s:Group width="20%" height="50" top="0">
 		<s:CheckBox id="gridCheckbox" label="Grid" left="5" top="15" />
-		<s:Button id="debugButton" label="Debug" left="50" top="15" />
 	</s:Group>
 	
 	<s:Group width="100%" height="50" top="0" left="20%">

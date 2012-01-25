@@ -3,6 +3,7 @@ package com.bienvisto.view.components
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
 	[Event(name="selected", type="com.bienvisto.view.events.NodeSpriteEvent")]
@@ -26,6 +27,11 @@ package com.bienvisto.view.components
 		private var _nodeSprite:NodeSprite;
 		
 		/**
+		 * @private
+		 */ 
+		private var dirty:Boolean;
+		
+		/**
 		 * @readonly nodeSprite
 		 */ 
 		public function get nodeSprite():NodeSprite
@@ -42,6 +48,7 @@ package com.bienvisto.view.components
 		{
 			_nodeSprite = nodeSprite;
 			addEventListener(MouseEvent.CLICK, handleClick);
+			_nodeSprite.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteEventSelected);
 			
 			invalidate();
 			draw();
@@ -77,6 +84,19 @@ package com.bienvisto.view.components
 			addEventListener(MouseEvent.CLICK, handleClick);
 			_nodeSprite = null;
 		}
+			
+		/**
+		 * Handle node sprite event selected
+		 * 
+		 * @param event
+		 */ 
+		private function handleNodeSpriteEventSelected(event:NodeSpriteEvent):void
+		{
+			if (dirty) {
+				return;
+			}
+			dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, nodeSprite));
+		}
 		
 		/**
 		 * Handle click
@@ -85,8 +105,10 @@ package com.bienvisto.view.components
 		 */ 
 		private function handleClick(event:MouseEvent):void
 		{
+			dirty = true;
 			// nodeSprite.selected = !nodeSprite.selected; // Handled in NodeSelectionDrawingManager.as
 			dispatchEvent(new NodeSpriteEvent(NodeSpriteEvent.SELECTED, false, false, nodeSprite));
+			dirty = false;
 		}
 	}
 }

@@ -14,24 +14,6 @@
 			import com.bienvisto.ui.menu.ProgressTimeSlider;
 			
 			import mx.events.FlexEvent;
-
-			/**
-			 * @public
-			 */ 
-			[Event(name="playbackTimerChangeValue", type="com.bienvisto.core.events.TimedEvent")]
-			public static const PLAYBACK_TIMER_CHANGE_VALUE:String = "playbackTimerChangeValue";
-			
-			/**
-			 * @public
-			 */ 
-			[Event(name="playbackTimerChangeStart", type="flash.events.Event")]
-			public static const PLAYBACK_TIMER_CHANGE_START:String = "playbackTimerChangeStart";
-			
-			/**
-		 	 * @public
-			 */ 
-			[Event(name="playbackTimerChangeEnd", type="flash.events.Event")]
-			public static const PLAYBACK_TIMER_CHANGE_END:String   = "playbackChangeEnd";
 			
 			/**
 			 * @private
@@ -45,17 +27,19 @@
 			 */ 
 			private function initComponent(event:FlexEvent):void
 			{
-				playback.addEventListener(TimedEvent.ELAPSED, handleProgressSliderChangeValue);
-				playback.timeSlider.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
-				playback.timeSlider.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
+				playback.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
+				playback.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
 				
 	
-				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadingStart);
-				playback.timeSlider.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadingEnd);
+				playback.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
+				playback.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
 				
 				addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 			}
 			
+			/**
+			 * @override
+			 */ 
 			override public function invalidateSize():void
 			{
 				if (resize){
@@ -72,25 +56,13 @@
 			}
 			
 			/**
-			 * Handle progress slider change value
-			 * 
-			 * @param event
-			 */ 
-			private function handleProgressSliderChangeValue(event:TimedEvent):void
-			{
-				dispatchEvent(event);
-			}
-			
-			/**
 			 * Handle progress slider change start
 			 * 
 			 * @param event
 			 */ 
 			private function handleProgressSliderChangeStart(event:Event):void
 			{
-				// visualizerView.pause = true;
-				// visualizerView.loaderViewVisible = true;
-				dispatchEvent(new Event(PLAYBACK_TIMER_CHANGE_START));
+				
 			}
 			
 			/**
@@ -100,9 +72,7 @@
 			 */ 
 			private function handleProgressSliderChangeEnd(event:Event):void
 			{
-				// visualizerView.pause = true;
-				// visualizerView.loaderViewVisible = true;
-				dispatchEvent(new Event(PLAYBACK_TIMER_CHANGE_END));
+				visualizerView.loaderViewVisible = playback.buffering;
 			}
 			
 			/**
@@ -110,11 +80,9 @@
 			 * 
 			 * @param event
 			 */ 
-			private function handleProgressSliderLoadingStart(event:Event):void
+			private function handleProgressSliderLoadStart(event:Event):void
 			{
-				trace("handleProgressSliderLoadingStart");
 				visualizerView.loaderViewVisible = true;
-				// trace("loading start");
 			}
 			
 			/**
@@ -122,11 +90,9 @@
 			 * 
 			 * @param event
 			 */ 
-			private function handleProgressSliderLoadingEnd(event:Event):void
+			private function handleProgressSliderLoadEnd(event:Event):void
 			{
-				trace("handleProgressSliderLoadingEnd");
 				visualizerView.loaderViewVisible = false;
-				// trace("loading end");
 			}	
 			
 			/**

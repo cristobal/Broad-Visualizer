@@ -48,8 +48,8 @@ public:
   /**
    * @brief Sink that handles a change in a node's course
    */
-  void 
-	CourseChanged(std::string context, ns3::Ptr<const ns3::MobilityModel> model);
+  void
+  CourseChanged(std::string context, ns3::Ptr<const ns3::MobilityModel> model);
 
 	/**
 	 * @brief Log the properties and role for the nodes in a node container
@@ -66,14 +66,14 @@ public:
   /**
    * @brief Sink that handles static positioned nodes
    */
-  void 
-	StaticPosition(ns3::Ptr<const ns3::Node> node, int x, int y);
+  void
+  StaticPosition(ns3::Ptr<const ns3::Node> node, int x, int y);
 		
   /**
    * @brief Sink that handles static positioned nodes
    */
   void 
-	StaticPosition(int nodeId, int x, int y);
+  StaticPosition(int nodeId, int x, int y);
 
   /**
    * @brief Sink that handles a change in the routing table
@@ -100,7 +100,13 @@ public:
   MacDrop (std::string text, ns3::Ptr<const ns3::Packet> packet);
 
   /**
-   * @brief Sink that handles a transmission in the MAC layer
+   * @brief Sink that handles a mac rejection in the MAC layer
+   */
+  void
+  MacFail (std::string text, Mac48Address address);
+	 
+  /**
+   * @brief Sink that handles a queue change in the MAC layer
    */
   void
   QueueChange (std::string text, int nPackets);

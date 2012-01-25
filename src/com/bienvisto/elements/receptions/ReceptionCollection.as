@@ -77,6 +77,11 @@ package com.bienvisto.elements.receptions
 						break;
 					}
 					
+					// add only if inside window
+					if (packet.time > time) {
+						continue;
+					}
+					
 					if (packet.to == id) {
 						totalOwn++;
 					}

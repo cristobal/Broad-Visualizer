@@ -137,9 +137,9 @@ package com.bienvisto.core.aggregate
 		public function sampleItems(time:uint, windowSize:uint):Vector.<Aggregate>
 		{
 			var samples:Vector.<Aggregate> = new Vector.<Aggregate>();
-			if ((time > 0) && (time <=lastTimeAdded)) {
+			if (time > 0) {
 				
-				var startTime:uint = time - windowSize;
+				var startTime:Number = time - windowSize;
 				if (startTime < 0) {
 					startTime = 0;
 				}
@@ -151,6 +151,12 @@ package com.bienvisto.core.aggregate
 					if (sample.time < startTime) {
 						break;
 					}
+					
+					// add only if inside window
+					if (sample.time > time) {
+						continue;
+					}
+					
 					samples.push(sample);
 				}
 			}
@@ -220,6 +226,7 @@ package com.bienvisto.core.aggregate
 				else {
 					max = key - 1;
 				}
+				
 			} while (
 				key < total - 1 && 
 				max >= min  &&

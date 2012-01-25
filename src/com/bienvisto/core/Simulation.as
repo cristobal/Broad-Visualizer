@@ -236,38 +236,6 @@ package com.bienvisto.core
 			}
 		}
 		
-		/**
-		 * @private
-		 */ 
-		private var _buffering:Boolean;
-		
-		/**
-		 * @readonly buffering
-		 */ 
-		public function get buffering():Boolean
-		{
-			return _buffering;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _bufferTime:uint = 0;
-		
-		/**
-		 * @readonly bufferTime
-		 */ 
-		public function get bufferTime():uint
-		{
-			return _bufferTime;
-		}
-		
-		private function setBuffering(value:Boolean):void
-		{
-			_bufferTime = time; // when we start to buffer and wait
-			_buffering  = value;
-		}
-		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -335,7 +303,7 @@ package com.bienvisto.core
 		/**
 		 * @private
 		 */ 
-		private var updateTime:int;
+		private var updateTime:int = 0;
 		
 		/**
 		 * Start
@@ -346,14 +314,16 @@ package com.bienvisto.core
 				return;
 			}
 			
-			timer.start();
 			if (time == duration) {
 				setTime(0); // reset time
+				updateTime = 0;
 			}
 			
 			if (updateTime == 0) {
 				updateTime = getTimer();
 			}
+			
+			timer.start();
 		}
 		
 		/**
@@ -361,7 +331,10 @@ package com.bienvisto.core
 		 */ 
 		public function pause():void
 		{
-			timer.stop();
+			if (timer.running) {
+				timer.stop();
+			}
+		
 			updateTime = 0;
 		}
 		
@@ -377,8 +350,13 @@ package com.bienvisto.core
 			if (total > loaded) {
 				flag = true;
 			}
-			setBuffering(flag);
 			setTime(time);
+			if (timer.running) {
+				updateTime = getTimer();
+			}
+			else {
+				updateTime = 0;
+			}
 		}
 		
 		/**
@@ -416,6 +394,7 @@ package com.bienvisto.core
 		private function handleTimer(event:TimerEvent):void
 		{
 			var elapsed:int = (getTimer() - updateTime) * speed;
+			
 			elapsed = internalTime + elapsed;
 			var stop:Boolean = false;
 			if (elapsed >= duration) {
@@ -424,11 +403,6 @@ package com.bienvisto.core
 				stop = true;
 			}
 			setTime(elapsed);
-			
-			
-			if (buffering) {
-				elapsed = bufferTime;
-			}
 			
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {

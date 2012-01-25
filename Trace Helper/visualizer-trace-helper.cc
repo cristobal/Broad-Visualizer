@@ -131,9 +131,6 @@ VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
 		destId = GetNodeIdForAddress(it->GetDestAddr ());
 		nextId = GetNodeIdForAddress(it->GetNextAddr ());
 		hops	 = it->GetDistance();
-		if (destId == nextId) {
-			nextId = -1; // there is no next id points to same node final destination.
-		}
 		outputStream << destId << "," << nextId << "," << hops;
 		index++;
   }
@@ -270,6 +267,23 @@ VisualizerTraceHelper::MacDrop (std::string text, Ptr<const Packet> packet)
   outputStream << Simulator::Now ().GetMilliSeconds() << " ";
   outputStream << endl;
 }
+
+void
+VisualizerTraceHelper::MacFail (std::string text, Mac48Address address)
+{
+  int nodeId;
+  
+  sscanf(text.c_str(), "/NodeList/%i/", &nodeId); // Get its id
+  
+  // Write to file,
+  // format: md <node id> <time>
+  
+  outputStream << "md "; // Line type: Mac Drop
+  outputStream << nodeId << " ";
+  outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+  outputStream << endl;
+}
+
 
 
 void
@@ -465,11 +479,15 @@ VisualizerTraceHelper::ConnectSinks()
     MakeCallback (&VisualizerTraceHelper::MacDrop, this));
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsOverlay/Enqueue",
     MakeCallback (&VisualizerTraceHelper::QueueChange, this));
-	// Added by Cristobal
-	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsServer/SeqTsReceived",
-		MakeCallback (&VisualizerTraceHelper::SeqTsReceived, this));
-	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
-		MakeCallback (&VisualizerTraceHelper::SeqTsSent, this));
+  
+  // Added by Cristobal
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalDataFailed",
+	  MakeCallback (&VisualizerTraceHelper::MacFail, this));
+  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsServer/SeqTsReceived",
+	  MakeCallback (&VisualizerTraceHelper::SeqTsReceived, this));
+  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
+	  MakeCallback (&VisualizerTraceHelper::SeqTsSent, this));
+	
   // Added by Morten.
   Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate,this);
 }

@@ -21,6 +21,8 @@ package com.bienvisto
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
 	import com.bienvisto.ui.menu.Playback;
+	import com.bienvisto.ui.menu.PlaybackContainer;
+	import com.bienvisto.ui.menu.ProgressTimeSlider;
 	import com.bienvisto.view.VisualizerView;
 	import com.bienvisto.view.components.GridView;
 	import com.bienvisto.view.components.LoaderView;
@@ -186,8 +188,6 @@ package com.bienvisto
 			
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
-
-			// view.loaderViewVisible = true;
 		}
 		
 		/**
@@ -201,7 +201,13 @@ package com.bienvisto
 			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
 			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
 			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
-			window.addEventListener(ApplicationWindow.PLAYBACK_TIMER_CHANGE_VALUE, handlePlaybackTimerChangeValue);
+
+			window.playback.addEventListener(TimedEvent.ELAPSED, handlePlaybackProgressTimerElapsed);
+			window.playback.addEventListener(ProgressTimeSlider.CHANGE_START, handlePlaybackProgressTimerChangeStart);
+			window.playback.addEventListener(ProgressTimeSlider.CHANGE_END, handlePlaybackProgressTimerChangeEnd);
+			window.playback.addEventListener(ProgressTimeSlider.LOAD_START, handlePlaybackProgressTimerLoadStart);
+			window.playback.addEventListener(ProgressTimeSlider.LOAD_END, handlePlaybackProgressTimerLoadEnd);
+			
 			
 			// window menu add toggeable node drawing managers
 			window.menu.addToggeableNodeDrawingManager(nodeIDDrawingManager);
@@ -231,10 +237,28 @@ package com.bienvisto
 			
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);
-			
-			window.playback.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
-				debug();
-			});
+		}
+		
+		/**
+		 * Update time
+		 */ 
+		private function updateTime():void
+		{
+			var time:uint = simulation.time; 
+			window.playback.setTime(time);
+			window.nodeWindows.setTime(time);
+			view.setTime(time);
+		}
+		
+		/**
+		 * Jump to time
+		 * 
+		 * @param elapsed
+		 */ 
+		private function jumpToTime(elapsed:uint):void
+		{
+			simulation.jumpToTime(elapsed);
+			updateTime();
 		}
 		
 		private function debug():void
@@ -308,10 +332,7 @@ package com.bienvisto
 		 */ 
 		private function handleSimulationTimer(event:TimerEvent):void
 		{
-			var time:uint = simulation.time; 
-			window.playback.setTime(time);
-			window.nodeWindows.setTime(time);
-			view.setTime(time);
+			updateTime();
 		}
 		
 		/**
@@ -350,13 +371,68 @@ package com.bienvisto
 		}
 		
 		/**
-		 * Handle playback timer change value
+		 * Handle playback progress timer change value
+		 * 
+		 * @param event
 		 */ 
-		private function handlePlaybackTimerChangeValue(event:TimedEvent):void
+		private function handlePlaybackProgressTimerElapsed(event:TimedEvent):void
 		{
-			simulation.jumpToTime(event.elapsed);
+			if (!window.playback.buffering) {
+				jumpToTime(event.elapsed);
+			}
+		}
+
+		/**
+		 * Handle playback progress timer change start
+		 * 
+		 * @param event
+		 */
+		private function handlePlaybackProgressTimerChangeStart(event:Event):void
+		{
+			if (simulation.running) {
+				simulation.pause();
+			}
 		}
 		
+		/**
+		 * Handle playback progress timer change end
+		 * 
+		 * @param event
+		 */
+		private function handlePlaybackProgressTimerChangeEnd(event:Event):void
+		{
+			if (!window.playback.buffering) {
+				jumpToTime(window.playback.getTime());
+				if (window.playback.isPlaying && !simulation.running) {
+					simulation.start();
+				}
+			}
+		}
 		
+		/**
+		 * Handle playback timer load start
+		 * 
+		 * @param event
+		 */
+		private function handlePlaybackProgressTimerLoadStart(event:Event):void
+		{
+			if (simulation.running) {
+				simulation.pause();
+			}
+		}
+		
+		/**
+		 * Handle playback progress timer load start
+		 * 
+		 * @param event
+		 */
+		private function handlePlaybackProgressTimerLoadEnd(event:Event):void
+		{
+			jumpToTime(window.playback.getTime());
+			if (window.playback.isPlaying && !simulation.running) {
+				simulation.start();
+			}
+		}
+			
 	}
 }

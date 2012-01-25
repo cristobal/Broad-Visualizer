@@ -118,6 +118,23 @@ package com.bienvisto.ui.menu
 		{
 			super.setValue(value);
 			if (_time != value && !_timeFlag) {
+				
+				// invalidate bufffering
+				var w:Number  = width - 2;
+				var ew:Number = w;
+				var tw:Number = w;
+				
+				var flag:Boolean = false;
+				
+				if (value < duration) {
+					ew = (ew * value) / duration;
+				}
+				
+				var wx:Number = (ew / w) * 100;		
+				if ((loaded < 100) && (wx > loaded)) {
+					setBuffering(true);
+				}
+				
 				dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, value));
 				
 				var dx:Number = (value / duration) * 100;
@@ -127,10 +144,10 @@ package com.bienvisto.ui.menu
 					dispatchEvent(new Event(LOAD_START));
 				}
 				else if ((dx < loaded) && loading) {
-					// trace("load end from setValue", loadingValue, loaded);
 					loading = false;
 					dispatchEvent(new Event(LOAD_END));
 				}
+				
 			}
 			_timeFlag = false;
 			invalidate();
@@ -181,10 +198,7 @@ package com.bienvisto.ui.menu
 			
 			
 			_loaded = value;
-			
-			
 			if ((loadingValue < loaded) && loading) {
-				// trace("load end from set loaded", loadingValue, loaded);
 				loading = false;
 				dispatchEvent(new Event(LOAD_END));
 			}

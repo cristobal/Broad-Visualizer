@@ -27,7 +27,7 @@ package com.bienvisto.elements.drops
 		 */ 
 		override public function sampleItems(time:uint, windowSize:uint):Vector.<Aggregate>
 		{
-			return super.sampleItems(time, windowSize);time;
+			return super.sampleItems(time, windowSize);
 /*			var samples:Vector.<Aggregate>;
 			var key:String = String(time) + "," + String(windowSize);
 			if (!(key in cache)) {
