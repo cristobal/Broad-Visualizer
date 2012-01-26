@@ -1,7 +1,7 @@
 package com.bienvisto.view
 {
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.ViewComponent;
 	import com.bienvisto.view.drawing.IDrawingManager;

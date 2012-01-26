@@ -1,4 +1,4 @@
-package com.bienvisto.elements.network
+package com.bienvisto.elements.network.packet
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 

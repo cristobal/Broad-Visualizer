@@ -4,9 +4,9 @@ package com.bienvisto.elements.transmissions
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
-	import com.bienvisto.elements.network.Packet;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.elements.network.packet.Packet;
 	
 	import flash.utils.Dictionary;
 	

@@ -2,8 +2,8 @@ package com.bienvisto.elements.buffer
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	
 	import flash.utils.Dictionary;
 	

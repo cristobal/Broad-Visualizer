@@ -1,7 +1,7 @@
 package com.bienvisto.elements.routing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
-	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.node.Node;
 	
 	/**
 	 * RoutingTable.as

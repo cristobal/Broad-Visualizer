@@ -15,7 +15,7 @@ package com.bienvisto.core
 	import flash.utils.getTimer;
 	
 	import mx.core.UIComponent;
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	
 	
 	public class Visualizer extends UIComponent

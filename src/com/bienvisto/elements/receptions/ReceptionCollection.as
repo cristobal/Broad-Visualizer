@@ -2,9 +2,9 @@ package com.bienvisto.elements.receptions
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.Packet;
-	import com.bienvisto.elements.network.PacketStats;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.packet.Packet;
+	import com.bienvisto.elements.network.packet.PacketStats;
 	
 	import flash.utils.Dictionary;
 	

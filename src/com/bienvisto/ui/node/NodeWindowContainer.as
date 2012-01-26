@@ -8,7 +8,8 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
+	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingStatsItem;
@@ -128,6 +129,16 @@ package com.bienvisto.ui.node
 		 * @public
 		 */ 
 		public var routingContent:NavigatorContent;
+		
+		/**
+		 * @public
+		 */ 
+		public var adjacencyContent:NavigatorContent;
+		
+		/**
+		 * @public
+		 */ 
+		public var localAdjacencyMatrixGroup:AdjacencyMatrixGroup;
 		
 		/**
 		 * @public
@@ -590,6 +601,7 @@ package com.bienvisto.ui.node
 			settings.propertiesContentVisible = propertiesContent.visible;
 			settings.metricsContentVisible    = metricsContent.visible;
 			settings.routingContentVisible    = routingContent.visible;
+			settings.adjacencyContentVisible  = adjacencyContent.visible;
 			
 			if (routingDataGrid) {
 				var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
@@ -653,6 +665,9 @@ package com.bienvisto.ui.node
 					else if (settings.routingContentVisible) {
 						tabNavigator.selectedChild = routingContent;
 					}
+					else if (settings.adjacencyContentVisible) {
+						tabNavigator.selectedChild = adjacencyContent;
+					}
 					routingContentOrderDefaults = settings.routingContentOrderDefaults;
 				}
 				
@@ -702,6 +717,11 @@ package com.bienvisto.ui.node
 			// Update Routing
 			if (routingContent.visible) {
 				updateRoutingContent(node);
+			}
+			
+			// Update Addjacency
+			if (adjacencyContent.visible) {
+				updateAdjacencyContent(node);
 			}
 			
 		}
@@ -886,6 +906,24 @@ package com.bienvisto.ui.node
 						}
 					}
 				}
+			}
+		}
+		
+		/**
+		 * Update adjacency content
+		 * 
+		 * @param node
+		 */ 
+		protected function updateAdjacencyContent(node:Node):void
+		{
+			var time:uint = elapsed;// - (elapsed % 1000); // fix to 1000
+			var adjacencyMatrix:AdjacencyMatrix = routing.getAdjacencyMatrix(node, time);
+			
+			if (adjacencyMatrix) {
+				localAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
+			}
+			else {
+				localAdjacencyMatrixGroup.adjacencyMatrix = null;
 			}
 		}
 		

@@ -1,5 +1,6 @@
-package com.bienvisto.elements.network
+package com.bienvisto.elements.network.packet
 {
+	import com.bienvisto.elements.network.node.Node;
 
 	/**
 	 * PacketStats.as

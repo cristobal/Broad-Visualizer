@@ -3,10 +3,10 @@ package com.bienvisto.elements.receptions
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
-	import com.bienvisto.elements.network.Packet;
-	import com.bienvisto.elements.network.PacketStats;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.elements.network.packet.Packet;
+	import com.bienvisto.elements.network.packet.PacketStats;
 	
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;

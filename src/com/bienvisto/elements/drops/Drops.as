@@ -4,8 +4,8 @@ package com.bienvisto.elements.drops
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	
 	import flash.utils.Dictionary;
 	

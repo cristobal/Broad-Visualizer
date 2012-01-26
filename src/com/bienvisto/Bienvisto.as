@@ -8,8 +8,8 @@ package com.bienvisto
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.network.Node;
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingTable;

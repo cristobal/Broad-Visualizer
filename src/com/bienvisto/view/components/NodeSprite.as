@@ -1,6 +1,6 @@
 package com.bienvisto.view.components
 {
-	import com.bienvisto.elements.network.Node;
+	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.display.Shape;

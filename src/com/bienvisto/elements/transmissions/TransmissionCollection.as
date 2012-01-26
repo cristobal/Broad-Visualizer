@@ -2,7 +2,7 @@ package com.bienvisto.elements.transmissions
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.elements.network.Packet;
+	import com.bienvisto.elements.network.packet.Packet;
 	
 	import flash.utils.Dictionary;
 	

@@ -1,6 +1,6 @@
 package com.bienvisto.view.overlays
 {
-	import com.bienvisto.elements.network.NodeContainer;
+	import com.bienvisto.elements.network.node.NodeContainer;
 	
 	import mx.core.FlexSprite;
 	import com.bienvisto.view.components.NodeSprite;
