@@ -18,6 +18,11 @@ package com.bienvisto.elements.network.graph
 		
 		/**
 		 * @private
+		 */ 
+		private var lines:Vector.<String>;
+		
+		/**
+		 * @private
 		 */  
 		private var _vertices:Vector.<int>;
 		
@@ -60,7 +65,17 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function get size():int 
 		{
-			return vertices.length;
+			return _vertices.length;
+		}
+		
+		/**
+		 * Vertex exists
+		 * 
+		 * @param key
+		 */ 
+		public function vertexExists(vertex:int):Boolean
+		{
+			return vertex in keys;
 		}
 		
 		/**
@@ -71,10 +86,35 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function edgeExists(from:int, to:int):Boolean
 		{
-			var x:int = keys[from];
-			var y:int = keys[to];
+			var value:Boolean = false;
 			
-			return edgeExistsXY(x, y);
+			if ((from in keys) && (to in keys)) {
+				var x:int = keys[from];
+				var y:int = keys[to];
+				
+				value = edgeExistsXY(x, y);
+			}
+			
+			return value;
+		}
+		
+		/**
+		 * Get adjacent vertices
+		 * 
+		 * @param from
+		 */ 
+		public function getAdjacentVertices(from:int):Vector.<int>
+		{
+			var adjacentVertices:Vector.<int> = vertices.concat(); // create shallow copy
+			var to:int;
+			for (var i:int = adjacentVertices.length; i--;) {
+				to = adjacentVertices[i];
+				if (!edgeExists(from, to) /* || (from == to) */ ) {
+					adjacentVertices.splice(i, 1);	
+				}
+			}
+			
+			return adjacentVertices;
 		}
 		
 		/**
@@ -88,5 +128,46 @@ package com.bienvisto.elements.network.graph
 			return matrix[x + (y * size)];
 		}
 		
+		/**
+		 * To string
+		 */ 
+		public function toString():String
+		{
+			if (!lines) {
+				lines = new Vector.<String>();
+				
+				
+				var args:Array = ["\\"];
+				
+				var V:Vector.<int> = this.vertices;
+				var vertex:int;
+				
+				for (var i:int = 0, l:int = size; i < l; i++) {
+					vertex = V[i];
+					args.push(vertex);
+				}
+				
+				var line:String = args.join(", ");
+				lines.push(line);
+				
+				for (var y:int = 0, h:int = size; y < h; y++) {
+					vertex = V[y];
+					args   = [vertex];
+					for (var x:int = 0, w:int = size; x < w; x++) {
+						if (edgeExistsXY(x, y)) {
+							args.push("1");
+						}
+						else {
+							args.push("0");
+						}
+					}
+					
+					line = args.join(", ");
+					lines.push(line);
+				}
+			}
+			
+			return lines.join("\n");		
+		}
 	}
 }

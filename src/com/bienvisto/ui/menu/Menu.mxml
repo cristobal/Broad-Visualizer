@@ -16,7 +16,8 @@
 			<s:Button id="browseFileButton" label="Load file" />		
 		</s:Group>
 		<s:Group right="5" top="2">
-			<s:Button id="optionsButton" label="Options" />
+			<s:Button id="debugButton" label="Debug" right="180" />
+			<s:Button id="optionsButton" label="Options" right="0" />
 		</s:Group>
 	</s:BorderContainer>
 </menu:MenuContainer>

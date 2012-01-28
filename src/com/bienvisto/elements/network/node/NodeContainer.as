@@ -72,7 +72,6 @@ package com.bienvisto.elements.network.node
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
-;
 			// Format: nr <id> <role> <ipv4Address> <macAddress>
 			var id:int = int(params[0]);
 			var role:String = params[1];

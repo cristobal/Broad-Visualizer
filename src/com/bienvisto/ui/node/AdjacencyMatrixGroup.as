@@ -2,6 +2,8 @@ package com.bienvisto.ui.node
 {
 	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
 	
+	import mx.core.UIComponent;
+	
 	import spark.components.Group;
 	import spark.components.Label;
 	
@@ -29,6 +31,9 @@ package com.bienvisto.ui.node
 			}
 		}
 		
+		/**
+		 * @readonly adjacencyMatrix
+		 */ 
 		public function get adjacencyMatrix():AdjacencyMatrix
 		{
 			return _adjacencyMatrix;
@@ -55,12 +60,13 @@ package com.bienvisto.ui.node
 		 */ 
 		private function draw():void
 		{
-			removeAllElements();
+			
 			graphics.clear();
+			removeAllElements();
+			
 			if (adjacencyMatrix) {
 				
 				var vertices:Vector.<int> = adjacencyMatrix.vertices;
-				// trace("vertices:", vertices);
 				var size:int              = adjacencyMatrix.size;
 				var vertice:int;
 				var label:Label;
@@ -152,6 +158,8 @@ package com.bienvisto.ui.node
 				graphics.moveTo(0, 5);
 				graphics.lineTo(25, 5);
 			}
+			
+			invalidateSize();
 		}
 	}
 }

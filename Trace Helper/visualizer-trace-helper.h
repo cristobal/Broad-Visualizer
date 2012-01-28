@@ -11,6 +11,8 @@
 #include "ns3/output-stream-wrapper.h"
 #include "ns3/ipv4-header.h"
 #include "ns3/cross-layer-interface.h"
+#include "ns3/olsr-repositories.h"
+#include "ns3/olsr-routing-protocol.h"
 #include "ns3/resource-manager.h"
 
 #ifndef __VISUALICER_TRACE_HELPER_H__
@@ -38,7 +40,7 @@ public:
   * everything
   */
   VisualizerTraceHelper (unsigned int simulationLengthInMilliseconds,
-                         ns3::NodeContainer theNodeContainer);
+                         ns3::NodeContainer theNodeContainer, int theRoutingProtocol);
 
   /**
   * @brief Destructor of the class
@@ -57,11 +59,25 @@ public:
 	void 
 	LogNodeContainerProperties(const ns3::NodeContainer nodeContainer, std::string role);
 	
+	
 	/**
 	 * @brief Log the properties and role for a node
 	 */
 	void 
 	LogNodeProperties(ns3::Ptr<const ns3::Node> node, std::string role);
+
+	/**
+	 * @brief enable topology set output
+	 */
+ 	void 
+ 	EnableTopologySetOutput();
+
+
+	/**
+	 * @brief Log a simulation property
+	 */
+	void 
+	LogMobilityArea(double x1_area1, double x2_area1, double y1_area1, double y2_area1);
 
   /**
    * @brief Sink that handles static positioned nodes
@@ -166,7 +182,10 @@ public:
 protected:
 
   unsigned int simulationLength;
-
+  int routingProtocol;
+	bool outputTopologySet;
+	std::vector<unsigned int> outputTopologySetExpTime;
+	
   ns3::NodeContainer nodeContainer;
 
   std::ofstream outputStream;

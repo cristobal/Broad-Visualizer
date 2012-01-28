@@ -7,16 +7,21 @@ package com.bienvisto
 	import com.bienvisto.elements.buffer.Buffers;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
+	import com.bienvisto.elements.mobility.MobilityArea;
 	import com.bienvisto.elements.mobility.Waypoint2D;
+	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
+	import com.bienvisto.elements.network.graph.Graph;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.routing.RoutingProtocol;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.routing.SimpleRoute;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
@@ -79,11 +84,14 @@ package com.bienvisto
 		private var simulation:Simulation;
 		private var nodeContainer:NodeContainer;
 		private var mobility:Mobility;
+		private var mobilityArea:MobilityArea;
 		private var transmissions:Transmissions;
 		private var receptions:Receptions;
 		private var drops:Drops;
 		private var buffers:Buffers;
 		private var routing:Routing;
+		private var routingProtocol:RoutingProtocol;
+		private var topology:Topology;
 		private var sequencesSent:SequencesSent;
 		private var sequencesRecv:SequencesRecv;
 		
@@ -114,22 +122,32 @@ package com.bienvisto
 			
 			
 			nodeContainer = new NodeContainer();
+			
 			mobility 	  = new Mobility(nodeContainer);
+			mobilityArea  = new MobilityArea();
+			
 			transmissions = new Transmissions(nodeContainer);
 			receptions	  = new Receptions(nodeContainer);
 			drops		  = new Drops(nodeContainer);
 			buffers		  = new Buffers(nodeContainer);
-			routing		  = new Routing(nodeContainer);
+			
+			routing		    = new Routing(nodeContainer);
+			routingProtocol = new RoutingProtocol();
+			topology		= new Topology(nodeContainer);
+			
 			sequencesSent = new SequencesSent(nodeContainer);
 			sequencesRecv = new SequencesRecv(nodeContainer);
 			
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
+			// simulation.addSimulationObject(topology);
 			simulation.addSimulationObject(transmissions);
 			simulation.addSimulationObject(receptions);
 			simulation.addSimulationObject(drops);
 			simulation.addSimulationObject(buffers);
 			simulation.addSimulationObject(routing);
+			// simulation.addSimulationObject(routingProtocol);
+			simulation.addSimulationObject(topology);
 			simulation.addSimulationObject(sequencesSent);
 			simulation.addSimulationObject(sequencesRecv);
 			
@@ -144,6 +162,8 @@ package com.bienvisto
 			parser.addTraceSource(drops);
 			parser.addTraceSource(buffers);
 			parser.addTraceSource(routing);
+			parser.addTraceSource(routingProtocol);
+			parser.addTraceSource(topology);
 			parser.addTraceSource(sequencesSent);
 			parser.addTraceSource(sequencesRecv);
 			
@@ -237,6 +257,10 @@ package com.bienvisto
 			
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);
+			
+			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
+				debug();
+			});
 		}
 		
 		/**
@@ -263,8 +287,27 @@ package com.bienvisto
 		
 		private function debug():void
 		{
-			trace("app WxH:", app.width, app.height);
-			trace("window WxH", window.width, window.height);
+			var graph:Graph = routing.getGlobalGraph(simulation.time);
+			trace("-- Graph ---");
+			trace(graph);
+			
+			var adjacencyMatrix:AdjacencyMatrix = graph.getAdjacencyMatrix();
+			
+			trace("-- AdjacencyMatrix ---");
+			trace(adjacencyMatrix);
+			
+			trace("-- Adjacent Vertices ---");
+			
+			var vertices:Vector.<int> = adjacencyMatrix.vertices;
+			var size:int 			  = adjacencyMatrix.size;
+			var vertex:int;
+			for (var i:int = 0; i < size; i++) {
+				vertex = vertices[i];
+				trace("vertex:", vertex, "adjacent vertices:", adjacencyMatrix.getAdjacentVertices(vertex));
+			}
+			
+/*			trace("app WxH:", app.width, app.height);
+			trace("window WxH", window.width, window.height);*/
 			
 		}
 		

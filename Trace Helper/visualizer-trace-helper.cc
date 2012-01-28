@@ -4,11 +4,12 @@
 using namespace ns3;
 
 VisualizerTraceHelper::VisualizerTraceHelper (unsigned int simulationLengthInMilliseconds,
-                         NodeContainer theNodeContainer)
+                         NodeContainer theNodeContainer, int theRoutingProtocol)
 {
   simulationLength = simulationLengthInMilliseconds;
   nodeContainer = theNodeContainer;
-
+  routingProtocol = theRoutingProtocol;
+  outputTopologySet = false;
   ConnectSinks();
 }
 
@@ -18,6 +19,13 @@ VisualizerTraceHelper::~VisualizerTraceHelper ()
 
 }
 
+void 
+VisualizerTraceHelper::EnableTopologySetOutput()
+{
+	if (!outputStream.is_open()) {
+		outputTopologySet = true;
+	}
+}
 
 void
 VisualizerTraceHelper::CourseChanged (std::string context, Ptr<const MobilityModel> model)
@@ -72,6 +80,17 @@ VisualizerTraceHelper::LogNodeProperties(Ptr<const Node> node, std::string role)
 }
 
 /**
+ * @brief Log a simulation property
+ */
+void 
+VisualizerTraceHelper::LogMobilityArea(double x1_area1, double x2_area1, double y1_area1, double y2_area1)
+{
+	// FORMAT: ma <x1_area1> <x2_area1> <y1_area1>	<y2_area1>
+	outputStream << "ma " << x1_area1 <<  " " << x2_area1 << " " << y1_area1 << " " << y2_area1 << endl;
+}
+
+
+/**
  * @brief Sink that handles static positioned nodes
  */                     
 void 
@@ -108,12 +127,13 @@ VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
     return;
 
   int nodeId;
+  unsigned int now = Simulator::Now ().GetMilliSeconds();
   
   sscanf(text.c_str(), "/NodeList/%i/", &nodeId); // Get its id
   
   outputStream << "rc "; // Line type: Route Changed
   outputStream << nodeId << " ";
-  outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+  outputStream << now << " ";
   
   std::vector<GenericRoutingTableEntry> table = nodeContainer.Get (nodeId)->GetObject<CrossLayerInterface> ()->GetGenericRoutingTable ();
 
@@ -136,6 +156,36 @@ VisualizerTraceHelper::RouteChanged (std::string text, uint32_t size)
   }
   
   outputStream << endl;
+  
+  if (routingProtocol == OLSR && outputTopologySet) {
+	  
+	  unsigned int expTime = outputTopologySetExpTime[nodeId];
+	  if (now > expTime) { 
+		  Ptr<olsr::RoutingProtocol> olsr_rt = DynamicCast<olsr::RoutingProtocol> (
+		              nodeContainer.Get(nodeId)->GetObject<Ipv4> ()->GetRoutingProtocol()
+		   );
+	  
+		  const OlsrState &m_state = olsr_rt->GetOlsrState();
+		  const TopologySet &topology = m_state.GetTopologySet ();
+	  
+		  outputStream << "ts " << nodeId << " " << now;
+		  index = 0;
+		  unsigned int minTime;
+		  for (TopologySet::const_iterator tuple = topology.begin (); tuple != topology.end(); tuple++) {
+			  expTime = tuple->expirationTime.GetMilliSeconds();
+			  if (index == 0) {
+			  	minTime = expTime;
+			  }
+			  else if(expTime < minTime) {
+				  minTime = expTime;
+			  }
+			  outputStream << " " << tuple->destAddr << " " << tuple->lastAddr << " " << tuple->sequenceNumber << " " << expTime;
+			  index++;
+		  }
+	  	  outputTopologySetExpTime[nodeId] = minTime;
+		  outputStream << endl;
+	  }
+  }
 }
 
 
@@ -451,6 +501,20 @@ VisualizerTraceHelper::StartWritingFile (std::string filename, std::ios::openmod
   
   // Write the length of the simulation
   outputStream << "s " << simulationLength << endl;
+  
+  // output routing protocol
+  if (routingProtocol == OLSR) {
+  	outputStream << "rp OLSR" << endl;
+  }
+  else if (routingProtocol == AODV) {
+  	outputStream << "rp AODV" << endl;
+  }
+  
+  
+  if (outputTopologySet) {
+  	outputTopologySetExpTime =  vector<unsigned int>(nodeContainer.GetN(), 0);
+  }
+  
 }
 
 
@@ -487,7 +551,7 @@ VisualizerTraceHelper::ConnectSinks()
 	  MakeCallback (&VisualizerTraceHelper::SeqTsReceived, this));
   Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
 	  MakeCallback (&VisualizerTraceHelper::SeqTsSent, this));
-	
+
   // Added by Morten.
   Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate,this);
 }

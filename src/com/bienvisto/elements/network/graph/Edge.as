@@ -8,7 +8,7 @@ package com.bienvisto.elements.network.graph
 	public class Edge
 	{
 		
-		public function Edge(from:int, to:int, weight:Number = 0)
+		public function Edge(from:int, to:int, weight:Number = -1)
 		{
 			_from = from;
 			_to   = to;
@@ -54,5 +54,9 @@ package com.bienvisto.elements.network.graph
 			return _weight;
 		}
 		
+		public function toString():String
+		{
+			return [from, to, weight].join(",");
+		}
 	}
 }

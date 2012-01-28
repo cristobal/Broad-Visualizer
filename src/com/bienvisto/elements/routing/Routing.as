@@ -61,11 +61,10 @@ package com.bienvisto.elements.routing
 		 */ 
 		private var simpleRoutesWithNode:Dictionary = new Dictionary();
 		
-		
 		/**
 		 * @private
 		 */ 
-		private var adjacencyMatrixes:Dictionary = new Dictionary();
+		private var globalGraphs:Dictionary = new Dictionary();
 		
 		/**
 		 * Update
@@ -612,74 +611,75 @@ package com.bienvisto.elements.routing
 			
 			return traceback;
 		}
-			
+		
+		
 		/**
-		 * Get adjacency matrix
+		 * Get global adjacency matrix
+		 * 
+		 * @param time
 		 */ 
-		public function getAdjacencyMatrix(node:Node, time:uint):AdjacencyMatrix
-		{
-			var adjacencyMatrix:AdjacencyMatrix;
-			var key:String = [node.id, time].join("-");
-			
-			if (!(key in adjacencyMatrixes)) {
-				adjacencyMatrix        = resolveAdjacencyMatrix(node, time);
-				adjacencyMatrixes[key] = adjacencyMatrix;
-			}
-			else {
-				adjacencyMatrix = AdjacencyMatrix(adjacencyMatrixes[key]);
-			}
-			
-			
-			return adjacencyMatrix;
+		public function getGlobalAdjacencyMatrix(time:uint):AdjacencyMatrix
+		{			
+			return getGlobalGraph(time).getAdjacencyMatrix();
 		}
 		
+		/**
+		 * Get global graph
+		 * 
+		 * @param time
+		 */ 
+		public function getGlobalGraph(time:uint):Graph
+		{
+			var graph:Graph;
+			var key:String = String(time);
+			if (!(key in globalGraphs)) {
+				graph = resolveGlobalGraph(time);
+				globalGraphs[key] = graph;
+			}
+			else {
+				graph = Graph(globalGraphs[key]);		
+			}
+			
+			return graph;
+		}
 		
 		/**
-		 * Resolve adjacency matrix
+		 * Resolve global graph
 		 * 
 		 * @param node
 		 * @param time
 		 */ 
-		private function resolveAdjacencyMatrix(node:Node, time:uint):AdjacencyMatrix
+		private function resolveGlobalGraph(time:uint):Graph
 		{
-			var adjacencyMatrix:AdjacencyMatrix;
+			var graph:Graph = new Graph();
 			
-			var table:RoutingTable = findTable(node, time);
-			if (table) {
+			
+			var nodes:Vector.<Node> = nodeContainer.nodes;
+			var lut:Dictionary = getLUT(time);
+			
+			var table:RoutingTable;
+			var entries:Vector.<RoutingTableEntry>;
+			var entry:RoutingTableEntry;
+			
+			var node:Node;
+			var from:int;
+			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+				node  = nodes[i];
+				from  = node.id;
 				
-				var graph:Graph = new Graph();
-				var entries:Vector.<RoutingTableEntry> = table.entries;
-				var entry:RoutingTableEntry;
-				var from:int = node.id;
-				var next:int, to:int; 
-				var  hops:int;
-				for (var i:int = 0, l:int = entries.length; i < l; i++) {
-					entry = entries[i];
-					hops  = entry.distance;
-					next  = entry.next;
-					to    = entry.destination;
-					if (hops == 1) {
-						// 1 hop, single edge
-						graph.addEdge(from, to);
-					}
-					else if (hops == 2) {
-						// 2 hops gives us
-						// Single edge to the next
-						// And single edge from next to destination
-						graph.addEdge(from, next);
-						graph.addEdge(next, to);
-					}
-					else if (hops > 2){
-						// 3 or more hops single edge to next
-						graph.addEdge(from, next); 
+				table = RoutingTable(lut[from]);
+				if (table) {
+					entries = table.entries;
+					for (var j:int = entries.length; j--;) {
+						entry = entries[j];
+						if (entry.distance == 1) {
+							graph.addEdge(from, entry.destination);
+						}
 					}
 				}
-				
-				adjacencyMatrix = graph.getAdjacencyMatrix();
-
 			}
 			
-			return adjacencyMatrix;
+			return graph;
 		}
 		
 		/**

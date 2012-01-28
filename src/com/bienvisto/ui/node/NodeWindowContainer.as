@@ -133,12 +133,12 @@ package com.bienvisto.ui.node
 		/**
 		 * @public
 		 */ 
-		public var adjacencyContent:NavigatorContent;
+		public var globalAdjacencyContent:NavigatorContent;
 		
 		/**
 		 * @public
 		 */ 
-		public var localAdjacencyMatrixGroup:AdjacencyMatrixGroup;
+		public var globalAdjacencyMatrixGroup:AdjacencyMatrixGroup;
 		
 		/**
 		 * @public
@@ -601,7 +601,7 @@ package com.bienvisto.ui.node
 			settings.propertiesContentVisible = propertiesContent.visible;
 			settings.metricsContentVisible    = metricsContent.visible;
 			settings.routingContentVisible    = routingContent.visible;
-			settings.adjacencyContentVisible  = adjacencyContent.visible;
+			settings.globalAdjacencyContentVisible  = globalAdjacencyContent.visible;
 			
 			if (routingDataGrid) {
 				var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
@@ -665,8 +665,8 @@ package com.bienvisto.ui.node
 					else if (settings.routingContentVisible) {
 						tabNavigator.selectedChild = routingContent;
 					}
-					else if (settings.adjacencyContentVisible) {
-						tabNavigator.selectedChild = adjacencyContent;
+					else if (settings.globalAdjacencyContentVisible) {
+						tabNavigator.selectedChild = globalAdjacencyContent;
 					}
 					routingContentOrderDefaults = settings.routingContentOrderDefaults;
 				}
@@ -719,9 +719,9 @@ package com.bienvisto.ui.node
 				updateRoutingContent(node);
 			}
 			
-			// Update Addjacency
-			if (adjacencyContent.visible) {
-				updateAdjacencyContent(node);
+			// Update global adjacency
+			if (globalAdjacencyContent.visible) {
+				updateGlobalAdjacencyContent(node);
 			}
 			
 		}
@@ -910,20 +910,20 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
-		 * Update adjacency content
+		 * Update global adjacency content
 		 * 
 		 * @param node
 		 */ 
-		protected function updateAdjacencyContent(node:Node):void
+		protected function updateGlobalAdjacencyContent(node:Node):void
 		{
 			var time:uint = elapsed;// - (elapsed % 1000); // fix to 1000
-			var adjacencyMatrix:AdjacencyMatrix = routing.getAdjacencyMatrix(node, time);
+			var adjacencyMatrix:AdjacencyMatrix = routing.getGlobalAdjacencyMatrix(time);
 			
 			if (adjacencyMatrix) {
-				localAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
+				globalAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
 			}
 			else {
-				localAdjacencyMatrixGroup.adjacencyMatrix = null;
+				globalAdjacencyMatrixGroup.adjacencyMatrix = null;
 			}
 		}
 		
