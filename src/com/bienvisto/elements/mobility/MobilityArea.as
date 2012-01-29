@@ -1,5 +1,6 @@
 package com.bienvisto.elements.mobility
 {
+	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	
 	import flash.events.Event;
@@ -12,7 +13,7 @@ package com.bienvisto.elements.mobility
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public class MobilityArea extends TraceSource
+	public class MobilityArea extends TraceSource implements ISimulationObject
 	{
 		
 		public function MobilityArea()
@@ -51,6 +52,14 @@ package com.bienvisto.elements.mobility
 			dispatchEvent(new Event(Event.CHANGE));
 			
 			return 0;
+		}
+		
+		public function onTimeUpdate(elapsed:uint):void
+		{
+		}
+		
+		public function setDuration(duration:uint):void
+		{
 		}
 		
 	}

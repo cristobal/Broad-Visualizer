@@ -1,5 +1,6 @@
 package com.bienvisto.elements.routing
 {
+	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	
 	import flash.events.Event;
@@ -9,7 +10,7 @@ package com.bienvisto.elements.routing
 	 * 
 	 * @author Cristobal Dabed
 	 */
-	public final class RoutingProtocol extends TraceSource
+	public final class RoutingProtocol extends TraceSource implements ISimulationObject
 	{
 		public function RoutingProtocol()
 		{
@@ -42,5 +43,12 @@ package com.bienvisto.elements.routing
 			return 0;
 		}
 		
+		public function onTimeUpdate(elapsed:uint):void
+		{
+		}
+		
+		public function setDuration(duration:uint):void
+		{
+		}
 	}
 }

@@ -140,13 +140,13 @@ package com.bienvisto
 			
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
-			// simulation.addSimulationObject(topology);
+			simulation.addSimulationObject(mobilityArea);
 			simulation.addSimulationObject(transmissions);
 			simulation.addSimulationObject(receptions);
 			simulation.addSimulationObject(drops);
 			simulation.addSimulationObject(buffers);
 			simulation.addSimulationObject(routing);
-			// simulation.addSimulationObject(routingProtocol);
+			simulation.addSimulationObject(routingProtocol);
 			simulation.addSimulationObject(topology);
 			simulation.addSimulationObject(sequencesSent);
 			simulation.addSimulationObject(sequencesRecv);
