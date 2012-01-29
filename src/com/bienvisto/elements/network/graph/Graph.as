@@ -1,12 +1,7 @@
 package com.bienvisto.elements.network.graph
 {
-	import com.bienvisto.elements.routing.RoutingTableEntry;
-	
 	import flash.utils.Dictionary;
-	
-	import spark.primitives.Path;
-	
-	// TODO: Implement FSP
+
 	/**
 	 * Graph.as
 	 * 
@@ -21,25 +16,34 @@ package com.bienvisto.elements.network.graph
 		/**
 		 * @private
 		 */ 
-		private var edges:Vector.<Edge> = new Vector.<Edge>();
+		private var _adjacencyMatrix:AdjacencyMatrix;
 		
 		/**
 		 * @private
 		 */ 
-		private var _adjacencyMatrix:AdjacencyMatrix;
+		private var _edges:Vector.<Edge> = new Vector.<Edge>();
+		
+		/**
+		 * Get edges
+		 */ 
+		public function getEdges():Vector.<Edge>
+		{
+			return _edges.concat(); // return shallow copy
+		}
 		
 		/**
 		 * Add edge
 		 * 
 		 * @param from 
 		 * @param to
+		 * @param weight
 		 */ 
-		public function addEdge(from:int, to:int):void
+		public function addEdge(from:int, to:int, weight:int = -1):void
 		{
 			var add:Boolean = true;
 			var edge:Edge;
-			for (var i:int = edges.length; i--;) {
-				edge = edges[i];
+			for (var i:int = _edges.length; i--;) {
+				edge = _edges[i];
 				if ((edge.from == from) && (edge.to == to)) {
 					add = false; // edge already present
 					break;	
@@ -48,8 +52,8 @@ package com.bienvisto.elements.network.graph
 			
 			// only add if not present
 			if (add) {
-				edge = new Edge(from,to);
-				edges.push(edge);
+				edge = new Edge(from, to, weight);
+				_edges.push(edge);
 				_adjacencyMatrix = null;
 			}
 		}
@@ -65,10 +69,10 @@ package com.bienvisto.elements.network.graph
 			var removed:Boolean = false;
 			var edge:Edge;
 			
-			for (var i:int = edges.length; i--;) {
-				edge = edges[i];
+			for (var i:int = _edges.length; i--;) {
+				edge = _edges[i];
 				if ((edge.from == from) && (edge.to == to)) {
-					edges.splice(i, 1); // remove the edge
+					_edges.splice(i, 1); // remove the edge
 					removed = true;
 					edge    = null;
 					break;	
@@ -81,6 +85,53 @@ package com.bienvisto.elements.network.graph
 		}
 		
 		/**
+		 * Find edge 
+		 * 
+		 * @param from
+		 * @param to
+		 */ 
+		public function findEdge(from:int, to:int):Edge
+		{
+			var edge:Edge;
+			var found:Boolean = false;
+			
+			for (var i:int = _edges.length; i--;) {
+				edge = _edges[i];
+				if ((edge.from == from) && (edge.to == to)) {
+					found = true;
+					break;	
+				}
+			}
+			
+			if (!found && edge) {
+				edge = null;
+			}
+			
+			return edge;
+		}
+		
+		/**
+		 * Find edges
+		 * 
+		 * @param vertex
+		 */ 
+		public function findEdges(vertex:int):Vector.<Edge>
+		{
+			var edges:Vector.<Edge> = _edges.concat(); // shallow copy
+			var edge:Edge;
+			
+			for (var i:int = edges.length; i--;) {
+				edge = edges[i];
+				if (edge.from != vertex) {
+					edges.splice(i, 1); // remove the edge
+				}
+			}
+			
+			return edges;
+		}
+		
+		
+		/**
 		 * Get adjancy matrix
 		 * 
 		 * @return 
@@ -91,7 +142,7 @@ package com.bienvisto.elements.network.graph
 				return _adjacencyMatrix;
 			}
 			
-			if (edges.length == 0) {
+			if (_edges.length == 0) {
 				return null;
 			}
 			
@@ -111,8 +162,8 @@ package com.bienvisto.elements.network.graph
 			
 			var edge:Edge;
 			var x:int, y:int;
-			for (var i:int = 0, l:int = edges.length; i < l; i++) {
-				edge = edges[i];
+			for (var i:int = 0, l:int = _edges.length; i < l; i++) {
+				edge = _edges[i];
 				
 				from = edge.from;
 				to   = edge.to;
@@ -140,8 +191,8 @@ package com.bienvisto.elements.network.graph
 			
 			var edge:Edge;
 			var from:int, to:int;
-			for (var i:int = edges.length; i--;) {
-				edge = edges[i];
+			for (var i:int = _edges.length; i--;) {
+				edge = _edges[i];
 				from = edge.from;
 				to   = edge.to;
 				
@@ -208,9 +259,9 @@ package com.bienvisto.elements.network.graph
 		public function toString():String
 		{
 			var args:Array = [];
-			for (var i:int = 0, l:int = edges.length; i < l; i++) {
+			for (var i:int = 0, l:int = _edges.length; i < l; i++) {
 				args.push(
-					edges[i].toString()
+					_edges[i].toString()
 				);
 			}
 			

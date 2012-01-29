@@ -59,4 +59,5 @@ package com.bienvisto.elements.network.graph
 			return [from, to, weight].join(",");
 		}
 	}
+	
 }

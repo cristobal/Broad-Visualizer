@@ -69,6 +69,25 @@ package com.bienvisto.elements.network.graph
 		}
 		
 		/**
+		 * Get adjacent vertices
+		 * 
+		 * @param from
+		 */ 
+		public function getAdjacentVertices(from:int):Vector.<int>
+		{
+			var adjacentVertices:Vector.<int> = vertices.concat(); // create shallow copy
+			var to:int;
+			for (var i:int = adjacentVertices.length; i--;) {
+				to = adjacentVertices[i];
+				if (!edgeExists(from, to) /* || (from == to) */ ) {
+					adjacentVertices.splice(i, 1);	
+				}
+			}
+			
+			return adjacentVertices;
+		}
+		
+		/**
 		 * Vertex exists
 		 * 
 		 * @param key
@@ -89,32 +108,13 @@ package com.bienvisto.elements.network.graph
 			var value:Boolean = false;
 			
 			if ((from in keys) && (to in keys)) {
-				var x:int = keys[from];
-				var y:int = keys[to];
+				var x:int = keys[to];
+				var y:int = keys[from];
 				
 				value = edgeExistsXY(x, y);
 			}
 			
 			return value;
-		}
-		
-		/**
-		 * Get adjacent vertices
-		 * 
-		 * @param from
-		 */ 
-		public function getAdjacentVertices(from:int):Vector.<int>
-		{
-			var adjacentVertices:Vector.<int> = vertices.concat(); // create shallow copy
-			var to:int;
-			for (var i:int = adjacentVertices.length; i--;) {
-				to = adjacentVertices[i];
-				if (!edgeExists(from, to) /* || (from == to) */ ) {
-					adjacentVertices.splice(i, 1);	
-				}
-			}
-			
-			return adjacentVertices;
 		}
 		
 		/**
@@ -127,6 +127,8 @@ package com.bienvisto.elements.network.graph
 		{
 			return matrix[x + (y * size)];
 		}
+		
+		
 		
 		/**
 		 * To string
