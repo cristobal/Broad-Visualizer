@@ -114,13 +114,14 @@ package com.bienvisto
 		 */ 
 		private function setup(window:ApplicationWindow):void
 		{
+			// Setup simulation
 			simulation 	  = new Simulation();
 			simulation.addEventListener(Simulation.READY, handleSimulationReady);
 			simulation.addEventListener(Simulation.RESET, handleSimulationReset);
 			simulation.addEventListener(Simulation.COMPLETE, handleSimulationComplete);
 			simulation.addEventListener(TimerEvent.TIMER, handleSimulationTimer);
 			
-			
+			// Setup simulation objects
 			nodeContainer = new NodeContainer();
 			
 			mobility 	  = new Mobility(nodeContainer);
@@ -151,6 +152,11 @@ package com.bienvisto
 			simulation.addSimulationObject(sequencesSent);
 			simulation.addSimulationObject(sequencesRecv);
 			
+			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
+			topology.addEventListener(Event.CHANGE, handleTopologyChange);
+			
+			
+			// Reader Part
 			reader = new FileReferenceReader();
 			parser = new TraceSourceParser(reader);
 			
@@ -248,6 +254,7 @@ package com.bienvisto
 			// window nodeWindows set the trace source components
 			window.nodeWindows.setMobility(mobility);
 			window.nodeWindows.setRouting(routing);
+			window.nodeWindows.setTopology(topology);
 			window.nodeWindows.setBuffers(buffers);
 			window.nodeWindows.setTransmissions(transmissions);
 			window.nodeWindows.setReceptions(receptions);
@@ -257,6 +264,10 @@ package com.bienvisto
 			
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);
+			
+			// Window topology window set nodeContainer + routing
+			window.topologyWindow.setNodeContainer(nodeContainer);
+			window.topologyWindow.setRouting(routing);
 			
 			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
 				debug();
@@ -269,8 +280,7 @@ package com.bienvisto
 		private function updateTime():void
 		{
 			var time:uint = simulation.time; 
-			window.playback.setTime(time);
-			window.nodeWindows.setTime(time);
+			window.setTime(time);
 			view.setTime(time);
 		}
 		
@@ -347,6 +357,26 @@ package com.bienvisto
 		}
 		
 		/**
+		 * Handle mobility area change
+		 * 
+		 * @param event
+		 */
+		private function handleMobilityAreaChange(event:Event):void
+		{
+			
+		}
+		
+		/**
+		 * Handle topology change
+		 * 
+		 * @param event
+		 */ 
+		private function handleTopologyChange(event:Event):void
+		{
+			window.setTopologyEnabled(true); // enable topology
+		}
+		
+		/**
 		 * Handle simulation ready
 		 * 
 		 * @param event
@@ -366,6 +396,7 @@ package com.bienvisto
 		private function handleSimulationReset(event:Event):void
 		{
 			// Global Reset
+			window.setTopologyEnabled(false);
 		}
 		
 		/**

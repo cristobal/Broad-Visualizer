@@ -58,7 +58,7 @@ package com.bienvisto.view.drawing
 						continue;
 					}
 					
-					trace("samples… for node: ", nodeSprite.node.id, "total:", samples.length, time, "vs.", samples[0].time);
+					//trace("samples… for node: ", nodeSprite.node.id, "total:", samples.length, time, "vs.", samples[0].time);
 					nodeSprite.setHighlighted(highlightColor);
 					
 				}

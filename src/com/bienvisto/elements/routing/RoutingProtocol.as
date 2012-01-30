@@ -36,7 +36,7 @@ package com.bienvisto.elements.routing
 		override public function update(params:Vector.<String>):uint
 		{
 			// FORMAT: rp OLSR/AODV
-			_routingProtocol = params[1];
+			_routingProtocol = params[0];
 			
 			dispatchEvent(new Event(Event.CHANGE));
 			

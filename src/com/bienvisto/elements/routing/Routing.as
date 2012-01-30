@@ -673,7 +673,7 @@ package com.bienvisto.elements.routing
 					for (var j:int = entries.length; j--;) {
 						entry = entries[j];
 						if (entry.distance == 1) {
-							graph.addEdge(from, entry.destination);
+							graph.addEdge(from, entry.destination, 1);
 						}
 					}
 				}

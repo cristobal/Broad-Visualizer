@@ -7,6 +7,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
@@ -228,6 +229,17 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
+		 * Set topology
+		 * 
+		 * @param topology
+		 */ 
+		public function setTopology(topology:Topology):void
+		{
+			window.setTopology(topology);
+			window2.setTopology(topology);
+		}
+		
+		/**
 		 * Set buffers
 		 * 
 		 * @param buffers
@@ -302,6 +314,17 @@ package com.bienvisto.ui.node
 		{
 			nodeView = view;
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
+		}
+		
+		/**
+		 * Set topology enabled
+		 * 
+		 * @param value
+		 */ 
+		public function setTopologyEnabled(value:Boolean):void
+		{
+			window.topologyEnabled = value;
+			window2.topologyEnabled = value;
 		}
 		
 		//--------------------------------------------------------------------------

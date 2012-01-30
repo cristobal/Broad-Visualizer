@@ -2,6 +2,7 @@ package com.bienvisto.elements.topology
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
+	import com.bienvisto.elements.network.graph.Graph;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
 	
@@ -37,6 +38,11 @@ package com.bienvisto.elements.topology
 		/**
 		 * @private
 		 */ 
+		private var localGraphs:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
 		private var flag:Boolean = false;
 		
 		/**
@@ -44,7 +50,7 @@ package com.bienvisto.elements.topology
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
-			// FORMAT: cc <node id> <time> <destAddr> <lastAddr> <sequenceNumber> <expirationTime> …
+			// FORMAT: ts <node id> <time> <destAddr> <lastAddr> <sequenceNumber> <expirationTime> …
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
 			
@@ -119,6 +125,8 @@ package com.bienvisto.elements.topology
 					expTime  = uint(params[i + 3]);
 					
 					if ((destAddr in addresses) && (lastAddr in addresses)) {
+						destID = addresses[destAddr];
+						lastID = addresses[lastAddr];
 						tuple = new TopologyTuple(destID, lastID, seqNum, expTime);
 						tuples.push(tuple);
 					}
@@ -127,6 +135,56 @@ package com.bienvisto.elements.topology
 			
 			return tuples;
 		}
+		
+		/**
+		 * Get local graph
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function getLocalGraph(node:Node, time:uint):Graph
+		{
+			var graph:Graph;
+			var key:String = [node.id, time].join("-");
+			if (!(key in localGraphs)){
+				graph = resolveLocalGraph(node, time);
+				localGraphs[key] = graph;
+			}
+			else {
+				graph = Graph(localGraphs[key]);
+			}
+			
+			return graph;
+		}
+		
+		/**
+		 * Resolve local graph
+		 * 
+		 * 
+		 * @param node 
+		 * @param time
+		 */ 
+		private function resolveLocalGraph(node:Node, time:uint):Graph
+		{
+			var graph:Graph;
+			
+			var collection:TopologySetCollection = getCollection(node.id);
+			if (collection) {
+				var set:TopologySet = TopologySet(collection.findNearest(time));
+				if (set) {
+					graph = new Graph();
+					var tuples:Vector.<TopologyTuple> = set.tuples;
+					var tuple:TopologyTuple;
+					for (var i:int = 0, l:int = tuples.length; i < l; i++) {
+						tuple = tuples[i];
+						graph.addEdge(tuple.lastID, tuple.destID, 1);
+					}
+				}
+			}
+			
+			return graph;
+		}
+		
 		
 		public function onTimeUpdate(elapsed:uint):void
 		{

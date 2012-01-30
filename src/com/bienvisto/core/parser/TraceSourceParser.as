@@ -7,6 +7,7 @@ package com.bienvisto.core.parser
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.system.System;
 	
 	[Event(name="complete", type="flash.events.Event")]
 	
@@ -93,6 +94,7 @@ package com.bienvisto.core.parser
 				}
 			}
 			
+			params = null;
 		}
 		
 		/**
@@ -109,6 +111,7 @@ package com.bienvisto.core.parser
 			}
 			
 			dispatchEvent(new Event(Event.COMPLETE));
+			System.gc(); // Garbage collect
 		}
 	}
 }

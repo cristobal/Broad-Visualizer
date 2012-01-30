@@ -15,7 +15,6 @@ package com.bienvisto.ui.sequences
 	 * 	This is the code behind controller class for the SequencesWindow.mxml
 	 * 
 	 * @author Cristobal Dabed
-	 * @versio {{VERSION_NUMBER}}
 	 */ 
 	public class SequencesWindowContainer extends TitleWindow
 	{

@@ -9,6 +9,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
+	import com.bienvisto.elements.network.graph.Graph;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
@@ -18,6 +19,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.routing.SimpleRoute;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
@@ -133,12 +135,12 @@ package com.bienvisto.ui.node
 		/**
 		 * @public
 		 */ 
-		public var globalAdjacencyContent:NavigatorContent;
+		public var localAdjacencyContent:NavigatorContent;
 		
 		/**
 		 * @public
 		 */ 
-		public var globalAdjacencyMatrixGroup:AdjacencyMatrixGroup;
+		public var localAdjacencyMatrixGroup:AdjacencyMatrixGroup;
 		
 		/**
 		 * @public
@@ -562,6 +564,40 @@ package com.bienvisto.ui.node
 			this.routing = routing;
 		}
 		
+		/**
+		 * @private
+		 */ 
+		private var topology:Topology;
+		
+		/**
+		 * Set topology
+		 * 
+		 * @param topology
+		 */ 
+		public function setTopology(topology:Topology):void
+		{
+			this.topology = topology;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _topologyEnabled:Boolean;
+		
+		/**
+		 * @readwrite localTopologyEnabled
+		 */ 
+		public function get topologyEnabled():Boolean
+		{
+			return _topologyEnabled;
+		}
+		
+		public function set topologyEnabled(value:Boolean):void
+		{
+			_topologyEnabled = value;
+			invalidateLocalTopology();
+		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -601,7 +637,7 @@ package com.bienvisto.ui.node
 			settings.propertiesContentVisible = propertiesContent.visible;
 			settings.metricsContentVisible    = metricsContent.visible;
 			settings.routingContentVisible    = routingContent.visible;
-			settings.globalAdjacencyContentVisible  = globalAdjacencyContent.visible;
+			settings.localAdjacencyContentVisible  = localAdjacencyContent.visible;
 			
 			if (routingDataGrid) {
 				var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
@@ -665,8 +701,8 @@ package com.bienvisto.ui.node
 					else if (settings.routingContentVisible) {
 						tabNavigator.selectedChild = routingContent;
 					}
-					else if (settings.globalAdjacencyContentVisible) {
-						tabNavigator.selectedChild = globalAdjacencyContent;
+					else if (settings.localAdjacencyContentVisible) {
+						tabNavigator.selectedChild = localAdjacencyContent;
 					}
 					routingContentOrderDefaults = settings.routingContentOrderDefaults;
 				}
@@ -720,8 +756,8 @@ package com.bienvisto.ui.node
 			}
 			
 			// Update global adjacency
-			if (globalAdjacencyContent.visible) {
-				updateGlobalAdjacencyContent(node);
+			if (localAdjacencyContent.visible) {
+				updateLocalAdjacencyContent(node);
 			}
 			
 		}
@@ -910,20 +946,30 @@ package com.bienvisto.ui.node
 		}
 		
 		/**
-		 * Update global adjacency content
+		 * Update local adjacency content
 		 * 
 		 * @param node
 		 */ 
-		protected function updateGlobalAdjacencyContent(node:Node):void
+		protected function updateLocalAdjacencyContent(node:Node):void
 		{
-			var time:uint = elapsed;// - (elapsed % 1000); // fix to 1000
-			var adjacencyMatrix:AdjacencyMatrix = routing.getGlobalAdjacencyMatrix(time);
-			
-			if (adjacencyMatrix) {
-				globalAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
+			if (!localAdjacencyMatrixGroup) {
+				return;
 			}
-			else {
-				globalAdjacencyMatrixGroup.adjacencyMatrix = null;
+			
+			var graph:Graph = topology.getLocalGraph(node, time);
+			var adjacencyMatrix:AdjacencyMatrix = graph.getAdjacencyMatrix();
+			
+			localAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
+		}
+		
+		/**
+		 * Invalidate local topology
+		 */
+		protected function invalidateLocalTopology():void
+		{
+			localAdjacencyContent.visible = topologyEnabled;
+			if (!topologyEnabled && localAdjacencyContent.visible) {
+				tabNavigator.selectedChild = propertiesContent;
 			}
 		}
 		

@@ -2,7 +2,41 @@
 <menu:MenuContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
-					xmlns:menu="com.bienvisto.ui.menu.*">
+					xmlns:menu="com.bienvisto.ui.menu.*" creationComplete="initComponent(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			[Event(name="topologyClick", type="flash.events.Event")]
+			public static const TOPOLOGY_CLICK:String = "topologyClick";
+			
+			private function initComponent(event:FlexEvent):void
+			{
+				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
+			}
+			
+			/**
+			 * Set topology enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setTopologyEnabled(value:Boolean):void
+			{
+				topologyButton.visible = value;
+			}
+			
+			
+			/**
+			 * Handle topology button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleTopologyButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(TOPOLOGY_CLICK));
+			}
+		]]>
+	</fx:Script>
 	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
 		<s:layout>
 			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="0" paddingLeft="5" />
@@ -16,8 +50,12 @@
 			<s:Button id="browseFileButton" label="Load file" />		
 		</s:Group>
 		<s:Group right="5" top="2">
-			<s:Button id="debugButton" label="Debug" right="180" />
-			<s:Button id="optionsButton" label="Options" right="0" />
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
+			</s:layout>
+			<s:Button id="debugButton" label="Debug" />
+			<s:Button id="topologyButton" label="Topology" visible="false" />
+			<s:Button id="optionsButton" label="Options" />
 		</s:Group>
 	</s:BorderContainer>
 </menu:MenuContainer>

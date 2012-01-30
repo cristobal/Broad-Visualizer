@@ -3,7 +3,11 @@ package com.bienvisto.elements.network.node
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.util.log;
-
+	
+	import flash.events.Event;
+	
+	[Event(name="change", type="flash.events.Event")]
+	
 	/**
 	 * NodeContainer.as
 	 * 	Manages all the nodes (basic pooling). 
@@ -62,6 +66,7 @@ package com.bienvisto.elements.network.node
 			if (!flag) {
 				node = new Node(id);
 				_nodes.push(node);	
+				invalidate();
 			}
 			
 			return node;
@@ -88,6 +93,14 @@ package com.bienvisto.elements.network.node
 			log("Updated node", node.toString());
 			
 			return 0;
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		/**

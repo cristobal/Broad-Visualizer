@@ -100,11 +100,11 @@
 			</s:DataGrid>
 		</s:NavigatorContent>
 		
-		<!-- Node :: Routing :: Global AdjacencyMatrix -->
-		<s:NavigatorContent id="globalAdjacencyContent" width="100%" height="100%" label="Global AM">
+		<!-- Node :: Routing :: Local AdjacencyMatrix -->
+		<s:NavigatorContent id="localAdjacencyContent" width="100%" height="100%" label="Local AM" visible="false">
 			<s:Scroller width="100%" height="100%" >
 				<s:Group>
-					<node:AdjacencyMatrixGroup id="globalAdjacencyMatrixGroup" x="10" y="10" width="100%" height="100%"/>
+					<node:AdjacencyMatrixGroup id="localAdjacencyMatrixGroup" x="10" y="10" width="100%" height="100%"/>
 				</s:Group>
 			</s:Scroller>
 		</s:NavigatorContent>

@@ -14,6 +14,9 @@ package com.bienvisto.elements.topology
 			super(time);
 			
 			_tuples = tuples;
+			if (!_tuples) {
+				_tuples = new Vector.<TopologyTuple>();
+			}
 		}
 		
 		

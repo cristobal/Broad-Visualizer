@@ -55,10 +55,15 @@ package com.bienvisto.ui.menu
 		public var optionsButton:Button;
 		
 		/**
+		 * @public
+		 */ 
+		public var topologyButton:Button;
+		
+		/**
 		 * @protected
 		 */ 
 		protected var managers:Dictionary = new Dictionary();
-
+	
 		/**
 		 * Init components
 		 */ 
@@ -141,6 +146,5 @@ package com.bienvisto.ui.menu
 			}
 		}
 		
-
 	}
 }
