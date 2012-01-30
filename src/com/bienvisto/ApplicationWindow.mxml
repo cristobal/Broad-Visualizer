@@ -157,9 +157,8 @@
 			 */ 
 			private function handleTopologyButtonClick(event:Event):void
 			{
-				if (topologyEnabled && !topologyWindow.visible) {
-					topologyWindow.visible = true;
-				}
+				// toggle topology window
+				topologyWindow.visible = !topologyWindow.visible;
 			}
 		]]>
 	</fx:Script>
@@ -172,7 +171,7 @@
 	<menu:Playback id="playback" bottom="0" width="100%" height="50" />
 	
 	<!-- TopologyWindow -->
-	<topology:TopologyWindow id="topologyWindow" right="10" top="70" visible="true" />
+	<topology:TopologyWindow id="topologyWindow" right="10" top="40" visible="false" />
 	
 	<!-- Node windows -->
 	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />

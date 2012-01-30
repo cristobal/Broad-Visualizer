@@ -1,6 +1,7 @@
 package com.bienvisto.elements.topology
 {
 	import com.bienvisto.core.aggregate.Aggregate;
+	import com.bienvisto.elements.network.graph.Graph;
 	
 	/**
 	 * TopologySet.as
@@ -32,5 +33,38 @@ package com.bienvisto.elements.topology
 		{
 			return _tuples;
 		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _graph:Graph;
+		
+		/**
+		 * @readonly graph
+		 */ 
+		public function get graph():Graph
+		{
+			if (!_graph) {
+				_graph = resolveGraph();
+			}
+			return _graph;
+		}
+		
+		/**
+		 * Resolve graph
+		 */ 
+		private function resolveGraph():Graph
+		{
+			var graph:Graph = new Graph();
+			
+			var tuple:TopologyTuple;
+			for (var i:int = 0, l:int = _tuples.length; i < l; i++) {
+				tuple = _tuples[i];
+				graph.addEdge(tuple.lastID, tuple.destID, 1);
+			}
+			
+			return graph;
+		}
+		
 	}
 }

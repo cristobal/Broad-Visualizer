@@ -38,7 +38,7 @@ package com.bienvisto.elements.topology
 		/**
 		 * @private
 		 */ 
-		private var localGraphs:Dictionary = new Dictionary();
+		private var sets:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
@@ -137,6 +137,28 @@ package com.bienvisto.elements.topology
 		}
 		
 		/**
+		 * Get topology set
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function getTopologySet(node:Node, time:uint):TopologySet
+		{
+			var set:TopologySet;
+			var key:String = [node.id, time].join("-");
+			
+			if (!(key in sets)){
+				set = resolveSet(node, time);
+				sets[key] = set;
+			}
+			else {
+				set = TopologySet(sets[key]);
+			}
+			
+			return set;
+		}
+		
+		/**
 		 * Get local graph
 		 * 
 		 * @param node
@@ -144,45 +166,34 @@ package com.bienvisto.elements.topology
 		 */ 
 		public function getLocalGraph(node:Node, time:uint):Graph
 		{
+			var set:TopologySet = getTopologySet(node, time);
 			var graph:Graph;
-			var key:String = [node.id, time].join("-");
-			if (!(key in localGraphs)){
-				graph = resolveLocalGraph(node, time);
-				localGraphs[key] = graph;
-			}
-			else {
-				graph = Graph(localGraphs[key]);
+			// lookup the set and get the graph for the set instead of creating new graphs reduces the amount of graphs created drastically.
+			// Since its one 1 graph per existing set, instead of creating multiple same graphs for a same set
+			if (set) {
+				graph = set.graph;
 			}
 			
 			return graph;
 		}
+	
 		
 		/**
-		 * Resolve local graph
+		 * Resolve set
 		 * 
-		 * 
-		 * @param node 
+		 * @param node
 		 * @param time
 		 */ 
-		private function resolveLocalGraph(node:Node, time:uint):Graph
+		private function resolveSet(node:Node, time:uint):TopologySet
 		{
-			var graph:Graph;
+			var set:TopologySet;
 			
 			var collection:TopologySetCollection = getCollection(node.id);
 			if (collection) {
-				var set:TopologySet = TopologySet(collection.findNearest(time));
-				if (set) {
-					graph = new Graph();
-					var tuples:Vector.<TopologyTuple> = set.tuples;
-					var tuple:TopologyTuple;
-					for (var i:int = 0, l:int = tuples.length; i < l; i++) {
-						tuple = tuples[i];
-						graph.addEdge(tuple.lastID, tuple.destID, 1);
-					}
-				}
+				set = TopologySet(collection.findNearest(time));
 			}
 			
-			return graph;
+			return set;
 		}
 		
 		

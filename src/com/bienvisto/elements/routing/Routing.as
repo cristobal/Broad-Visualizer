@@ -3,9 +3,11 @@ package com.bienvisto.elements.routing
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
+	import com.bienvisto.elements.network.graph.Edge;
 	import com.bienvisto.elements.network.graph.Graph;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.util.MD5;
 	
 	import flash.utils.Dictionary;
 	
@@ -64,7 +66,7 @@ package com.bienvisto.elements.routing
 		/**
 		 * @private
 		 */ 
-		private var globalGraphs:Dictionary = new Dictionary();
+		private var graphs:Dictionary = new Dictionary();
 		
 		/**
 		 * Update
@@ -612,17 +614,6 @@ package com.bienvisto.elements.routing
 			return traceback;
 		}
 		
-		
-		/**
-		 * Get global adjacency matrix
-		 * 
-		 * @param time
-		 */ 
-		public function getGlobalAdjacencyMatrix(time:uint):AdjacencyMatrix
-		{			
-			return getGlobalGraph(time).getAdjacencyMatrix();
-		}
-		
 		/**
 		 * Get global graph
 		 * 
@@ -632,12 +623,12 @@ package com.bienvisto.elements.routing
 		{
 			var graph:Graph;
 			var key:String = String(time);
-			if (!(key in globalGraphs)) {
+			if (!(key in graphs)) {
 				graph = resolveGlobalGraph(time);
-				globalGraphs[key] = graph;
+				graphs[key] = graph;
 			}
 			else {
-				graph = Graph(globalGraphs[key]);		
+				graph = Graph(graphs[key]);		
 			}
 			
 			return graph;
@@ -651,15 +642,20 @@ package com.bienvisto.elements.routing
 		 */ 
 		private function resolveGlobalGraph(time:uint):Graph
 		{
-			var graph:Graph = new Graph();
+			var graph:Graph;
 			
 			
 			var nodes:Vector.<Node> = nodeContainer.nodes;
-			var lut:Dictionary = getLUT(time);
+			var tables:Dictionary   = getLUT(time);
+			
 			
 			var table:RoutingTable;
 			var entries:Vector.<RoutingTableEntry>;
 			var entry:RoutingTableEntry;
+			
+			var uids:Vector.<String> = new Vector.<String>();
+			var edges:Vector.<Edge>  = new Vector.<Edge>();
+			var edge:Edge;
 			
 			var node:Node;
 			var from:int;
@@ -667,17 +663,42 @@ package com.bienvisto.elements.routing
 				node  = nodes[i];
 				from  = node.id;
 				
-				table = RoutingTable(lut[from]);
+				table = RoutingTable(tables[from]);
 				if (table) {
+					uids.push(table.uuid);
+					
 					entries = table.entries;
 					for (var j:int = entries.length; j--;) {
 						entry = entries[j];
 						if (entry.distance == 1) {
-							graph.addEdge(from, entry.destination, 1);
+							edge = new Edge(from, entry.destination, 1); //
+							edges.push(edge);
 						}
 					}
 				}
 			}
+			
+			var key:String = MD5.hash(
+				uids.join("-") 
+			);
+			if (!(key in graphs)) {
+				// Create new graph
+				graph = new Graph();
+				for (i = 0, l = edges.length; i < l; i++) {
+					edge = edges[i];
+					graph.addEdge(edge.from, edge.to, edge.weight);
+				}
+				graphs[key] = graph; // store referencce
+			}
+			else {
+				// return reference by key
+				graph = Graph(graphs[key]);
+			}
+			edges = null;
+			
+			// For a 6minutes simulation we got ~=
+			//	 total: 428 unique: 252 lookup: 176
+			// meaning that storing a reference with a md5 key reduces the amount of graph objects created around ~30-40 
 			
 			return graph;
 		}

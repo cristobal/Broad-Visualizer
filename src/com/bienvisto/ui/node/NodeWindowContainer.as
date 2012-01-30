@@ -429,6 +429,9 @@ package com.bienvisto.ui.node
 		 */ 
 		private var _time:uint = 0;
 		
+		/**
+		 * @readwrite time
+		 */ 
 		public function get time():uint
 		{
 			return _time;
@@ -439,7 +442,19 @@ package com.bienvisto.ui.node
 			_time = value;
 			if (elapsed != time) {
 				elapsed = time;
-				updateStats();
+				invalidate();
+			}
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override public function set visible(value:Boolean):void
+		{
+			var update:Boolean = !visible && value;
+			super.visible = value;
+			if (update) {
+				invalidate();
 			}
 		}
 		
@@ -726,6 +741,16 @@ package com.bienvisto.ui.node
 				_selectedNode = null;
 				visible = false;
 
+			}
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			if (visible) {
+				updateStats();
 			}
 		}
 		

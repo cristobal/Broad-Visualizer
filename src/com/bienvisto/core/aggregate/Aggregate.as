@@ -1,5 +1,7 @@
 package com.bienvisto.core.aggregate
 {
+	import mx.utils.UIDUtil;
+
 	/**
 	 * Aggregate.as
 	 * 	The basic class for an aggregate.
@@ -24,6 +26,7 @@ package com.bienvisto.core.aggregate
 		public function Aggregate(time:uint)
 		{
 			_time = time;
+			_uuid = UIDUtil.createUID();
 		}
 		
 		
@@ -31,6 +34,23 @@ package com.bienvisto.core.aggregate
 		//
 		//  Properties
 		//
+
+		
+		//----------------------------------
+		// uuid 
+		//---------------------------------- 
+		/**
+		 * @private
+		 */
+		private var _uuid:String;
+		
+		/**
+		 * @readonly time
+		 */ 
+		public function get uuid():String
+		{
+			return _uuid;
+		}
 		//--------------------------------------------------------------------------
 		
 		//----------------------------------

@@ -9,6 +9,8 @@ package com.bienvisto.ui.topology
 	import com.bienvisto.ui.node.AdjacencyMatrixGroup;
 	
 	import flash.events.Event;
+	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	import mx.collections.ArrayCollection;
 	import mx.events.CloseEvent;
@@ -75,21 +77,29 @@ package com.bienvisto.ui.topology
 		 */ 
 		private var needsInvalidation:Boolean;
 		
-		public var labelDijkstra:Label;
-		
-		private function set pathValueDijkstra(value:String):void
+		/**
+		 * @override
+		 */ 
+		override public function set visible(value:Boolean):void
 		{
-			labelDijkstra.text = value;
+			var flag:Boolean = !visible && value;
+			super.visible = value;
+			if (flag) {
+				invalidate();
+			}
 		}
 		
-		public var labelBSF:Label;
+		/**
+		 * @public
+		 */ 
+		public var pathValueLabel:Label;
 		
 		/**
-		 * 
+		 * @write pathValue
 		 */ 
-		private function set pathValueBSF(value:String):void
+		private function set pathValue(value:String):void
 		{
-			labelBSF.text = value;
+			pathValueLabel.text = value;
 		}
 		
 		/**
@@ -139,16 +149,11 @@ package com.bienvisto.ui.topology
 			if (elapsed != time) {
 				elapsed = time;
 				
-				// only update every half second.
-				if ((time % 500) == 0) { 
-					update();
-					if (needsInvalidation) {
-						updateDropDownLists();
-						needsInvalidation = false;
-					}
+				// only update every 1/4 second.
+				if ((time % 250) == 0) { 
+					invalidate();
 				}
 			}
-			
 		}
 		
 		/**
@@ -158,6 +163,17 @@ package com.bienvisto.ui.topology
 		{
 			dropDownListFrom.addEventListener(IndexChangeEvent.CHANGE, handleDropDownListChange);
 			dropDownListTo.addEventListener(IndexChangeEvent.CHANGE, handleDropDownListChange);
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			if (visible) {
+				update();
+				updateDropDownLists();
+			}
 		}
 		
 		/**
@@ -175,21 +191,16 @@ package com.bienvisto.ui.topology
 			
 			if (graph) {
 				adjacencyMatrix = graph.getAdjacencyMatrix();
-				
-				if (from >= 0 && to >= 0) {
+				if (from >= 0 && to >= 0 && from != to) {
+					// path = graph.findShortestPathBFS(from, to); Dijkstra is about 3x and up slower than BFS but we use it anyways talking about ms in this case
 					path = graph.findShortestPathDijkstra(from, to);
 					if (path) {
-						pathValueDijkstra = parsePath(path);
-					}
-					path = graph.findShortestPathBFS(from, to);
-					if (path) {
-						pathValueBSF = parsePath(path);
+						pathValue = parsePath(path); // + " time:" + (getTimer() - t) + "ms";
 					}
 				}
 			}
 			else {
-				pathValueDijkstra = "–";
-				pathValueBSF = "–";
+				pathValue = "–";
 			}
 			
 			adjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
@@ -225,21 +236,33 @@ package com.bienvisto.ui.topology
 		 */ 
 		private function updateDropDownLists():void
 		{
+			if (!needsInvalidation) {
+				return;
+			}
+			needsInvalidation = false;
+			
 			var itemsFrom:ArrayCollection = new ArrayCollection();
 			var itemsTo:ArrayCollection = new ArrayCollection();
 			var nodes:Vector.<Node>  = nodeContainer.nodes;
 			var node:Node;
+			var total:int = 0;
 			
 			itemsFrom.addItem({id: -1, label: "–"});
 			itemsTo.addItem({id: -1, label: "–"});
+			
 			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
 				node = nodes[i];
 				itemsFrom.addItem({id: node.id, label: "#" + node.id});	
 				itemsTo.addItem({id: node.id, label: "#" + node.id});	
+				total++;
 			}
 			
 			updateDropDownlist(dropDownListFrom, itemsFrom);
 			updateDropDownlist(dropDownListTo, itemsTo);
+			
+			if (total == 0) {
+				needsInvalidation = true; 
+			}
 		}
 		
 		/**
@@ -324,6 +347,7 @@ package com.bienvisto.ui.topology
 		private function handleNodeContainerChange(event:Event):void
 		{
 			needsInvalidation = true;
+			setTimeout(updateDropDownLists, 10); // call later
 		}
 		
 		/**
@@ -342,8 +366,7 @@ package com.bienvisto.ui.topology
 			else {
 				to  = id;
 			}
-			// trace("from:", from, "to:", to);
-			update();
+			setTimeout(update, 10); // call later
 		}
 	
 	}

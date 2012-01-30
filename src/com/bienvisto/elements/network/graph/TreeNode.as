@@ -53,6 +53,13 @@ package com.bienvisto.elements.network.graph
 			return _weight;
 		}
 		
+		/**
+		 * @readonly length
+		 */ 
+		public function get length():int
+		{
+			return parent ? 1 + parent.length : 0;
+		}
 		
 		public function toString():String
 		{
