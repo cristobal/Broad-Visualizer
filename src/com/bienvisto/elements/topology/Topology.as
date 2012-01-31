@@ -58,7 +58,7 @@ package com.bienvisto.elements.topology
 			if (tuples.length) {
 				
 				// trace("added new ts for node:", id, ", time:", time, " total of:", tuples.length, "tuples");
-				var set:TopologySet = new TopologySet(time, id, tuples);
+				var set:TopologySet = new TopologySet(time, tuples);
 				var collection:TopologySetCollection = getCollection(id);	
 				collection.add(set);
 			}

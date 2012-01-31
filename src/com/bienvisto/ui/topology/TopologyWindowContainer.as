@@ -260,22 +260,21 @@ package com.bienvisto.ui.topology
 			var adjacencyMatrix:AdjacencyMatrix;
 			var path:Vector.<Edge>;
 			
+			var value:String = "–";
 			if (graph) {
 				adjacencyMatrix = graph.getAdjacencyMatrix();
 				if (from >= 0 && to >= 0 && from != to) {
 					// path = graph.findShortestPathBFS(from, to); Dijkstra is about 3x and up slower than BFS but we use it anyways talking about ms in this case
 					path = graph.findShortestPathDijkstra(from, to);
 					if (path) {
-						pathValue = parsePath(path); // + " time:" + (getTimer() - t) + "ms";
+						value = parsePath(path); // + " time:" + (getTimer() - t) + "ms";
 					}
-					else {
-						pathValue = "–";
-					}
+					
 				}
 			}
-			else {
-				pathValue = "–";
-			}
+			
+			pathValue = value;
+			
 			
 			adjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
 		}
