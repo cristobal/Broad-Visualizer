@@ -24,6 +24,10 @@ package com.bienvisto.view.drawing
 	 */ 
 	public final class NodeRoutingDrawingManager extends NodeDrawingManager
 	{
+		/**
+		 * @public
+		 */ 
+		public static const DRAW_UPDATE_TIME:uint = 300;
 		
 		/**
 		 * @private
@@ -185,6 +189,7 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
+			time = time - (time % DRAW_UPDATE_TIME);
 			if ((view.selectedNodeSprite && view.selectedNodeSprite2) && betweenNodesDrawingManager.enabled) {
 				drawRoutesBetweenNodes(time, nodeSprites);
 			}
@@ -209,9 +214,9 @@ package com.bienvisto.view.drawing
 				clearGraphics();
 				return;
 			}
-			
+				
 			var routes:Vector.<SimpleRoute> = routing.findSimpleRoutes(time);
-			var spritesCache:Dictionary = getSpritesCache(time, nodeSprites);
+			var spritesCache:Dictionary     = getSpritesCache(time, nodeSprites);
 			
 			clearGraphics();
 			var from:int, dest:int;

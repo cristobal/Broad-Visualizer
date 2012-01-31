@@ -26,6 +26,11 @@
 			private var topologyEnabled:Boolean;
 			
 			/**
+			 * @private
+			 */ 
+			private var localTopologyEnabled:Boolean;
+			
+			/**
 			 * Init component
 			 * 
 			 * @param event
@@ -42,7 +47,9 @@
 				playback.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
 				
 				
+				menu.addEventListener(Menu.LOCAL_TOPOLOGY_CLICK, handleLocalTopologyButtonClick);
 				menu.addEventListener(Menu.TOPOLOGY_CLICK, handleTopologyButtonClick);
+				
 			}
 			
 			/**
@@ -54,7 +61,7 @@
 			{
 				nodeWindows.setTime(time);
 				playback.setTime(time);
-				topologyWindow.setTime(time);	
+				topologyWindows.setTime(time);	
 			}
 			
 			/**
@@ -64,9 +71,17 @@
 			 */ 
 			public function setTopologyEnabled(value:Boolean):void
 			{
-				nodeWindows.setTopologyEnabled(value);
 				menu.setTopologyEnabled(value);
 				topologyEnabled = value;
+			}
+			
+			/**
+			 * 
+			 */ 
+			public function setLocalTopologyEnabled(value:Boolean):void
+			{
+				menu.setLocalTopologyEnabled(value);
+				localTopologyEnabled = value;
 			}
 			
 			/**
@@ -151,6 +166,16 @@
 			}
 			
 			/**
+			 * Handle local topology button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleLocalTopologyButtonClick(event:Event):void
+			{
+				topologyWindows.localTopologyWindow.toggle();
+			}
+			
+			/**
 			 * Handle topology button click
 			 * 
 			 * @param event
@@ -158,7 +183,7 @@
 			private function handleTopologyButtonClick(event:Event):void
 			{
 				// toggle topology window
-				topologyWindow.visible = !topologyWindow.visible;
+				topologyWindows.globalTopologyWindow.toggle();
 			}
 		]]>
 	</fx:Script>
@@ -171,7 +196,7 @@
 	<menu:Playback id="playback" bottom="0" width="100%" height="50" />
 	
 	<!-- TopologyWindow -->
-	<topology:TopologyWindow id="topologyWindow" right="10" top="40" visible="false" />
+	<topology:TopologyWindows id="topologyWindows" right="10" top="40" />
 	
 	<!-- Node windows -->
 	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />

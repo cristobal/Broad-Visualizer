@@ -153,6 +153,7 @@ package com.bienvisto
 			simulation.addSimulationObject(sequencesRecv);
 			
 			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
+			routing.addEventListener(Event.CHANGE, handleRoutingChange);
 			topology.addEventListener(Event.CHANGE, handleTopologyChange);
 			
 			
@@ -266,8 +267,9 @@ package com.bienvisto
 			window.nodeWindows.setNodeView(nodeView);
 			
 			// Window topology window set nodeContainer + routing
-			window.topologyWindow.setNodeContainer(nodeContainer);
-			window.topologyWindow.setRouting(routing);
+			window.topologyWindows.setNodeContainer(nodeContainer);
+			window.topologyWindows.setRouting(routing);
+			window.topologyWindows.setTopology(topology);
 			
 			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
 				debug();
@@ -367,13 +369,24 @@ package com.bienvisto
 		}
 		
 		/**
+		 * Handle routing change
+		 * 
+		 * @param event
+		 */ 
+		private function handleRoutingChange(event:Event):void
+		{
+			window.setTopologyEnabled(true); // enable global topology trough routing
+		}
+		
+		/**
 		 * Handle topology change
 		 * 
 		 * @param event
 		 */ 
 		private function handleTopologyChange(event:Event):void
 		{
-			window.setTopologyEnabled(true); // enable topology
+			window.setLocalTopologyEnabled(true);
+			// window.setTopologyEnabled(true); // enable topology
 		}
 		
 		/**

@@ -9,10 +9,12 @@ package com.bienvisto.elements.routing
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.util.MD5;
 	
+	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
 	import mx.utils.ObjectProxy;
 	
+	[Event(name="change", type="flash.events.Event")]
 	/**
 	 * Routing.as
 	 * 
@@ -69,6 +71,11 @@ package com.bienvisto.elements.routing
 		private var graphs:Dictionary = new Dictionary();
 		
 		/**
+		 * @private
+		 */ 
+		private var flag:Boolean = false;
+		
+		/**
 		 * Update
 		 * 
 		 * @params 
@@ -85,6 +92,11 @@ package com.bienvisto.elements.routing
 			var table:RoutingTable = new RoutingTable(time, node, entries);
 			var collection:RoutingCollection = getCollection(id);	
 			collection.add(table);
+			
+			if (!flag) {
+				dispatchEvent(new Event(Event.CHANGE));
+				flag = true;
+			}
 			
 			return time;
 		}
@@ -473,8 +485,8 @@ package com.bienvisto.elements.routing
 			}
 			
 			
-			var lut:Dictionary = getLUT(time);
-			var from:int         = node.id;
+			var lut:Dictionary     = getLUT(time);
+			var from:int           = node.id;
 			var table:RoutingTable = RoutingTable(lut[from]);
 			if (table) {
 				routes = new Vector.<SimpleRoute>();
@@ -489,7 +501,7 @@ package com.bienvisto.elements.routing
 					entry = entries[i];
 					dest  = entry.destination;
 					
-					route = new SimpleRoute(from, dest, entry.next, entry.distance);
+					route 			= new SimpleRoute(from, dest, entry.next, entry.distance);
 					route.paths     = resolvePaths(from, entry, lut);
 					route.traceback = tracebackPath(from, entry, lut);
 					

@@ -50,14 +50,19 @@ package com.bienvisto.ui.menu
 		public var browseFileButton:Button;
 		
 		/**
-		 * @public
+		 * @private
 		 */ 
-		public var optionsButton:Button;
+		public var localTopologyButton:Button;
+		
+		/**
+		 * @private
+		 */ 
+		public var topologyButton:Button;
 		
 		/**
 		 * @public
 		 */ 
-		public var topologyButton:Button;
+		public var optionsButton:Button;
 		
 		/**
 		 * @protected

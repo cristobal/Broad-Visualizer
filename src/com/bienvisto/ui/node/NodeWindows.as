@@ -316,17 +316,6 @@ package com.bienvisto.ui.node
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
-		/**
-		 * Set topology enabled
-		 * 
-		 * @param value
-		 */ 
-		public function setTopologyEnabled(value:Boolean):void
-		{
-			window.topologyEnabled = value;
-			window2.topologyEnabled = value;
-		}
-		
 		//--------------------------------------------------------------------------
 		//
 		// Windows ui 

@@ -56,8 +56,9 @@ package com.bienvisto.elements.topology
 			
 			var tuples:Vector.<TopologyTuple> = parseTuples(params.splice(2, params.length - 2));
 			if (tuples.length) {
+				
 				// trace("added new ts for node:", id, ", time:", time, " total of:", tuples.length, "tuples");
-				var set:TopologySet = new TopologySet(time, tuples);
+				var set:TopologySet = new TopologySet(time, id, tuples);
 				var collection:TopologySetCollection = getCollection(id);	
 				collection.add(set);
 			}
@@ -118,6 +119,7 @@ package com.bienvisto.elements.topology
 				var seqNum:int;
 				var expTime:uint;
 				var tuple:TopologyTuple;
+				
 				for (i= 0, l = params.length; i < l; i += 4) {
 					destAddr = String(params[i]);
 					lastAddr = String(params[i + 1]);
@@ -127,10 +129,12 @@ package com.bienvisto.elements.topology
 					if ((destAddr in addresses) && (lastAddr in addresses)) {
 						destID = addresses[destAddr];
 						lastID = addresses[lastAddr];
-						tuple = new TopologyTuple(destID, lastID, seqNum, expTime);
+						tuple  = new TopologyTuple(destID, lastID, seqNum, expTime);
 						tuples.push(tuple);
 					}
 				}
+				
+				
 			}
 			
 			return tuples;

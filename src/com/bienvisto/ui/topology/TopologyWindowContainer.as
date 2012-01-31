@@ -6,7 +6,9 @@ package com.bienvisto.ui.topology
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
+	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.ui.node.AdjacencyMatrixGroup;
+	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
 	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -29,13 +31,36 @@ package com.bienvisto.ui.topology
 	 */ 
 	public class TopologyWindowContainer extends TitleWindow
 	{
+
+		/**
+		 * @public
+		 */
+		public static const WINDOW_TYPE_ROUTING:String = "routing";
+		
+		/**
+		 * @public
+		 */ 
+		public static const WINDOW_TYPE_TOPOLOGY:String = "topology";
+		
 		public function TopologyWindowContainer()
 		{
 			super();
 			
 			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
 			addEventListener(CloseEvent.CLOSE, handleClose);
+			
+			updateTime = NodeRoutingDrawingManager.DRAW_UPDATE_TIME;
 		}
+		
+		/**
+		 * @private
+		 */  
+		private var node:Node;
+		
+		/**
+		 * @private
+		 */ 
+		private var updateTime:uint;
 		
 		/**
 		 * @private
@@ -128,6 +153,23 @@ package com.bienvisto.ui.topology
 			this.routing = routing;
 		}
 		
+		
+		/**
+		 * @private
+		 */ 
+		private var topology:Topology;
+		
+		/**
+		 * Set topology
+		 * 
+		 * @param topology
+		 */ 
+		public function setTopology(topology:Topology):void
+		{
+			this.topology = topology;
+		}
+		
+		
 		/**
 		 * @private
 		 */ 
@@ -149,11 +191,33 @@ package com.bienvisto.ui.topology
 			if (elapsed != time) {
 				elapsed = time;
 				
-				// only update every 1/4 second.
-				if ((time % 250) == 0) { 
+				// only update around 1/3 second or every 300ms.
+				if ((time % updateTime) == 0) { 
 					invalidate();
 				}
 			}
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _windowType:String = "routing";
+		
+		/**
+		 * @readwrite windowType
+		 */ 
+		public function get windowType():String
+		{
+			return _windowType;
+		}
+		
+		[Inspectable(type="String", defaultValue="routing", enumeration="routing,topology")]
+		public function set windowType(value:String):void
+		{
+			if ((value != WINDOW_TYPE_ROUTING) && (value != WINDOW_TYPE_TOPOLOGY)) {
+				throw(new Error("Not a valid window type"));
+			}
+			_windowType = value;	
 		}
 		
 		/**
@@ -185,7 +249,14 @@ package com.bienvisto.ui.topology
 				return;
 			}
 			
-			var graph:Graph = routing.getGlobalGraph(time);
+			
+			var graph:Graph;
+			if (windowType == WINDOW_TYPE_ROUTING) {
+				graph = routing.getGlobalGraph(time);
+			}
+			else if ((windowType == WINDOW_TYPE_TOPOLOGY) && node) {
+				graph = topology.getLocalGraph(node, time);
+			}
 			var adjacencyMatrix:AdjacencyMatrix;
 			var path:Vector.<Edge>;
 			
@@ -196,6 +267,9 @@ package com.bienvisto.ui.topology
 					path = graph.findShortestPathDijkstra(from, to);
 					if (path) {
 						pathValue = parsePath(path); // + " time:" + (getTimer() - t) + "ms";
+					}
+					else {
+						pathValue = "–";
 					}
 				}
 			}
@@ -362,6 +436,12 @@ package com.bienvisto.ui.topology
 			var id:int = selectedItem.id;
 			if (dropDownList == dropDownListFrom) {
 				from = id;
+				if (from >= 1) {
+					node = nodeContainer.getNode(from);
+				}
+				else {
+					node = null;
+				}
 			}
 			else {
 				to  = id;

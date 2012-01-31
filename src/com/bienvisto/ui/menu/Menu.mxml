@@ -7,12 +7,34 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			[Event(name="localTopologyClick", type="flash.events.Event")]
+			public static const LOCAL_TOPOLOGY_CLICK:String = "localTopologyClick";
+			
 			[Event(name="topologyClick", type="flash.events.Event")]
 			public static const TOPOLOGY_CLICK:String = "topologyClick";
 			
 			private function initComponent(event:FlexEvent):void
-			{
+			{	
+				localTopologyButton = new Button();
+				localTopologyButton.visible = false;
+				localTopologyButton.label = "Local Topology";
+				localTopologyButton.addEventListener(MouseEvent.CLICK, handleLocalTopologyButtonClick);
+				
+				topologyButton       = new Button();
+				topologyButton.visible = false;
+				topologyButton.label = "Topology";
 				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
+			}
+			
+			/**
+			 * Set local topology enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setLocalTopologyEnabled(value:Boolean):void
+			{
+				localTopologyButton.visible = value;
+				invalidate();
 			}
 			
 			/**
@@ -23,8 +45,18 @@
 			public function setTopologyEnabled(value:Boolean):void
 			{
 				topologyButton.visible = value;
+				invalidate();
 			}
 			
+			/**
+			 * Handle local topology button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleLocalTopologyButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(LOCAL_TOPOLOGY_CLICK));
+			}
 			
 			/**
 			 * Handle topology button click
@@ -34,6 +66,29 @@
 			private function handleTopologyButtonClick(event:MouseEvent):void
 			{
 				dispatchEvent(new Event(TOPOLOGY_CLICK));
+			}
+			
+			/**
+			 * Invalidate
+			 */ 
+			private function invalidate():void
+			{
+				var index:int = 1;
+				if (localTopologyButton.visible) {
+					buttons.addElementAt(localTopologyButton, index++);
+				}
+				else if (buttons.contains(localTopologyButton)) {
+					buttons.removeElement(localTopologyButton);
+				}
+				
+				if (topologyButton.visible) {
+					buttons.addElementAt(topologyButton, index++);
+				}
+				else if (buttons.contains(topologyButton)) {
+					buttons.removeElement(topologyButton);
+				}
+				
+				buttons.addElementAt(optionsButton, index);
 			}
 		]]>
 	</fx:Script>
@@ -49,12 +104,11 @@
 		<s:Group left="5" top="2">	
 			<s:Button id="browseFileButton" label="Load file" />		
 		</s:Group>
-		<s:Group right="5" top="2">
+		<s:Group id="buttons" right="5" top="2">
 			<s:layout>
 				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
 			</s:layout>
 			<s:Button id="debugButton" label="Debug" />
-			<s:Button id="topologyButton" label="Topology" visible="false" />
 			<s:Button id="optionsButton" label="Options" />
 		</s:Group>
 	</s:BorderContainer>

@@ -23,6 +23,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
+	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.events.Event;
@@ -69,6 +70,8 @@ package com.bienvisto.ui.node
 		{
 			super();
 			bind();	
+			
+			updateTime = NodeRoutingDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
 		//--------------------------------------------------------------------------
@@ -76,6 +79,11 @@ package com.bienvisto.ui.node
 		// Variables
 		//
 		//-------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var updateTime:uint;
 		
 		/**
 		 * @public
@@ -131,16 +139,6 @@ package com.bienvisto.ui.node
 		 * @public
 		 */ 
 		public var routingContent:NavigatorContent;
-		
-		/**
-		 * @public
-		 */ 
-		public var localAdjacencyContent:NavigatorContent;
-		
-		/**
-		 * @public
-		 */ 
-		public var localAdjacencyMatrixGroup:AdjacencyMatrixGroup;
 		
 		/**
 		 * @public
@@ -442,7 +440,11 @@ package com.bienvisto.ui.node
 			_time = value;
 			if (elapsed != time) {
 				elapsed = time;
-				invalidate();
+				
+				// only update around 1/3 second or every 300ms.
+				if ((time % updateTime) == 0) { 
+					invalidate();
+				}
 			}
 		}
 		
@@ -594,26 +596,6 @@ package com.bienvisto.ui.node
 			this.topology = topology;
 		}
 		
-		/**
-		 * @private
-		 */ 
-		private var _topologyEnabled:Boolean;
-		
-		/**
-		 * @readwrite localTopologyEnabled
-		 */ 
-		public function get topologyEnabled():Boolean
-		{
-			return _topologyEnabled;
-		}
-		
-		public function set topologyEnabled(value:Boolean):void
-		{
-			_topologyEnabled = value;
-			invalidateLocalTopology();
-		}
-		
-		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -652,7 +634,6 @@ package com.bienvisto.ui.node
 			settings.propertiesContentVisible = propertiesContent.visible;
 			settings.metricsContentVisible    = metricsContent.visible;
 			settings.routingContentVisible    = routingContent.visible;
-			settings.localAdjacencyContentVisible  = localAdjacencyContent.visible;
 			
 			if (routingDataGrid) {
 				var item:Object = {sort: null, selectedItem: null, visibleSortIndicatorIndices: null};
@@ -716,9 +697,6 @@ package com.bienvisto.ui.node
 					else if (settings.routingContentVisible) {
 						tabNavigator.selectedChild = routingContent;
 					}
-					else if (settings.localAdjacencyContentVisible) {
-						tabNavigator.selectedChild = localAdjacencyContent;
-					}
 					routingContentOrderDefaults = settings.routingContentOrderDefaults;
 				}
 				
@@ -778,11 +756,6 @@ package com.bienvisto.ui.node
 			// Update Routing
 			if (routingContent.visible) {
 				updateRoutingContent(node);
-			}
-			
-			// Update global adjacency
-			if (localAdjacencyContent.visible) {
-				updateLocalAdjacencyContent(node);
 			}
 			
 		}
@@ -967,34 +940,6 @@ package com.bienvisto.ui.node
 						}
 					}
 				}
-			}
-		}
-		
-		/**
-		 * Update local adjacency content
-		 * 
-		 * @param node
-		 */ 
-		protected function updateLocalAdjacencyContent(node:Node):void
-		{
-			if (!localAdjacencyMatrixGroup) {
-				return;
-			}
-			
-			var graph:Graph = topology.getLocalGraph(node, time);
-			var adjacencyMatrix:AdjacencyMatrix = graph.getAdjacencyMatrix();
-			
-			localAdjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
-		}
-		
-		/**
-		 * Invalidate local topology
-		 */
-		protected function invalidateLocalTopology():void
-		{
-			localAdjacencyContent.visible = topologyEnabled;
-			if (!topologyEnabled && localAdjacencyContent.visible) {
-				tabNavigator.selectedChild = propertiesContent;
 			}
 		}
 		

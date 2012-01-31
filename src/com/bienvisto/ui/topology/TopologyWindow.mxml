@@ -4,8 +4,7 @@
 								  xmlns:mx="library://ns.adobe.com/flex/mx" 
 								  xmlns:topology="com.bienvisto.ui.topology.*" 
 								  xmlns:node="com.bienvisto.ui.node.*"
-								  width="500" height="500"
-								  title="Global Topology">
+								  width="500" height="500">
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
@@ -22,6 +21,14 @@
 			fontSize: 10px;
 		}
 	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			public function toggle():void
+			{
+				visible = !visible;
+			}
+		]]>
+	</fx:Script>
 	<topology:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
 	</topology:controlBarLayout>
