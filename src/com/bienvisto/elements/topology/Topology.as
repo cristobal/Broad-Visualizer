@@ -170,10 +170,11 @@ package com.bienvisto.elements.topology
 		 */ 
 		public function getLocalGraph(node:Node, time:uint):Graph
 		{
-			var set:TopologySet = getTopologySet(node, time);
 			var graph:Graph;
+			
 			// lookup the set and get the graph for the set instead of creating new graphs reduces the amount of graphs created drastically.
-			// Since its one 1 graph per existing set, instead of creating multiple same graphs for a same set
+			// Since its one 1 graph per existing set, instead of creating multiple equal graphs for a same given set
+			var set:TopologySet = getTopologySet(node, time);
 			if (set) {
 				graph = set.graph;
 			}

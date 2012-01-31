@@ -7,7 +7,6 @@ package com.bienvisto.elements.network.node
 	import flash.events.Event;
 	
 	[Event(name="change", type="flash.events.Event")]
-	
 	/**
 	 * NodeContainer.as
 	 * 	Manages all the nodes (basic pooling). 
@@ -16,6 +15,12 @@ package com.bienvisto.elements.network.node
 	 */ 
 	public final class NodeContainer extends TraceSource implements ISimulationObject
 	{
+		/**
+		 * @public
+		 */
+		[Event(name="propertyChange", type="flash.events.Event")]
+		public static const PROPERTY_CHANGE:String = "propertyChange";
+		
 		/**
 		 * Constructor
 		 */ 
@@ -92,6 +97,7 @@ package com.bienvisto.elements.network.node
 			
 			log("Updated node", node.toString());
 			
+			dispatchEvent(new Event(PROPERTY_CHANGE));
 			return 0;
 		}
 		

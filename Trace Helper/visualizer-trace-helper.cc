@@ -10,7 +10,7 @@ VisualizerTraceHelper::VisualizerTraceHelper (unsigned int simulationLengthInMil
   nodeContainer = theNodeContainer;
   routingProtocol = theRoutingProtocol;
   outputTopologySet = false;
-  ConnectSinks();
+  outputVideoOverlay = false;
 }
 
 
@@ -18,6 +18,15 @@ VisualizerTraceHelper::~VisualizerTraceHelper ()
 {
 
 }
+
+void 
+VisualizerTraceHelper::EnableVideoOverlayOutput()
+{
+	if (!outputStream.is_open()) {
+		outputVideoOverlay = true;
+	}
+}
+
 
 void 
 VisualizerTraceHelper::EnableTopologySetOutput()
@@ -78,6 +87,35 @@ VisualizerTraceHelper::LogNodeProperties(Ptr<const Node> node, std::string role)
 	// FORMAT: np <id> <role> <ipv4address>	<macAddress>
 	outputStream << "np " << id <<  " " << role << " " << ipv4Address << " " << macAddress << endl;
 }
+
+/**
+ * @brief Add video source node
+ */
+void 
+VisualizerTraceHelper::AddVideoSource(ns3::Ptr<const ns3::Node> node) 
+{
+ 	if (outputVideoOverlay) {
+ 		uint32_t id = node->GetId();        
+		
+		// FORMAT: vs <id> 
+		outputStream << "vs " << id << endl;		
+ 	}
+}
+	 
+/**
+ * @brief Add video source node
+ */
+void 
+VisualizerTraceHelper::AddVideoDestination(ns3::Ptr<const ns3::Node> node) 
+{
+ 	if (outputVideoOverlay) {
+ 		uint32_t id = node->GetId();      
+		  
+		// FORMAT: vd <id> 
+		outputStream << "vd " << id << endl;
+ 	}
+}
+
 
 /**
  * @brief Log a simulation property
@@ -353,6 +391,44 @@ VisualizerTraceHelper::QueueChange (std::string text, int nPackets)
   outputStream << endl;
 }
 
+
+void
+VisualizerTraceHelper::DtsOverlayForwardMessage (std::string text,  Ptr<const Packet> packet, Ipv4Address destAddr)
+{
+	int nodeId;
+	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
+	
+    // Write to file,
+    // format: sf <node id> <time> <destAddr>
+  
+    outputStream << "sf "; // Line type: Buffer Enqueue
+    outputStream << nodeId << " " ;
+    outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+    // std::cout << lastAddr << " ";
+    outputStream << destAddr<< " ";
+    outputStream << endl;
+	
+}
+
+void
+VisualizerTraceHelper::DtsOverlayInsertMessage (std::string text, Ptr<const Packet> packet)
+{
+	int nodeId;
+	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
+	
+    // Write to file,
+    // format: si <node id> <time>
+  
+    outputStream << "si "; // Line type: Buffer Enqueue
+    outputStream << nodeId << " " ;
+    outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+    // std::cout << lastAddr << " ";
+    // std::cout << destAddr<< " ";
+    outputStream << endl;
+	
+}
+
+
 void
 VisualizerTraceHelper::SeqTsReceived(std::string text, Ptr<const Packet> packet, uint32_t sequenceNumber) 
 {
@@ -497,6 +573,9 @@ VisualizerTraceHelper::PeriodicBufferSizeUpdate ()
 void
 VisualizerTraceHelper::StartWritingFile (std::string filename, std::ios::openmode filemode)
 {
+  // Connect sinks
+  ConnectSinks();
+	
   outputStream.open(filename.c_str(), filemode);
   
   // Write the length of the simulation
@@ -547,11 +626,20 @@ VisualizerTraceHelper::ConnectSinks()
   // Added by Cristobal
   Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalDataFailed",
 	  MakeCallback (&VisualizerTraceHelper::MacFail, this));
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsServer/SeqTsReceived",
+  if (outputVideoOverlay) { // Only connect if enabled
+	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsServer/SeqTsReceived",
 	  MakeCallback (&VisualizerTraceHelper::SeqTsReceived, this));
-  Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
+  	Config::Connect ("/NodeList/*/ApplicationList/*/$ns3::DtsTraceClient/SeqTsSent",
 	  MakeCallback (&VisualizerTraceHelper::SeqTsSent, this));
+	
+	Config::Connect("/NodeList/*/$ns3::DtsOverlay/ForwardMessage",
+	  MakeCallback (&VisualizerTraceHelper::DtsOverlayForwardMessage, this));
+	Config::Connect("/NodeList/*/$ns3::DtsOverlay/InsertMessage",
+	  MakeCallback (&VisualizerTraceHelper::DtsOverlayInsertMessage, this));
 
+	
+  }
+  
   // Added by Morten.
   Simulator::Schedule (Seconds(1.0), &VisualizerTraceHelper::PeriodicBufferSizeUpdate,this);
 }

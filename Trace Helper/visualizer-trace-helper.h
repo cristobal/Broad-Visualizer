@@ -65,6 +65,24 @@ public:
 	 */
 	void 
 	LogNodeProperties(ns3::Ptr<const ns3::Node> node, std::string role);
+	 
+	/**
+	 * @brief Add video source node
+	 */
+	void 
+	AddVideoSource(ns3::Ptr<const ns3::Node> node);
+	 
+	/**
+	 * @brief Add video source node
+	 */
+	void 
+	AddVideoDestination(ns3::Ptr<const ns3::Node> node); 
+	 
+	/**
+	 * @brief enable video overlayoutput
+	 */
+ 	void 
+ 	EnableVideoOverlayOutput();
 
 	/**
 	 * @brief enable topology set output
@@ -128,6 +146,19 @@ public:
   QueueChange (std::string text, int nPackets);
 
   /**
+   * @brief Sink that handles a queue change in the MAC layer
+   */
+  void
+  DtsOverlayInsertMessage (std::string text, ns3::Ptr<const ns3::Packet> packet);
+
+
+  /**
+   * @brief Sink that handles a queue change in the MAC layer
+   */
+  void
+  DtsOverlayForwardMessage (std::string text,  Ptr<const Packet> packet, Ipv4Address destAddr);
+
+  /**
    * @brief Sink that handles a sequence received
    */
 	void
@@ -184,6 +215,7 @@ protected:
   unsigned int simulationLength;
   int routingProtocol;
 	bool outputTopologySet;
+	bool outputVideoOverlay;
 	std::vector<unsigned int> outputTopologySetExpTime;
 	
   ns3::NodeContainer nodeContainer;
