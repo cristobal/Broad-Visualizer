@@ -58,30 +58,28 @@
 		<s:NavigatorContent id="metricsContent" width="100%" height="100%" label="Metrics">
 			<s:Group x="10">
 				<s:Label styleName="label" text="Buffer size:"  />
-				<s:Label styleName="label" y="20" text="Buffer vSize:"  />
 				
-				<s:Label styleName="label" y="50" text="Tx total:" />
-				<s:Label styleName="label" y="70" text="Rx total:" />
-				<s:Label styleName="label" y="90" text="Dx total:" />
+				<s:Label styleName="label" y="30" text="Tx total:" />
+				<s:Label styleName="label" y="50" text="Rx total:" />
+				<s:Label styleName="label" y="70" text="Dx total:" />
 				
-				<s:Label styleName="label" y="120" text="Sx total:" />
-				<s:Label styleName="label" y="140" text="Sr total:" />
-				<s:Label styleName="label" y="160" text="Sf total:" />
-				<s:Label styleName="label" y="180" text="Si total:" />
+				<s:Label styleName="label" y="100" text="Sx total:" />
+				<s:Label styleName="label" y="120" text="Sr total:" />
+				<s:Label styleName="label" y="140" text="Sf total:" />
+				<s:Label styleName="label" y="160" text="Si total:" />
 			</s:Group>	
 			
 			<s:Group x="100">
 				<s:Label id="bufferSizeValue" styleName="value" y="2" text="0" />
-				<s:Label id="buffervSizeValue" styleName="value" y="22" text="0" />
 				
-				<s:Label id="txTotalValue" styleName="value"  y="52" text="0" />
-				<s:Label id="rxTotalValue" styleName="value" y="72" text="0" />
-				<s:Label id="dxTotalValue" styleName="value" y="92" text="0" />
+				<s:Label id="txTotalValue" styleName="value"  y="32" text="0" />
+				<s:Label id="rxTotalValue" styleName="value" y="52" text="0" />
+				<s:Label id="dxTotalValue" styleName="value" y="72" text="0" />
 				
-				<s:Label id="sxTotalValue" styleName="value" y="120" text="0" />
-				<s:Label id="srTotalValue" styleName="value" y="142" text="0" />
-				<s:Label id="sfTotalValue" styleName="value" y="162" text="0" />
-				<s:Label id="siTotalValue" styleName="value" y="182" text="0" />
+				<s:Label id="sxTotalValue" styleName="value" y="102" text="0" />
+				<s:Label id="srTotalValue" styleName="value" y="122" text="0" />
+				<s:Label id="sfTotalValue" styleName="value" y="142" text="0" />
+				<s:Label id="siTotalValue" styleName="value" y="162" text="0" />
 			</s:Group>
 			
 			<s:Group x="200">

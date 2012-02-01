@@ -17,11 +17,6 @@ package com.bienvisto.elements.buffer
 		}
 		
 		/**
-		 * @private
-		 */ 
-		private var cache:Dictionary = new Dictionary();
-		
-		/**
 		 * Find buffer
 		 * 
 		 * @param time
@@ -29,17 +24,6 @@ package com.bienvisto.elements.buffer
 		public function findBuffer(time:uint):Buffer
 		{
 			return Buffer(findNearest(time));
-/*			var buffer:Buffer;
-			
-			if (!(time in cache)) {
-				buffer = Buffer(findNearest(time));
-				cache[time] = buffer;
-			}
-			else {
-				buffer = Buffer(cache[time]);
-			}
-			
-			return buffer;*/
 		}
 		
 	}

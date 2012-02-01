@@ -43,7 +43,21 @@ package com.bienvisto.elements.buffer
 			
 			var buffer:Buffer = new Buffer(time, size);
 			
+			var collection:BufferCollection = getCollection(id);
+			collection.add(buffer);
+			
+			return time;
+		}
+		
+		/**
+		 * Get collection 
+		 * 
+		 * @param id
+		 */ 
+		private function getCollection(id:int):BufferCollection
+		{
 			var collection:BufferCollection;
+			
 			if (!(id in collections)) {
 				collection = new BufferCollection();
 				collections[id] = collection;
@@ -52,10 +66,38 @@ package com.bienvisto.elements.buffer
 				collection = BufferCollection(collections[id]);
 			}
 			
-			collection.add(buffer);
-			
-			return time;
+			return collection;
 		}
+		
+		/**
+		 * Find buffer
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function findBuffer(node:Node, time:uint):Buffer
+		{
+			var collection:BufferCollection = BufferCollection(collections[node.id]);
+			var buffer:Buffer = collection.findBuffer(time);
+			
+			return buffer;
+		}
+		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTotal(node:Node, time:uint):int
+		{
+			var collection:BufferCollection = BufferCollection(collections[node.id]);
+			var total:int = collection.sampleTotal(time);
+			
+			return total;
+		}
+		
+		
 		
 		/**
 		 * On time update
@@ -75,46 +117,7 @@ package com.bienvisto.elements.buffer
 		{
 			
 		}
-		
-		/**
-		 * Find buffer
-		 * 
-		 * @param node
-		 * @param time
-		 */ 
-		public function findBuffer(node:Node, time:uint):Buffer
-		{
-			var buffer:Buffer;
-			var id:int = node.id;
-			var collection:BufferCollection;
-			
-			if (id in collections) {
-				collection = BufferCollection(collections[id]);
-				buffer = collection.findBuffer(time);
-			}
-			
-			return buffer;
-		}
-		
-		/**
-		 * Sample total
-		 * 
-		 * @param node
-		 * @param time
-		 */ 
-		public function sampleTotal(node:Node, time:uint):int
-		{
-			var total:uint = 0;
-			var id:int = node.id;
-			var collection:BufferCollection;
-			
-			if (id in collections) {
-				collection = BufferCollection(collections[id]);
-				total = collection.sampleTotal(time);
-			}
-			
-			return total;
-		}
+
 		
 	}
 }

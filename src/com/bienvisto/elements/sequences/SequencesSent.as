@@ -41,15 +41,7 @@ package com.bienvisto.elements.sequences
 			var seqNum:uint = uint(params[2]);
 			var sequence:Sequence = new Sequence(time, seqNum);
 			
-			var collection:SequenceCollection;
-			if (!(id in collections)) {
-				collection = new SequenceCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = SequenceCollection(collections[id]);
-			}
-			
+			var collection:SequenceCollection = getCollection(id);
 			collection.add(sequence);
 			
 			return time;
@@ -63,15 +55,28 @@ package com.bienvisto.elements.sequences
 		 */ 
 		public function sampleTotal(node:Node, time:int):int
 		{
-			var id:int = node.id;
-			var total:int = 0;
-			
-			if 	(id in collections) {
-				var collection:SequenceCollection = SequenceCollection(collections[id]);
-				total = collection.sampleTotal(time);
-			}
+			var collection:SequenceCollection = getCollection(node.id);
+			var total:int = collection.sampleTotal(time);
 			
 			return total;
+		}
+		
+		
+		/**
+		 * Get collection
+		 */ 
+		private function getCollection(id:int):SequenceCollection
+		{
+			var collection:SequenceCollection;
+			if (!(id in collections)) {
+				collection = new SequenceCollection();
+				collections[id] = collection;
+			}
+			else {
+				collection = SequenceCollection(collections[id]);
+			}
+			
+			return collection;
 		}
 		
 		/**
