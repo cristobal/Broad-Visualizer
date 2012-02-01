@@ -5,7 +5,10 @@ package com.bienvisto.elements.sequences
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
 	
+	import flash.events.Event;
 	import flash.utils.Dictionary;
+	
+	[Event(name="change", type="flash.events.Event")]
 	
 	/**
 	 * SequencesSent.as
@@ -32,6 +35,11 @@ package com.bienvisto.elements.sequences
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
+		 * @private
+		 */	
+		private var first:Boolean = true;
+		
+		/**
 		 * @override
 		 */ 
 		override public function update(params:Vector.<String>):uint
@@ -44,6 +52,10 @@ package com.bienvisto.elements.sequences
 			var collection:SequenceCollection = getCollection(id);
 			collection.add(sequence);
 			
+			if (first) {
+				dispatchEvent(new Event(Event.CHANGE));
+				first = false;
+			}
 			return time;
 		}
 		

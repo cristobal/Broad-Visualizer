@@ -1,7 +1,11 @@
 package com.bienvisto.ui.sequences
 {
 	import com.bienvisto.elements.sequences.Sequence;
+	import com.bienvisto.elements.sequences.SequencesContainer;
+	import com.bienvisto.elements.sequences.SequencesRecv;
+	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.util.sprintf;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	
 	import mx.controls.ProgressBar;
 	import mx.events.CloseEvent;
@@ -21,8 +25,9 @@ package com.bienvisto.ui.sequences
 		public function SequencesWindowContainer()
 		{
 			super();
-			
 			addEventListener(CloseEvent.CLOSE, handleClose);
+			
+			updateTime = NodeDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
 		/**
@@ -56,14 +61,82 @@ package com.bienvisto.ui.sequences
 		public var progressBar:ProgressBar;
 		
 		/**
+		 * @private
+		 */ 
+		private var updateTime:uint;
+		
+		/**
+		 * @private
+		 */ 
+		private var elapsed:uint = 0;
+		
+		/**
+		 * @private
+		 */ 
+		private var sequencesContainer:SequencesContainer;
+		
+		/**
+		 * @pverride
+		 */ 
+		override public function set visible(value:Boolean):void 
+		{
+			var flag:Boolean = !visible && value;
+			super.visible = value;
+			if (flag) {
+				update();
+			}
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _time:uint;
+		
+		/**
+		 * @readwrite time
+		 */ 
+		public function get time():uint
+		{
+			return _time;
+		}
+		
+		/**
+		 * Set time
+		 * 
+		 * @param time
+		 */ 
+		public function setTime(value:uint):void
+		{
+			_time = value;
+			if (elapsed != time) {
+				elapsed = time;
+				
+				// only update around 1/3 second or every 300ms.
+				if ((time % updateTime) == 0) { 
+					invalidate();
+				}
+			}
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			if (visible) {
+				update();
+			}
+		}
+		
+		/**
 		 * Update 
 		 * 
 		 * @param sent
 		 * @param recv
 		 */ 
-		public function update(sent:Vector.<Sequence>, recv:Vector.<Sequence>):void
+		public function update():void
 		{
-			if (sent) {
+/*			if (sent) {
 				if (sent.length > 0) {
 					totalSent.text = String(sent.length);
 					lastSeqNumSent.text = String(sent[sent.length - 1].seqNum);
@@ -90,7 +163,7 @@ package com.bienvisto.ui.sequences
 					percRecv.text = sprintf("%0.2f %s", value, "%");
 					progressBar.setProgress(value, 100);
 				}
-			}
+			}*/
 		}
 		
 		/**

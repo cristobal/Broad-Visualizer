@@ -24,10 +24,6 @@ package com.bienvisto.view.drawing
 	 */ 
 	public final class NodeRoutingDrawingManager extends NodeDrawingManager
 	{
-		/**
-		 * @public
-		 */ 
-		public static const DRAW_UPDATE_TIME:uint = 300;
 		
 		/**
 		 * @private

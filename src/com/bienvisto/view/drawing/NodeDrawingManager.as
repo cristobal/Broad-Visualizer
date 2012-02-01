@@ -14,6 +14,11 @@ package com.bienvisto.view.drawing
 	 */ 
 	public class NodeDrawingManager extends EventDispatcher implements IDrawingManager
 	{
+		/**
+		 * @readonly
+		 */ 
+		public static const DRAW_UPDATE_TIME:uint = 300;
+		
 		public function NodeDrawingManager(name:String)
 		{
 			super();

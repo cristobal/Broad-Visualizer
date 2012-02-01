@@ -50,6 +50,11 @@ package com.bienvisto.ui.menu
 		public var browseFileButton:Button;
 		
 		/**
+		 * @public
+		 */ 
+		public var videoSequencesButton:Button;
+		
+		/**
 		 * @private
 		 */ 
 		public var localTopologyButton:Button;
@@ -63,6 +68,8 @@ package com.bienvisto.ui.menu
 		 * @public
 		 */ 
 		public var optionsButton:Button;
+		
+		
 		
 		/**
 		 * @protected

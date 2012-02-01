@@ -11,16 +11,15 @@ package com.bienvisto.elements.sequences
 	[Event(name="change", type="flash.events.Event")]
 	
 	/**
-	 * VideoDestination.as
+	 * SequencesSources.as
 	 * 
 	 * @author Cristobal Dabed
-	 */
-	public final class VideoDestination extends TraceSource implements ISimulationObject
+	 */ 
+	public final class SequencesSources extends TraceSource implements ISimulationObject
 	{
-		
-		public function VideoDestination(nodeContainer:NodeContainer)
+		public function SequencesSources(nodeContainer:NodeContainer)
 		{
-			super("Video Destination", "vd");
+			super("Video Source", "vs");
 			this.nodeContainer = nodeContainer;
 		}
 		
@@ -52,7 +51,7 @@ package com.bienvisto.elements.sequences
 		 */
 		override public function update(params:Vector.<String>):uint
 		{
-			var id:int = params[0];
+			var id:int = int(params[0]);
 			
 			if (!(id in map)) {
 				var node:Node = nodeContainer.getNode(id);
@@ -60,7 +59,6 @@ package com.bienvisto.elements.sequences
 				
 				dispatchEvent(new Event(Event.CHANGE));
 			}
-			
 			
 			return 0;
 		}
@@ -72,5 +70,6 @@ package com.bienvisto.elements.sequences
 		public function setDuration(duration:uint):void
 		{
 		}
+		
 	}
 }

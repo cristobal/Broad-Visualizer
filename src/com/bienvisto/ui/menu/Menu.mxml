@@ -7,6 +7,9 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			[Event(name="videoSequencesClick", type="flash.events.Event")]
+			public static const VIDEO_SEQUENCES_CLICK:String = "videoSequencesClick";
+			
 			[Event(name="localTopologyClick", type="flash.events.Event")]
 			public static const LOCAL_TOPOLOGY_CLICK:String = "localTopologyClick";
 			
@@ -15,6 +18,11 @@
 			
 			private function initComponent(event:FlexEvent):void
 			{	
+				videoSequencesButton = new Button();
+				videoSequencesButton.visible = false;
+				videoSequencesButton.label = "Video Sequences";
+				videoSequencesButton.addEventListener(MouseEvent.CLICK, handleVideoButtonClick);
+				
 				localTopologyButton = new Button();
 				localTopologyButton.visible = false;
 				localTopologyButton.label = "Local Topology";
@@ -24,6 +32,17 @@
 				topologyButton.visible = false;
 				topologyButton.label = "Topology";
 				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
+			}
+
+			/**
+			 * Set video sequences enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setVideoSequencesEnabled(value:Boolean):void
+			{
+				videoSequencesButton.visible = value;
+				invalidate();
 			}
 			
 			/**
@@ -46,6 +65,16 @@
 			{
 				topologyButton.visible = value;
 				invalidate();
+			}
+			
+			/**
+			 * Handle video button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleVideoButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(VIDEO_SEQUENCES_CLICK));
 			}
 			
 			/**
@@ -74,6 +103,13 @@
 			private function invalidate():void
 			{
 				var index:int = 1;
+				if (videoSequencesButton.visible) {
+					buttons.addElementAt(videoSequencesButton, index++);
+				}
+				else if (buttons.containsElement(videoSequencesButton)) {
+					buttons.removeElement(videoSequencesButton);
+				}
+				
 				if (localTopologyButton.visible) {
 					buttons.addElementAt(localTopologyButton, index++);
 				}

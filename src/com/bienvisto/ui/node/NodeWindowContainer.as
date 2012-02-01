@@ -1,7 +1,5 @@
 package com.bienvisto.ui.node
 {
-	import avmplus.getQualifiedClassName;
-	
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.elements.buffer.Buffer;
 	import com.bienvisto.elements.buffer.Buffers;
@@ -17,13 +15,12 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.routing.SimpleRoute;
-	import com.bienvisto.elements.sequences.SequencesRecv;
-	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.sequences.SequencesContainer;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
-	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import flash.events.Event;
@@ -71,7 +68,7 @@ package com.bienvisto.ui.node
 			super();
 			bind();	
 			
-			updateTime = NodeRoutingDrawingManager.DRAW_UPDATE_TIME;
+			updateTime = NodeDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
 		//--------------------------------------------------------------------------
@@ -174,6 +171,16 @@ package com.bienvisto.ui.node
 		 * @public
 		 */ 
 		public var srTotalValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var sfTotalValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var siTotalValue:Label;
 		
 		/**
 		 * @public
@@ -395,6 +402,32 @@ package com.bienvisto.ui.node
 			return srTotalValue.text;
 		}
 		
+		/**
+		 * @readwrite sequences forwarded total
+		 */ 
+		public function set sfTotal(value:String):void
+		{
+			sfTotalValue.text = value;	
+		}
+		
+		public function get sfTotal():String
+		{
+			return sfTotalValue.text;
+		}
+		
+		/**
+		 * @readwrite sequences inserted total
+		 */ 
+		public function set siTotal(value:String):void
+		{
+			siTotalValue.text = value;	
+		}
+		
+		public function get siTotal():String
+		{
+			return siTotalValue.text;
+		}
+		
 		
 		/**
 		 * @readwrite rts total
@@ -538,33 +571,17 @@ package com.bienvisto.ui.node
 		/**
 		 * @private
 		 */ 
-		private var sequencesRecv:SequencesRecv;
+		private var sequencesContainer:SequencesContainer;
 		
 		/**
-		 * Set sequencesRecv
+		 * Set sequences container
 		 * 
-		 * @param sequencesRecv
+		 * @param sequencesContainer
 		 */ 
-		public function setSequencesRecv(sequencesRecv:SequencesRecv):void
+		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
-			this.sequencesRecv = sequencesRecv;
+			this.sequencesContainer = sequencesContainer;
 		}
-		
-		/**
-		 * @private
-		 */ 
-		private var sequencesSent:SequencesSent;
-		
-		/**
-		 * Set sequencesSent
-		 * 
-		 * @param sequencesSent
-		 */ 
-		public function setSequencesSent(sequencesSent:SequencesSent):void
-		{
-			this.sequencesSent = sequencesSent;
-		}
-		
 		
 		/**
 		 * @private
@@ -816,13 +833,20 @@ package com.bienvisto.ui.node
 				dxTotal = String(total);
 			}
 			
-			if (sequencesSent) {
-				total   = sequencesSent.sampleTotal(node, elapsed);
+			if (sequencesContainer) {
+				total   = sequencesContainer.sent.sampleTotal(node, elapsed);
 				sxTotal = String(total);
-			}
-			if (sequencesRecv) {
-				total   = sequencesRecv.sampleTotal(node, elapsed);
+				
+				
+				total   = sequencesContainer.recv.sampleTotal(node, elapsed);
 				srTotal = String(total);
+				
+				total   = sequencesContainer.forwarded.sampleTotal(node, elapsed);
+				sfTotal = String(total);
+				
+				
+				total   = sequencesContainer.inserted.sampleTotal(node, elapsed);
+				siTotal = String(total);
 			}
 			
 			if (routing) {

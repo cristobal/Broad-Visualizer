@@ -8,7 +8,7 @@ package com.bienvisto.ui.topology
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.ui.node.AdjacencyMatrixGroup;
-	import com.bienvisto.view.drawing.NodeRoutingDrawingManager;
+	import com.bienvisto.view.drawing.NodeDrawingManager;
 	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -49,7 +49,7 @@ package com.bienvisto.ui.topology
 			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
 			addEventListener(CloseEvent.CLOSE, handleClose);
 			
-			updateTime = NodeRoutingDrawingManager.DRAW_UPDATE_TIME;
+			updateTime = NodeDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
 		/**

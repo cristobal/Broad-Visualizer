@@ -19,6 +19,7 @@ package com.bienvisto
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.routing.SimpleRoute;
+	import com.bienvisto.elements.sequences.SequencesContainer;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
 	import com.bienvisto.elements.topology.Topology;
@@ -92,8 +93,7 @@ package com.bienvisto
 		private var routing:Routing;
 		private var routingProtocol:RoutingProtocol;
 		private var topology:Topology;
-		private var sequencesSent:SequencesSent;
-		private var sequencesRecv:SequencesRecv;
+		private var sequencesContainer:SequencesContainer;
 		
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
@@ -136,8 +136,7 @@ package com.bienvisto
 			routingProtocol = new RoutingProtocol();
 			topology		= new Topology(nodeContainer);
 			
-			sequencesSent = new SequencesSent(nodeContainer);
-			sequencesRecv = new SequencesRecv(nodeContainer);
+			sequencesContainer = new SequencesContainer(nodeContainer);
 			
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
@@ -148,9 +147,14 @@ package com.bienvisto
 			simulation.addSimulationObject(buffers);
 			simulation.addSimulationObject(routing);
 			simulation.addSimulationObject(routingProtocol);
-			simulation.addSimulationObject(topology);
-			simulation.addSimulationObject(sequencesSent);
-			simulation.addSimulationObject(sequencesRecv);
+			simulation.addSimulationObject(topology);			
+			simulation.addSimulationObject(sequencesContainer.sources);
+			simulation.addSimulationObject(sequencesContainer.destinations);
+			simulation.addSimulationObject(sequencesContainer.sent);
+			simulation.addSimulationObject(sequencesContainer.recv);
+			simulation.addSimulationObject(sequencesContainer.inserted);
+			simulation.addSimulationObject(sequencesContainer.forwarded);
+			
 			
 			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
 			routing.addEventListener(Event.CHANGE, handleRoutingChange);
@@ -171,8 +175,12 @@ package com.bienvisto
 			parser.addTraceSource(routing);
 			parser.addTraceSource(routingProtocol);
 			parser.addTraceSource(topology);
-			parser.addTraceSource(sequencesSent);
-			parser.addTraceSource(sequencesRecv);
+			parser.addTraceSource(sequencesContainer.sources);
+			parser.addTraceSource(sequencesContainer.destinations);
+			parser.addTraceSource(sequencesContainer.sent);
+			parser.addTraceSource(sequencesContainer.recv);
+			parser.addTraceSource(sequencesContainer.inserted);
+			parser.addTraceSource(sequencesContainer.forwarded);;
 			
 			parser.addEventListener(TimedEvent.ELAPSED, handleParserTimedEventElapsed);
 			parser.addEventListener(Event.COMPLETE, handleParserEventComplete);
@@ -260,8 +268,7 @@ package com.bienvisto
 			window.nodeWindows.setTransmissions(transmissions);
 			window.nodeWindows.setReceptions(receptions);
 			window.nodeWindows.setDrops(drops);
-			window.nodeWindows.setSequencesRecv(sequencesRecv);
-			window.nodeWindows.setSequencesSent(sequencesSent);
+			window.nodeWindows.setSequencesContainer(sequencesContainer);
 			
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);

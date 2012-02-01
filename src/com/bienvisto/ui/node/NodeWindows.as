@@ -5,8 +5,7 @@ package com.bienvisto.ui.node
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
-	import com.bienvisto.elements.sequences.SequencesRecv;
-	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.sequences.SequencesContainer;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.view.components.NodeSprite;
@@ -284,25 +283,14 @@ package com.bienvisto.ui.node
 		}
 
 		/**
-		 * Set sequences recv
+		 * Set sequences container
 		 * 
-		 * @param sequencesRecv
+		 * @param sequencesContainer
 		 */
-		public function setSequencesRecv(sequencesRecv:SequencesRecv):void
+		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
-			window.setSequencesRecv(sequencesRecv);
-			window2.setSequencesRecv(sequencesRecv);
-		}
-		
-		/**
-		 * Set sequences sent
-		 * 
-		 * @param sequencesSent
-		 */ 
-		public function setSequencesSent(sequencesSent:SequencesSent):void
-		{
-			window.setSequencesSent(sequencesSent);
-			window2.setSequencesSent(sequencesSent);
+			window.setSequencesContainer(sequencesContainer);
+			window2.setSequencesContainer(sequencesContainer);
 		}
 		
 		/**
