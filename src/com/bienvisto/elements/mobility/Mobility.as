@@ -45,19 +45,14 @@ package com.bienvisto.elements.mobility
 			var pos:Vector2D = new Vector2D(Number(params[2]), Number(params[3]));
 			var dir:Vector2D = new Vector2D(Number(params[4]), Number(params[5]));
 			
-			var point:Waypoint2D = new Waypoint2D(time, pos, dir);
-			
-			var collection:MobilityCollection;
 			if (!(id in collections)) {
-				collection = new MobilityCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = MobilityCollection(collections[id]);
+				collections[id] = new MobilityCollection();
 			}
 			
 			
-			collection.add(point);
+			MobilityCollection(collections[id]).add(
+				new Waypoint2D(time, pos, dir)
+			);
 			
 			return time;
 		}
@@ -90,14 +85,12 @@ package com.bienvisto.elements.mobility
 		 */ 
 		public function findWaypoint(node:Node, time:uint):Waypoint2D
 		{
-			var waypoint:Waypoint2D;
 			var id:int = node.id;
-			if (id in collections) {
-				var collection:MobilityCollection = MobilityCollection(collections[id]);
-				waypoint = Waypoint2D(collection.findNearest(time));
+			if (!(id in collections)) {
+				return null;
 			}
 			
-			return waypoint;
+			return Waypoint2D(MobilityCollection(collections[id]).findNearest(time));
 		}
 	}
 }

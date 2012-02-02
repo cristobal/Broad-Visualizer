@@ -48,7 +48,7 @@ package com.bienvisto.elements.routing
 		/**
 		 * @private
 		 */ 
-		private var statsCollections:Dictionary = new Dictionary();
+		private var stats:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
@@ -86,12 +86,16 @@ package com.bienvisto.elements.routing
 			// Format: rc <node_id> <node_id2> <node_id3> …
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
-			var entries:Vector.<RoutingTableEntry> = parseEntries(id, time, params[2]);
+			var entries:Vector.<RoutingTableEntry> = parseEntries(id, time, params[2]);			
+			var node:Node  = nodeContainer.getNode(id);
 			
-			var node:Node 		   = nodeContainer.getNode(id);
-			var table:RoutingTable = new RoutingTable(time, node, entries);
-			var collection:RoutingCollection = getCollection(id);	
-			collection.add(table);
+			if (!(id in collections)) {
+				collections[id] = new RoutingCollection();
+			}
+			
+			RoutingCollection(collections[id]).add(
+				new RoutingTable(time, node, entries)
+			);
 			
 			if (!flag) {
 				dispatchEvent(new Event(Event.CHANGE));
@@ -102,40 +106,18 @@ package com.bienvisto.elements.routing
 		}
 		
 		/**
-		 * Get collection
-		 * 
-		 * @param id
-		 */ 
-		private function getCollection(id:int):RoutingCollection
-		{
-			var collection:RoutingCollection;
-			if (!(id in collections)) {
-				collection = new RoutingCollection();	
-				collections[id] = collection;
-			}
-			else {
-				collection = RoutingCollection(collections[id]);
-			}
-			
-			return collection;
-		}
-		
-		/**
 		 * Get stats collection
 		 * 
 		 * @param id
 		 */ 
 		private function getStatsCollection(id:int):RoutingStatsCollection
 		{
-			var statsCollection:RoutingStatsCollection;
+			if (id in stats) {
+				return RoutingStatsCollection(stats[id]);
+			}
 			
-			if (!(id in statsCollections)) {
-				statsCollection = new RoutingStatsCollection();	
-				statsCollections[id] = statsCollection;
-			}
-			else {
-				statsCollection = RoutingStatsCollection(statsCollections[id]);
-			}
+			var statsCollection:RoutingStatsCollection  = new RoutingStatsCollection();	
+			stats[id] = statsCollection;
 			
 			return statsCollection;
 		}
@@ -147,14 +129,12 @@ package com.bienvisto.elements.routing
 		 */ 
 		private function getStatsItem(id:int):Object
 		{
-			var item:Object;
-			if (!(id in statsItems)) {
-				item = {rts: false, rtsTotal: 0, rtsAvgTotal: 0};
-				statsItems[id] = item;
+			if (id in statsItems) {
+				return statsItems[id];
 			}
-			else {
-				item = statsItems[id];
-			}
+			
+			var item:Object = {rts: false, rtsTotal: 0, rtsAvgTotal: 0};
+			statsItems[id] = item;
 			
 			return item;
 		}
@@ -462,10 +442,12 @@ package com.bienvisto.elements.routing
 		 */
 		public function findTable(node:Node, time:uint):RoutingTable
 		{
-			var collection:RoutingCollection = getCollection(node.id);
-			var table:RoutingTable 			 = RoutingTable(collection.findNearest(time));
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
 			
-			return table;
+			return RoutingTable(RoutingCollection(collections[id]).findNearest(time));
 		}
 		
 		/**

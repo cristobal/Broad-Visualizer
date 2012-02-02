@@ -26,7 +26,7 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
-		private static var windowSize:uint = 500;
+		private static var windowSize:int = 500;
 		
 		/**
 		 * @private
@@ -127,7 +127,7 @@ package com.bienvisto.view.drawing
 				
 				packetStats = receptions.samplePacketStats(nodeSprite.node, time, windowSize);
 				if (packetStats) {
-					// trace(packetStats.node.id, packetStats.totalOther, packetStats.totalOwn);
+					
 					// If the reception is after the moment visualized, we just return
 					if (time < packetStats.time) {
 						return;

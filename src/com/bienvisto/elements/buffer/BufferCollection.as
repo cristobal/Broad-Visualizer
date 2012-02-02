@@ -16,15 +16,5 @@ package com.bienvisto.elements.buffer
 			super();
 		}
 		
-		/**
-		 * Find buffer
-		 * 
-		 * @param time
-		 */ 
-		public function findBuffer(time:uint):Buffer
-		{
-			return Buffer(findNearest(time));
-		}
-		
 	}
 }

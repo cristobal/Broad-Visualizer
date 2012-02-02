@@ -7,6 +7,8 @@ package com.bienvisto.ui.sequences
 	import com.bienvisto.util.sprintf;
 	import com.bienvisto.view.drawing.NodeDrawingManager;
 	
+	import flash.events.Event;
+	
 	import mx.controls.ProgressBar;
 	import mx.events.CloseEvent;
 	
@@ -76,6 +78,19 @@ package com.bienvisto.ui.sequences
 		private var sequencesContainer:SequencesContainer;
 		
 		/**
+		 * Set sequences container
+		 * 
+		 * @param sequencesContainer
+		 */ 
+		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
+		{
+			this.sequencesContainer = sequencesContainer;
+			
+			this.sequencesContainer.sources.addEventListener(Event.CHANGE, handleSourcesChange);
+			this.sequencesContainer.destinations.addEventListener(Event.CHANGE, handleDestinationsChange);
+		}
+		
+		/**
 		 * @pverride
 		 */ 
 		override public function set visible(value:Boolean):void 
@@ -129,6 +144,14 @@ package com.bienvisto.ui.sequences
 		}
 		
 		/**
+		 * Toggle
+		 */ 
+		public function toggle():void
+		{
+			visible = !visible;
+		}
+		
+		/**
 		 * Update 
 		 * 
 		 * @param sent
@@ -136,6 +159,10 @@ package com.bienvisto.ui.sequences
 		 */ 
 		public function update():void
 		{
+			if (!sequencesContainer || !initialized) {
+				return;
+			}
+			
 /*			if (sent) {
 				if (sent.length > 0) {
 					totalSent.text = String(sent.length);
@@ -164,6 +191,26 @@ package com.bienvisto.ui.sequences
 					progressBar.setProgress(value, 100);
 				}
 			}*/
+		}
+		
+		/**
+		 * Handle source change
+		 * 
+		 * @param event
+		 */ 
+		private function handleSourcesChange(event:Event):void
+		{
+			
+		}
+		
+		/**
+		 * Handle destunations change
+		 * 
+		 * @param event
+		 */ 
+		private function handleDestinationsChange(event:Event):void
+		{
+			
 		}
 		
 		/**

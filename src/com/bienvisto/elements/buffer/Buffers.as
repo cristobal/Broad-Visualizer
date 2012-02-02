@@ -41,32 +41,15 @@ package com.bienvisto.elements.buffer
 			var time:uint = uint(params[1]);
 			var size:uint = int(params[2]);
 			
-			var buffer:Buffer = new Buffer(time, size);
+			if (!(id in collections)) {
+				collections[id] = new BufferCollection();
+			}
 			
-			var collection:BufferCollection = getCollection(id);
-			collection.add(buffer);
+			BufferCollection(collections[id]).add(
+				new Buffer(time, size)
+			);
 			
 			return time;
-		}
-		
-		/**
-		 * Get collection 
-		 * 
-		 * @param id
-		 */ 
-		private function getCollection(id:int):BufferCollection
-		{
-			var collection:BufferCollection;
-			
-			if (!(id in collections)) {
-				collection = new BufferCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = BufferCollection(collections[id]);
-			}
-			
-			return collection;
 		}
 		
 		/**
@@ -77,10 +60,12 @@ package com.bienvisto.elements.buffer
 		 */ 
 		public function findBuffer(node:Node, time:uint):Buffer
 		{
-			var collection:BufferCollection = BufferCollection(collections[node.id]);
-			var buffer:Buffer = collection.findBuffer(time);
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
 			
-			return buffer;
+			return Buffer(BufferCollection(collections[id]).findNearest(time));
 		}
 		
 		/**
@@ -90,11 +75,13 @@ package com.bienvisto.elements.buffer
 		 * @param time
 		 */ 
 		public function sampleTotal(node:Node, time:uint):int
-		{
-			var collection:BufferCollection = BufferCollection(collections[node.id]);
-			var total:int = collection.sampleTotal(time);
+		{	
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return 0;
+			}
 			
-			return total;
+			return BufferCollection(collections[id]).sampleTotal(time);
 		}
 		
 		

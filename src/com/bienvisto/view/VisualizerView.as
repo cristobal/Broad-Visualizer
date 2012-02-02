@@ -114,13 +114,19 @@ package com.bienvisto.view
 /*			if (loaderViewVisible) {
 				return;
 			}*/
-			
+			var tt:int = getTimer();
 			var viewComponent:ViewComponent;
 			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
 				viewComponent = _viewComponents[i];
 				viewComponent.update(time);
 			}
+			if (s != time) {
+				trace("time:", s, " total elapsed:", getTimer() - tt);
+				s = time;
+			}
 		}
+		
+		private var s:int = -1;
 		
 		/**
 		 * Invalidate

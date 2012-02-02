@@ -9,9 +9,9 @@ package com.bienvisto.elements.network.packet
 	 */ 
 	public final class PacketStats
 	{
-		public function PacketStats(node:Node, time:uint, totalOwn:int, totalOther:int)
+		public function PacketStats(id:int, time:uint, totalOwn:int, totalOther:int)
 		{
-			_node 		= node;
+			_id         = id;
 			_time 		= time;
 			_totalOwn 	= totalOwn;
 			_totalOther = totalOther;
@@ -20,14 +20,14 @@ package com.bienvisto.elements.network.packet
 		/**
 		 * @private
 		 */ 
-		private var _node:Node;
+		private var _id:int;
 		
 		/**
-		 * @readonly node
+		 * @readonly id
 		 */ 
-		public function get node():Node
+		public function get id():int
 		{
-			return _node;
+			return _id;
 		}
 		
 		/**

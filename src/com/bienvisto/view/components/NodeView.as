@@ -13,6 +13,7 @@ package com.bienvisto.view.components
 	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
+	import flash.utils.getTimer;
 	
 	[Event(name="selected", type="com.bienvisto.view.events.NodeSpriteEvent")]
 	
@@ -205,6 +206,7 @@ package com.bienvisto.view.components
 		{
 			checkNodes();
 			
+			var tt:int =  getTimer();
 			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
 				manager = managers[i];

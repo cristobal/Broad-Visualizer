@@ -99,11 +99,9 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
-			var nodeSprite:NodeSprite;
-			var shape:Shape;
-			var buffer:Buffer;
 			if (time != lastTime) {
 				
+				var nodeSprite:NodeSprite, shape:Shape, buffer:Buffer, size:Number;		
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
 					buffer = buffers.findBuffer(nodeSprite.node, time);
@@ -114,11 +112,10 @@ package com.bienvisto.view.drawing
 						continue;
 					}
 					
-					var size:Number = buffer.size;
+					size = buffer.size;
 					if (size > 0) {
-						var value:Number = size / 100;
 						shape.graphics.lineStyle(5, fillColor);
-						shape.graphics.lineTo(0, -value);
+						shape.graphics.lineTo(0, -(size / 100));
 					}
 				}
 				
@@ -134,19 +131,16 @@ package com.bienvisto.view.drawing
 		 */ 
 		private function getShape(nodeSprite:NodeSprite):Shape
 		{
-			var shape:Shape;
 			var id:int = nodeSprite.node.id;
-			if (!(id in shapes)) {
-				shape = new Shape();
-				shape.x = nodeSprite.cx;
-				shape.y = nodeSprite.cy;
-				nodeSprite.addChild(shape);
-				
-				shapes[id] = shape;
+			if (id in shapes) {
+				return Shape(shapes[id]);
 			}
-			else {
-				shape = Shape(shapes[id]);
-			}
+			
+			var shape:Shape = new Shape();
+			shape.x = nodeSprite.cx;
+			shape.y = nodeSprite.cy;
+			nodeSprite.addChild(shape);
+			shapes[id] = shape;
 			
 			return shape;
 		}

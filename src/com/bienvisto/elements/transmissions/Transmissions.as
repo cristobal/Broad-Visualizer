@@ -42,24 +42,19 @@ package com.bienvisto.elements.transmissions
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
-						
 			// format: mt <node id> <time> <packet_size> <next_hop_id> 
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
 			var size:Number = uint(params[2]);
-			var destination:int = int(params[3]);;
-			var packet:Packet = new Packet(time, id, destination, size);
+			var destination:int = int(params[3]);
 			
-			var collection:TransmissionCollection;
 			if (!(id in collections)) {
-				collection = new TransmissionCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = TransmissionCollection(collections[id])
+				collections[id] = new TransmissionCollection();
 			}
 			
-			collection.add(packet);
+			TransmissionCollection(collections[id]).add(
+				new Packet(time, id, destination, size)
+			);
 			
 			return time;
 		}
@@ -90,19 +85,15 @@ package com.bienvisto.elements.transmissions
 		 * 
 		 * @param node
 		 * @param time
-		 * @param windowSize
 		 */ 
-		public function findNearest(node:Node, time:uint, windowSize:uint):Aggregate
+		public function findNearest(node:Node, time:uint):Aggregate
 		{
 			var id:int = node.id;
-			var item:Aggregate;
-			
-			if (id in collections) {
-				var collection:TransmissionCollection = TransmissionCollection(collections[id]);
-				item = collection.findNearest(time);
+			if (!(id in collections)) {
+				return null;
 			}
 			
-			return item;
+			return TransmissionCollection(collections[id]).findNearest(time);
 		}
 		
 		/**
@@ -114,15 +105,12 @@ package com.bienvisto.elements.transmissions
 		 */ 
 		public function samplePackets(node:Node, time:uint, windowSize:uint):Vector.<Packet>
 		{
-			var packets:Vector.<Packet>;
 			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:TransmissionCollection = TransmissionCollection(collections[id]);
-				packets = collection.samplePackets(time, windowSize);
+			if (!(id in collections)) {
+				return null;
 			}
-			
-			return packets;
+				
+			return TransmissionCollection(collections[id]).samplePackets(time, windowSize);
 		}
 	
 		/**
@@ -133,15 +121,12 @@ package com.bienvisto.elements.transmissions
 		 */ 
 		public function sampleTotal(node:Node, time:uint):int
 		{
-			var total:int = 0;
 			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:TransmissionCollection = TransmissionCollection(collections[id]);
-				total = collection.sampleTotal(time);
+			if (!(id in collections)) {
+				return 0;
 			}
 			
-			return total;
+			return TransmissionCollection(collections[id]).sampleTotal(time);
 		}
 		
 	}

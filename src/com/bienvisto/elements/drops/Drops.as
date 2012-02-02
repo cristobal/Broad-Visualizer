@@ -36,17 +36,13 @@ package com.bienvisto.elements.drops
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
 			
-			var item:Aggregate = new Aggregate(time);
-			var collection:DropsCollection;
 			if (!(id in collections)) {
-				collection = new DropsCollection();
-				collections[id] = collection;
-			}
-			else {
-				collection = DropsCollection(collections[id]);
+				collections[id] = new DropsCollection();
 			}
 			
-			collection.add(item);
+			DropsCollection(collections[id]).add(
+				new Aggregate(time)
+			);
 			
 			return time;
 		}
@@ -77,17 +73,14 @@ package com.bienvisto.elements.drops
 		 * @param time
 		 * @param windowSize
 		 */ 
-		public function sampleItems(node:Node, time:uint, windowSize:uint):Vector.<Aggregate>
+		public function sampleItems(node:Node, time:uint, windowSize:int):Vector.<Aggregate>
 		{
-			var samples:Vector.<Aggregate>;
 			var id:int = node.id;
-			var collection:DropsCollection;
-			if (id in collections) {
-				collection = DropsCollection(collections[id]);
-				samples	   = collection.sampleItems(time, windowSize);
+			if (!(id in collections)) {
+				return null;
 			}
 			
-			return samples;
+			return DropsCollection(collections[id]).sampleItems(time, windowSize);
 		}
 		
 		
@@ -99,16 +92,25 @@ package com.bienvisto.elements.drops
 		 */ 
 		public function sampleTotal(node:Node, time:uint):int
 		{
-			var total:int = 0;
 			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:DropsCollection = DropsCollection(collections[id]);
-				total = collection.sampleTotal(time);
+			if (!(id in collections)) {
+				return 0;
 			}
 			
-			return total;
+			return DropsCollection(collections[id]).sampleTotal(time);
 		}
 		
+		/**
+		 * Sample total with window size
+		 * 
+		 * @param node
+		 * @param time
+		 * @param windowSize
+		 */ 
+		public function sampleTotalWithWindowSize(node:Node, time:uint, windowSize:int):int
+		{
+			var items:Vector.<Aggregate> = sampleItems(node, time, windowSize);
+			return items ? items.length : 0;
+		}
 	}
 }

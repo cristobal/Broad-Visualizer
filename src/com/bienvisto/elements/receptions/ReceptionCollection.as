@@ -13,6 +13,7 @@ package com.bienvisto.elements.receptions
 		public function ReceptionCollection(node:Node)
 		{
 			super();
+			clear();
 			
 			this.node = node;
 		}
@@ -25,7 +26,7 @@ package com.bienvisto.elements.receptions
 		/**
 		 * @private
 		 */ 
-		private var spsCache:Dictionary = new Dictionary();
+		private var cache:Dictionary = new Dictionary();
 		
 		
 		/**
@@ -36,19 +37,14 @@ package com.bienvisto.elements.receptions
 		 */ 
 		public function samplePacketStats(time:uint, windowSize:uint):PacketStats
 		{
-			return processPacketStats(time, windowSize);
-/*			var packetStats:PacketStats;
-			var key:String = String(time) + "," + String(windowSize);
-			if (!(key in spsCache)) {
-				packetStats = processPacketStats(time, windowSize);
-				spsCache[key] = packetStats;
+			var key:String = String(time) + "-" + String(windowSize);
+			if (key in cache) {
+				return PacketStats(cache[key]);
 			}
-
-			else {
-				packetStats = PacketStats(spsCache[key]);
-			}
+			var packetStats:PacketStats = processPacketStats(time, windowSize);
+			cache[key] = packetStats;
 			
-			return packetStats;	*/
+			return packetStats
 		}
 		
 		/**
@@ -59,18 +55,19 @@ package com.bienvisto.elements.receptions
 		 */ 
 		private function processPacketStats(time:uint, windowSize:uint):PacketStats
 		{
+			
 			var packetStats:PacketStats;
-			if ((time > 0) && (time <= lastTimeAdded)) {
+			if (time > 0) {
 				var id:int = node.id;
 				var totalOwn:int = 0;
 				var totalOther:int = 0;
 				var packet:Packet;
-				var startTime:int = int(time) - int(windowSize);
+				var startTime:Number = time - windowSize;
 				if (startTime < 0) {
 					startTime = 0;
 				}
 				
-				var key:int = findNearestKeyMid(time);
+				var key:int = findNearestKey(time);
 				for (var i:int = key + 1; i--;) {
 					packet = Packet(_items[i]);
 					if (packet.time < startTime) {
@@ -90,12 +87,21 @@ package com.bienvisto.elements.receptions
 					}
 				}
 				
-				if ((totalOwn +  totalOther)> 0) {
-					packetStats = new PacketStats(node, _items[key].time, totalOwn, totalOther);
+				if ((totalOwn +  totalOther) > 0) {
+					packetStats = new PacketStats(id, _items[key].time, totalOwn, totalOther);
 				}
 			}
 			
 			return packetStats;
+		}
+		
+		
+		/**
+		 * Clear
+		 */ 
+		public function clear():void
+		{
+			cache = new Dictionary();
 		}
 	}
 }

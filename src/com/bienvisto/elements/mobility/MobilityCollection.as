@@ -10,6 +10,7 @@ package com.bienvisto.elements.mobility
 		public function MobilityCollection()
 		{
 			super();
+			clear();
 		}
 		
 		/**
@@ -22,19 +23,22 @@ package com.bienvisto.elements.mobility
 		 */ 
 		override public function findNearest(time:uint):Aggregate
 		{
-			var item:Aggregate;
+			if (time in cache) {
+				return Aggregate(cache[time]);
+			}
 			
-			if (!(time in cache)) {
-				item = super.findNearest(time);
-				if (item) {
-					cache[time] = item;
-				}
-			}
-			else {
-				item = cache[time];		
-			}
-				
+			var item:Aggregate = super.findNearest(time);
+			cache[time] = item;
+			
 			return item;
+		}
+		
+		/**
+		 * Clear
+		 */ 
+		public function clear():void
+		{
+			cache = new Dictionary();
 		}
 	}
 }

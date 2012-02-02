@@ -52,7 +52,7 @@ package com.bienvisto.ui.menu
 		/**
 		 * @public
 		 */ 
-		public var videoSequencesButton:Button;
+		public var sequencesButton:Button;
 		
 		/**
 		 * @private

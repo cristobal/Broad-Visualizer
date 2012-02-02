@@ -6,7 +6,7 @@
 		 xmlns:view="com.bienvisto.view.*" 
 		 xmlns:node="com.bienvisto.ui.node.*"
 		 width="100%" height="100%"
-		 creationComplete="initComponent(event)" xmlns:topology="com.bienvisto.ui.topology.*">
+		 creationComplete="initComponent(event)" xmlns:topology="com.bienvisto.ui.topology.*" xmlns:sequences="com.bienvisto.ui.sequences.*">
 	
 	<fx:Script>
 		<![CDATA[
@@ -19,6 +19,11 @@
 			 * @private
 			 */ 	
 			private var resize:Boolean;
+
+			/**
+			 * @private
+			 */ 
+			private var sequencesEnabled:Boolean;
 			
 			/**
 			 * @private
@@ -46,7 +51,7 @@
 				playback.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
 				playback.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
 				
-				
+				menu.addEventListener(Menu.SEQUENCES_CLICK, handleSequencesButtonClick);
 				menu.addEventListener(Menu.LOCAL_TOPOLOGY_CLICK, handleLocalTopologyButtonClick);
 				menu.addEventListener(Menu.TOPOLOGY_CLICK, handleTopologyButtonClick);
 				
@@ -62,6 +67,17 @@
 				nodeWindows.setTime(time);
 				playback.setTime(time);
 				topologyWindows.setTime(time);	
+			}
+			
+			/**
+			 * Set sequences enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setSequencesEnabled(value:Boolean):void
+			{
+				menu.setSequencesEnabled(value);
+				sequencesEnabled = value;
 			}
 			
 			/**
@@ -166,6 +182,16 @@
 			}
 			
 			/**
+			 * Handle sequences button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleSequencesButtonClick(event:Event):void
+			{
+				sequencesWindow.toggle();
+			}
+			
+			/**
 			 * Handle local topology button click
 			 * 
 			 * @param event
@@ -197,6 +223,9 @@
 	
 	<!-- TopologyWindow -->
 	<topology:TopologyWindows id="topologyWindows" right="10" top="40" />
+	
+	<!-- SequencesWindow -->
+	<sequences:SequencesWindow id="sequencesWindow" left="10" bottom="60" />
 	
 	<!-- Node windows -->
 	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />

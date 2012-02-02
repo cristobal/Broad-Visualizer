@@ -9,7 +9,6 @@ package com.bienvisto.elements.receptions
 	import com.bienvisto.elements.network.packet.PacketStats;
 	
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;
 	
 	/**
 	 * Receptions.as
@@ -50,19 +49,16 @@ package com.bienvisto.elements.receptions
 			var size:Number = uint(params[2]);
 			var from:int 	= int(params[3]);
 			var to:int 		= int(params[4]);
-			
-			var node:Node = nodeContainer.getNode(id);
-			var packet:Packet = new Packet(time, from, to, size);
-			var collection:ReceptionCollection;
+
 			if (!(id in collections)) {
-				collection = new ReceptionCollection(node);
-				collections[id] = collection;
-			}
-			else {
-				collection = ReceptionCollection(collections[id]);
-			}
+				collections[id] = new ReceptionCollection(
+					nodeContainer.getNode(id)
+				);
+			}		
 			
-			collection.add(packet);
+			ReceptionCollection(collections[id]).add(
+				new Packet(time, from, to, size)
+			);
 			
 			return time;
 		}
@@ -96,15 +92,12 @@ package com.bienvisto.elements.receptions
 		 */ 
 		public function samplePacketStats(node:Node, time:uint, windowSize:uint):PacketStats
 		{
-			var packetStats:PacketStats;
 			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
-				packetStats = collection.samplePacketStats(time, windowSize);
+			if (!(id in collections)) {
+				return null;
 			}
 			
-			return packetStats;
+			return ReceptionCollection(collections[id]).samplePacketStats(time, windowSize);
 		}
 		
 		/**
@@ -115,16 +108,12 @@ package com.bienvisto.elements.receptions
 		 */ 
 		public function sampleTotal(node:Node, time:uint):int
 		{
-			
-			var total:int = 0;
 			var id:int = node.id;
-			
-			if (id in collections) {
-				var collection:ReceptionCollection = ReceptionCollection(collections[id]);
-				total = collection.sampleTotal(time);
+			if (!(id in collections)) {
+				return 0;
 			}
 			
-			return total;
+			return ReceptionCollection(collections[id]).sampleTotal(time);
 		}
 	}
 }

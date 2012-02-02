@@ -30,7 +30,7 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
-		private static var windowSizeTotal:uint = 50;
+		private static var windowSizeTotal:int = 50;
 		
 		/**
 		 * @private
@@ -170,7 +170,7 @@ package com.bienvisto.view.drawing
 					view.addChildAt(shape, view.numChildren - 1); // push to top
 				}
 				
-				item = transmissions.findNearest(nodeSprite.node, time, windowSizeTotal);
+				item = transmissions.findNearest(nodeSprite.node, time);
 				if (!item || time < item.time) {
 					continue;
 				}

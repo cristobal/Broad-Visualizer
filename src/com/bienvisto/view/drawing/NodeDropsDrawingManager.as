@@ -2,7 +2,10 @@ package com.bienvisto.view.drawing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.elements.drops.Drops;
+	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.view.components.NodeSprite;
+	
+	import flash.utils.Dictionary;
 	
 	/**
 	 * NodeDropsDrawingManager.as
@@ -14,7 +17,7 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
-		private static var windowSize:uint = 100;
+		private static var windowSize:int = 100;
 		
 		/**
 		 * @private
@@ -39,6 +42,11 @@ package com.bienvisto.view.drawing
 		private var lastTime:uint = 0;
 		
 		/**
+		 * @private
+		 */ 
+		private var states:Dictionary = new Dictionary();
+		
+		/**
 		 * @overridej
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
@@ -48,24 +56,28 @@ package com.bienvisto.view.drawing
 			}
 			
 			if (lastTime != time) {
-				var nodeSprite:NodeSprite;
-				var samples:Vector.<Aggregate>;
+				var nodeSprite:NodeSprite, node:Node;
+				var total:int;
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
+					node       = nodeSprite.node;
 					
-					samples    = drops.sampleItems(nodeSprite.node, time, windowSize);
-					if (!samples || samples.length == 0) {
+					total  = drops.sampleTotalWithWindowSize(node, time, windowSize);
+					if (total == 0) {
+						if (states[node.id]) {
+							states[node.id] = false;
+							nodeSprite.invalidate();
+						}
+							
 						continue;
 					}
 					
-					//trace("samples… for node: ", nodeSprite.node.id, "total:", samples.length, time, "vs.", samples[0].time);
+					states[node.id] = time;
 					nodeSprite.setHighlighted(highlightColor);
-					
 				}
 				lastTime = time;
 			}
 			
 		}
-		
 	}
 }

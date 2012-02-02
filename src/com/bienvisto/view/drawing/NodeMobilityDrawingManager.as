@@ -28,17 +28,17 @@ package com.bienvisto.view.drawing
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			var nodeSprite:NodeSprite;
-			var waypoint2D:Waypoint2D;
+			var waypoint:Waypoint2D;
 			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 				nodeSprite = nodeSprites[i];
 				
-				waypoint2D   = mobility.findWaypoint(nodeSprite.node, time); 
-				if (waypoint2D) {
-					var elapsed:int = time - waypoint2D.time;
-					var vx:Number = (waypoint2D.direction.x / 1000) * elapsed;
-					var vy:Number = (waypoint2D.direction.y / 1000) * elapsed;
-					nodeSprite.x = waypoint2D.position.x + vx;
-					nodeSprite.y = waypoint2D.position.y + vy;
+				waypoint   = mobility.findWaypoint(nodeSprite.node, time); 
+				if (waypoint) {
+					var elapsed:int = time - waypoint.time;
+					var vx:Number = (waypoint.direction.x / 1000) * elapsed;
+					var vy:Number = (waypoint.direction.y / 1000) * elapsed;
+					nodeSprite.x = waypoint.position.x + vx;
+					nodeSprite.y = waypoint.position.y + vy;
 				}
 			}
 		}

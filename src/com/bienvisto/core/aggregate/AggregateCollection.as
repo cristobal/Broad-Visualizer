@@ -1,5 +1,6 @@
 package com.bienvisto.core.aggregate
 {
+	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 
 	// TODO: Optimize lookup's
@@ -10,6 +11,15 @@ package com.bienvisto.core.aggregate
 	 */ 
 	public class AggregateCollection
 	{
+		//--------------------------------------------------------------------------
+		//
+		//  Constants
+		//
+		//--------------------------------------------------------------------------
+		/**
+		 * @public 
+		 */ 
+		public static const SAMPLE_TIME:uint = 100; // update/normalize at each 100ms.
 		
 		//--------------------------------------------------------------------------
 		//
@@ -22,9 +32,10 @@ package com.bienvisto.core.aggregate
 		}
 		
 		/**
-		 * @private
+		 * @private 
+		 * 	A map of aggregate keys for this collection
 		 */ 
-		protected var lastTimeAdded:uint = 0;
+		protected var keys:Dictionary = new Dictionary();
 		
 		//--------------------------------------------------------------------------
 		//
@@ -68,62 +79,26 @@ package com.bienvisto.core.aggregate
 		public function add(item:Aggregate):void
 		{
 			_items.push(item);
-			lastTimeAdded = item.time;
+			addAggregateKey(item);
 		}
 		
 		/**
-		 * Remove a item from the collection
+		 * Add key
 		 * 
 		 * @param item
 		 */ 
-		public function remove(item:Aggregate):void
+		private function addAggregateKey(item:Aggregate):void
 		{
-			var value:Aggregate;
-			for (var i:int = _items.length; i--;) {
-				value = _items[i];
-				if (value == item) {
-					_items.splice(i, 1);
-					break;
-				}
-			}
-		}
-		
-		/**
-		 * Get total 
-		 * 
-		 * @param  time
-		 * @return Returns the total number
-		 */ 
-		public function getTotal(time:uint = uint.MAX_VALUE):int
-		{
-			return 0;
-		}
-		
-		/**
-		 * Count total 
-		 * 
-		 * @param  time
-		 * @return Returns the total number
-		 */
-		public function countTotal(time:uint):int
-		{
-			var total:int = 0; 
+			var key:int   = items.length - 1;
+			var time:uint = item.time - (item.time % SAMPLE_TIME);
+			var total:int = 1;
 			
-			if (time > lastTimeAdded) {
-				total = size;
-			}
-			else if (time > 0) {
-				var item:Aggregate;
-				for (var i:int = 0, l:int = size; i < l; i++) {
-					item = _items[i];
-					if (item.time > time) {
-						break;
-					}
-					total++;
-				}
+			if (time in keys) {
+				keys[time] = null; // null old reference
 			}
 			
-			return total;	
+			var aggregateKey:AggregateKey = new AggregateKey(key, item.time);
+			keys[time]       = aggregateKey;
 		}
 		
 		
@@ -144,7 +119,7 @@ package com.bienvisto.core.aggregate
 					startTime = 0;
 				}
 				
-				var key:int = findNearestKeyMid(time);	
+				var key:int = findNearestKey(time);	
 				var sample:Aggregate;
 				for (var i:int = key + 1; i--;) {
 					sample = _items[i];
@@ -169,10 +144,9 @@ package com.bienvisto.core.aggregate
 		 * 
 		 * @param time
 		 */ 
-		public function sampleTotal(time:uint):int
+		public function sampleTotal(time:uint, debug:Boolean = false):int
 		{
-			var total:int = findNearestKeyMid(time) + 1;
-			return total;
+			return findNearestKey(time) + 1;
 		}
 		
 		/**
@@ -183,23 +157,44 @@ package com.bienvisto.core.aggregate
 		public function findNearest(time:uint):Aggregate
 		{
 			var item:Aggregate;
-			var key:int = -1;
-			var total:int = _items.length;
 			
-			if (time > lastTimeAdded) {
-				key = total - 1;
-			}
-			else {
-				key = findNearestKeyMid(time);
-			}
-			
+			var key:int = findNearestKey(time);
 			if (key >= 0) {
 				item = _items[key];	
 			}
 			
-			
 			return item;
 		}
+		
+		/**
+		 * Find nearest key
+		 * 
+		 * @param time
+		 */ 
+		public function findNearestKey(time:uint):int
+		{
+			var key:int = -1;
+			
+			// var keyTime:uint = time - (time % SAMPLE_TIME); // All values from the Simulation are clamped to 100ms
+			var aggregateKey:AggregateKey = AggregateKey(keys[time]);
+			if (aggregateKey) {
+				key = aggregateKey.key;			
+				if (time < aggregateKey.time) {
+					while (key > 0 && time > _items[key].time) {
+						key--;
+					}
+				}
+			}
+			else {
+				key = findNearestKeyMid(time);
+				
+				aggregateKey  = new AggregateKey(key, time);
+				keys[time] = aggregateKey;
+			}
+			
+			return key;
+		}
+		
 		
 		/**
 		 * Find nearest key mid
@@ -219,79 +214,23 @@ package com.bienvisto.core.aggregate
 			
 			do
 			{
-				key = min + ( (max - min) / 2 );
-				if ( time > _items[key].time) {
+				key = min + int((max - min) / 2);
+				if (time > _items[key].time) {
 					min = key + 1;
 				}
 				else {
 					max = key - 1;
 				}
 				
-			} while (
+			} 
+			while (
 				key < total - 1 && 
 				max >= min  &&
-				(_items[key].time > time || _items[key + 1].time <= time)
+				(_items[key].time > time || time > _items[key + 1].time)
 			);
 			
 			
 			return key;
 		}
-		
-		/**
-		 * Find nearest key
-		 * 
-		 * @param time
-		 */ 
-		public function findNearestKey(time:uint):int
-		{
-			var key:int = -1;
-			
-			if (time <= lastTimeAdded) {
-				if (size > 1) {
-					key = int((size - 1) / 2);
-					if (_items[key].time > time) {
-						key = findNearestKeyFloor(time, key);
-					}
-					else {
-						key = findNearestKeyCeil(time, key);
-					}
-				}
-			}
-			
-			return key;
-		}
-		
-		
-		private function findNearestKeyFloor(time:uint, key:int):int
-		{ 
-			var item:Aggregate;
-			for (var i:int = key + 1; i--;) {
-				item = _items[i];
-				if (item.time <= time) {
-					break;
-				}
-			}
-			key = i;
-			
-			return key;
-		}
-		
-		private function findNearestKeyCeil(time:uint, key:int):int
-		{ 
-			var item:Aggregate;
-			for (var i:int = key, l:int = _items.length; i < l; i++) {
-				item = _items[i];
-				if (item.time >= time) {
-					break;
-				}
-			}
-			key = i;
-			if (key == l) {
-				key = -1;
-			}
-			
-			return key;
-		}
-		
 	}
 }

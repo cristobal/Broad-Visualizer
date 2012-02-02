@@ -15,33 +15,36 @@ package com.bienvisto.elements.drops
 		public function DropsCollection()
 		{
 			super();
+			clear();
 		}
 		
 		/**
 		 * @private
 		 */ 
-		private var cache:Dictionary = new Dictionary();
+		private var cache:Dictionary;
 		
 		/**
 		 * @override
 		 */ 
 		override public function sampleItems(time:uint, windowSize:uint):Vector.<Aggregate>
 		{
-			return super.sampleItems(time, windowSize);
-/*			var samples:Vector.<Aggregate>;
-			var key:String = String(time) + "," + String(windowSize);
-			if (!(key in cache)) {
-				var item:Aggregate = findNearest(time);
-				if (item && item.time >= time) {
-					samples = super.sampleItems(time, windowSize);
-				}
-				cache[key] = samples;
+			var key:String = String(time) + "-" + String(windowSize);
+			if (key in cache) {
+				return Vector.<Aggregate>(cache[key]);
 			}
-			else {
-				samples = Vector.<Aggregate>(cache[key]);
-			}
-			return samples;*/
+						
+			var samples:Vector.<Aggregate> = super.sampleItems(time, windowSize);
+			cache[key] = samples;
+			
+			return samples;
 		}
 		
+		/**
+		 * Clear
+		 */ 
+		public function clear():void
+		{
+			cache = new Dictionary();
+		}
 	}
 }
