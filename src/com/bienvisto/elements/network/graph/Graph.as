@@ -22,12 +22,22 @@ package com.bienvisto.elements.network.graph
 		private var _oid:String;
 		
 		/**
-		 * @return uuid
+		 * @return oid
 		 */ 
 		public function get oid():String
 		{
 			return _oid;
 		}
+		
+		/**
+		 * @priavte
+		 */ 
+		private var _pathDijkstra:Vector.<Edge>;
+		
+		/**
+		 * @priavte
+		 */
+		private var _pathBSF:Vector.<Edge>;
 		
 		/**
 		 * @private
@@ -71,6 +81,8 @@ package com.bienvisto.elements.network.graph
 				edge = new Edge(from, to, weight);
 				_edges.push(edge);
 				_adjacencyMatrix = null;
+				_pathDijkstra = null;
+				_pathBSF = null;
 			}
 		}
 		
@@ -97,6 +109,8 @@ package com.bienvisto.elements.network.graph
 			
 			if (removed) {
 				_adjacencyMatrix = null;
+				_pathDijkstra = null;
+				_pathBSF = null;
 			}
 		}
 		
@@ -255,7 +269,13 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function findShortestPathDijkstra(from:int, to:int):Vector.<Edge>
 		{
-			return GraphSearch.findShortestPathDijkstra(this, from, to);
+			if (_pathDijkstra) {
+				return _pathDijkstra;
+			}
+			
+			_pathDijkstra = GraphSearch.findShortestPathDijkstra(this, from, to);
+			
+			return _pathDijkstra;
 		}
 		
 		/**
@@ -266,7 +286,12 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function findShortestPathBFS(from:int, to:int):Vector.<Edge>
 		{
-			return GraphSearch.findShortestPathBFS(this, from, to);
+			if (_pathBSF) {
+				return _pathBSF;
+			}
+			_pathBSF = GraphSearch.findShortestPathBFS(this, from, to);
+			
+			return _pathBSF;
 		}
 		
 		/**

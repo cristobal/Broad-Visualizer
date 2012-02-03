@@ -14,17 +14,16 @@ package com.bienvisto.elements.sequences
 	 */
 	public class SequencesForwarded extends TraceSource implements ISimulationObject
 	{
-		public function SequencesForwarded(nodeContainer:NodeContainer)
+		public function SequencesForwarded(parent:SequencesContainer)
 		{
 			super("Sequences Forwarded", "sf");
-			
-			this.nodeContainer = nodeContainer;
+			this.parent = parent;
 		}
 		
 		/**
 		 * @private
 		 */ 
-		private var nodeContainer:NodeContainer;
+		private var parent:SequencesContainer;
 		
 		/**
 		 * @private
@@ -32,10 +31,16 @@ package com.bienvisto.elements.sequences
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
+		 * @private
+		 */ 
+		private var map:Dictionary = new Dictionary();
+		
+		/**
 		 * @override
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
+			// Format: sf <id> <time> <seqNum> <dest>
 			var id:int    = int(params[0]);
 			var time:uint = uint(params[1]);
 			var seqNum:int = uint(params[2]);
@@ -45,8 +50,14 @@ package com.bienvisto.elements.sequences
 				collections[id] = new SequencesCollection();
 			}
 			
-			SequencesCollection(collections[id]).add(
-				new Sequence(time, seqNum)
+			var sequence:Sequence = new Sequence(time, seqNum);
+			SequencesCollection(collections[id]).add(sequence);
+			
+			if (!seqNum in map) {
+				map[seqNum] = sequence;
+			}
+			parent.inserted.removeSequence(
+				parent.nodeContainer.getNode(id), sequence
 			);
 			
 			return time;

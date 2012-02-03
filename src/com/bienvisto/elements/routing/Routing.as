@@ -50,11 +50,6 @@ package com.bienvisto.elements.routing
 		/**
 		 * @private
 		 */ 
-		private var stats:Dictionary = new Dictionary();
-		
-		/**
-		 * @private
-		 */ 
 		private var statsItems:Dictionary = new Dictionary();
 		
 		/**
@@ -115,40 +110,6 @@ package com.bienvisto.elements.routing
 		}
 		
 		/**
-		 * Get stats collection
-		 * 
-		 * @param id
-		 */ 
-		private function getStatsCollection(id:int):RoutingStatsCollection
-		{
-			if (id in stats) {
-				return RoutingStatsCollection(stats[id]);
-			}
-			
-			var statsCollection:RoutingStatsCollection  = new RoutingStatsCollection();	
-			stats[id] = statsCollection;
-			
-			return statsCollection;
-		}
-		
-		/**
-		 * Get stats item
-		 * 
-		 * @param id
-		 */ 
-		private function getStatsItem(id:int):Object
-		{
-			if (id in statsItems) {
-				return statsItems[id];
-			}
-			
-			var item:Object = {rts: false, rtsTotal: 0, rtsAvgTotal: 0};
-			statsItems[id] = item;
-			
-			return item;
-		}
-		
-		/**
 		 * Parse entries
 		 * 
 		 * @param id
@@ -156,61 +117,25 @@ package com.bienvisto.elements.routing
 		 */ 
 		private function parseEntries(id:int, time:uint, table:String):Vector.<RoutingTableEntry>
 		{
-			var item:Object = getStatsItem(id);
-			var rts:Boolean    = false;
-			var rtsAvg:Boolean = false;
-			
 			var entries:Vector.<RoutingTableEntry> = new Vector.<RoutingTableEntry>();
 			var entry:RoutingTableEntry;
 			var args:Array = table.split(",");
 			if (args.length >= 3) {
 				for (var i:int = 0, l:int = args.length; i < l; i += 3) {
 					entry = new RoutingTableEntry(args[i], args[i + 1], args[i + 2]);
-					if (entry.destination == id) {
-						rts = true;
-						continue; // drop destinations to self
-					}
 					
-					if (entry.distance > 2) {
-						rtsAvg = true;
+					// For some reason OLSR will often contain routes to itself
+					// Often trough another hop but also and in some cases a 1-hop edge
+					// Seems to often incurr in most cases when there are more than 3-hops links.
+					if (entry.destination == id) {
+						continue; // drop destinations to self
 					}
 					
 					entries.push(entry);
 				}
 			}
 			
-			// Add new stats item 
-			if (rts && !item.rts) {
-				item.rts = true; 
-				item.rtsTotal++; // augment
-				if (rtsAvg) {
-					item.rtsAvgTotal++;
-				}
-				
-				var statsCollection:RoutingStatsCollection = getStatsCollection(id);
-				var statsItem:RoutingStatsItem = new RoutingStatsItem(time, item.rtsTotal, item.rtsAvgTotal);
-				statsCollection.add(statsItem);
-			}
-				// reset
-			else if (!rts && item.rts) {
-				item.rts = false;
-			}
-			
 			return entries;
-		}
-		
-		/**
-		 * Find stats item
-		 * 
-		 * @param node
-		 * @param time
-		 */ 
-		public function findStatsItem(node:Node, time:uint):RoutingStatsItem
-		{
-			var collection:RoutingStatsCollection = getStatsCollection(node.id);
-			var itemStats:RoutingStatsItem 		  = RoutingStatsItem(collection.findNearest(time));
-			
-			return itemStats;
 		}
 		
 		

@@ -55,6 +55,26 @@ package com.bienvisto.ui.sequences
 		/**
 		 * @public
 		 */ 
+		public var avgRateSent:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var avgTimeRecv:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var sourceValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var destValue:Label;
+		
+		/**
+		 * @public
+		 */ 
 		public var percRecv:Label
 		
 		/**
@@ -85,6 +105,8 @@ package com.bienvisto.ui.sequences
 		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
 			this.sequencesContainer = sequencesContainer;
+			this.sequencesContainer.recv.addEventListener(Event.CHANGE, handleSourceChange);
+			this.sequencesContainer.recv.addEventListener(Event.CHANGE, handleDestChange);
 		}
 		
 		/**
@@ -160,20 +182,18 @@ package com.bienvisto.ui.sequences
 				return;
 			}
 			
-/*			if (sent) {
-				if (sent.length > 0) {
-					totalSent.text = String(sent.length);
-					lastSeqNumSent.text = String(sent[sent.length - 1].seqNum);
-				}
-			}
+			totalSent.text      = String(sequencesContainer.sent.sampleSourceTotal(elapsed));
+			var value:int       = sequencesContainer.sent.sampleSourcelastSeqNum(elapsed);
+			lastSeqNumSent.text = (value < 0 ? "–" : String(value));
+			avgRateSent.text    = String(sequencesContainer.sent.sampleSourceRate(elapsed));
 			
-			if (recv) {
-				if (recv.length > 0) {
-					totalRecv.text = String(recv.length);
-					lastSeqNumRecv.text = String(recv[recv.length - 1].seqNum);
-				}				
-			}
+			totalRecv.text      = String(sequencesContainer.recv.sampleDestTotal(elapsed)) + "/" + String(sequencesContainer.recv.sampleDestDrops(elapsed));
 			
+			value			    = sequencesContainer.recv.sampleDestLastSeqNum(elapsed);
+			lastSeqNumRecv.text = (value < 0 ? "–" : String(value));
+			avgTimeRecv.text    = String(sequencesContainer.recv.sampleDestTime(elapsed)) + "ms";
+			
+			/* 
 			if (sent && recv) {
 				if (sent.length > 0 && recv.length > 0) {
 					var st:Number = sent.length;
@@ -188,6 +208,39 @@ package com.bienvisto.ui.sequences
 					progressBar.setProgress(value, 100);
 				}
 			}*/
+		}
+		
+		/**
+		 * Update sources
+		 */ 
+		private function updateSources():void
+		{
+			if (sequencesContainer.sent.sourceNode) {
+				sourceValue.text = String(sequencesContainer.sent.sourceNode.id);
+			}
+			if (sequencesContainer.recv.destNode) {
+				destValue.text = String(sequencesContainer.recv.destNode.id);
+			}
+		}
+		
+		/**
+		 * Handle source change
+		 * 
+		 * @param event
+		 */ 
+		private function handleSourceChange(event:Event):void
+		{
+			updateSources();
+		}
+		
+		/**
+		 * Handle dest change
+		 * 
+		 * @param event
+		 */ 
+		private function handleDestChange(event:Event):void
+		{
+			updateSources();
 		}
 		
 		/**

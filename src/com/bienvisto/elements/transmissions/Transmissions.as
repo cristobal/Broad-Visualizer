@@ -109,8 +109,8 @@ package com.bienvisto.elements.transmissions
 			if (!(id in collections)) {
 				return null;
 			}
-				
-			return TransmissionCollection(collections[id]).samplePackets(time, windowSize);
+			
+			return Vector.<Packet>(TransmissionCollection(collections[id]).sampleItems(time, windowSize));
 		}
 	
 		/**

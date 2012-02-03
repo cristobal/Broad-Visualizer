@@ -72,6 +72,22 @@ package com.bienvisto.core.aggregate
 		//--------------------------------------------------------------------------
 		
 		/**
+		 * Get first item
+		 */ 
+		public function first():Aggregate
+		{
+			return size > 0 ? _items[0] : null;
+		}
+		
+		/**
+		 * Get last item
+		 */ 
+		public function last():Aggregate
+		{
+			return size > 0 ? _items[size - 1] : null;
+		}
+		
+		/**
 		 * Add a item to the collection
 		 * 
 		 * @param
@@ -100,7 +116,6 @@ package com.bienvisto.core.aggregate
 			var aggregateKey:AggregateKey = new AggregateKey(key, item.time);
 			keys[time]       = aggregateKey;
 		}
-		
 		
 		
 		/**
@@ -144,7 +159,7 @@ package com.bienvisto.core.aggregate
 		 * 
 		 * @param time
 		 */ 
-		public function sampleTotal(time:uint, debug:Boolean = false):int
+		public function sampleTotal(time:uint):int
 		{
 			return findNearestKey(time) + 1;
 		}

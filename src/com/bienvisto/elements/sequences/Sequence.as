@@ -31,5 +31,6 @@ package com.bienvisto.elements.sequences
 		{
 			return _seqNum;
 		}
+		
 	}
 }

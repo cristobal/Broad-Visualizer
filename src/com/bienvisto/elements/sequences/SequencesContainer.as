@@ -11,10 +11,25 @@ package com.bienvisto.elements.sequences
 	{
 		public function SequencesContainer(nodeContainer:NodeContainer)
 		{	
-			_recv = new SequencesRecv(nodeContainer);
-			_sent = new SequencesSent(nodeContainer);
-			_inserted = new SequencesInserted(nodeContainer);
-			_forwarded = new SequencesForwarded(nodeContainer);
+			_recv      = new SequencesRecv(this);
+			_sent      = new SequencesSent(this);
+			_inserted  = new SequencesInserted(this);
+			_forwarded = new SequencesForwarded(this);
+			
+			_nodeContainer  = nodeContainer;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _nodeContainer:NodeContainer;
+		
+		/**
+		 * @readonly nodeContainer 
+		 */ 
+		public function get nodeContainer():NodeContainer
+		{
+			return _nodeContainer;
 		}
 		
 		/**

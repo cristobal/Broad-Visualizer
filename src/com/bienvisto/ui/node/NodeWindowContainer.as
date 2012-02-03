@@ -52,9 +52,7 @@ package com.bienvisto.ui.node
 	import spark.components.gridClasses.GridItemRenderer;
 	import spark.events.GridSelectionEvent;
 	import spark.events.IndexChangeEvent;
-	
-	// TODO: Add video sequences sent forward total 
-	// TOOD: Add video sequences drop total 
+	 
 	/**
 	 * NodeWindowContainer
 	 * 	This is the code behind controller class for the NodeWindow.mxml
@@ -162,6 +160,12 @@ package com.bienvisto.ui.node
 		 */ 
 		public var dxTotalValue:Label;
 		
+		
+		/**
+		 * @public
+		 */ 
+		public var sequencesSizeValue:Label;
+		
 		/**
 		 * @public
 		 */ 
@@ -182,15 +186,6 @@ package com.bienvisto.ui.node
 		 */ 
 		public var siTotalValue:Label;
 		
-		/**
-		 * @public
-		 */ 
-		public var rtsTotalValue:Label;
-		
-		/**
-		 * @public
-		 */ 
-		public var rtsAvgTotalValue:Label;
 		
 		/**
 		 * @private
@@ -375,6 +370,18 @@ package com.bienvisto.ui.node
 			return dxTotalValue.text;
 		}
 		
+		/**
+		 * @readwrite sequences size
+		 */ 
+		public function set sequencesSize(value:String):void
+		{
+			sequencesSizeValue.text = value;	
+		}
+		
+		public function get sequencesSize():String
+		{
+			return sequencesSizeValue.text;
+		}
 		
 		/**
 		 * @readwrite sequences sent total
@@ -426,33 +433,6 @@ package com.bienvisto.ui.node
 		public function get siTotal():String
 		{
 			return siTotalValue.text;
-		}
-		
-		
-		/**
-		 * @readwrite rts total
-		 */ 
-		public function set rtsTotal(value:String):void
-		{
-			rtsTotalValue.text = value;	
-		}
-		
-		public function get rtsTotal():String
-		{
-			return rtsTotalValue.text;
-		}
-		
-		/**
-		 * @readwrite rts avg total
-		 */ 
-		public function set rtsAvgTotal(value:String):void
-		{
-			rtsAvgTotalValue.text = value;	
-		}
-		
-		public function get rtsAvgTotal():String
-		{
-			return rtsAvgTotalValue.text;
 		}
 		
 		/**
@@ -834,6 +814,16 @@ package com.bienvisto.ui.node
 			}
 			
 			if (sequencesContainer) {
+				// internal times and the event lapse between the event flow is a bit 
+				total   = sequencesContainer.inserted.bufferSize(node, elapsed);
+				if (!buffer) {
+					total = 0;
+				}
+				else if (buffer.size < total) {
+					total = buffer.size;
+				}
+				sequencesSize = String(total);
+				
 				total   = sequencesContainer.sent.sampleTotal(node, elapsed);
 				sxTotal = String(total);
 				
@@ -849,17 +839,6 @@ package com.bienvisto.ui.node
 				siTotal = String(total);
 			}
 			
-			if (routing) {
-				var statsItem:RoutingStatsItem = routing.findStatsItem(node, elapsed);
-				if (statsItem) {
-					rtsTotal = String(statsItem.rtsTotal);
-					rtsAvgTotal = String(statsItem.rtsAvgTotal);
-				}
-				else {
-					rtsTotal    = "0";
-					rtsAvgTotal = "0";
-				}
-			}
 		}
 		
 		/**

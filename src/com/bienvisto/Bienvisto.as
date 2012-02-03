@@ -15,7 +15,6 @@ package com.bienvisto
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
-	import com.bienvisto.elements.routing.RoutingProtocol;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.routing.SimpleRoute;
@@ -91,7 +90,6 @@ package com.bienvisto
 		private var drops:Drops;
 		private var buffers:Buffers;
 		private var routing:Routing;
-		private var routingProtocol:RoutingProtocol;
 		private var topology:Topology;
 		private var sequencesContainer:SequencesContainer;
 		
@@ -133,7 +131,6 @@ package com.bienvisto
 			buffers		  = new Buffers(nodeContainer);
 			
 			routing		    = new Routing(nodeContainer);
-			routingProtocol = new RoutingProtocol();
 			topology		= new Topology(nodeContainer);
 			
 			sequencesContainer = new SequencesContainer(nodeContainer);
@@ -152,7 +149,6 @@ package com.bienvisto
 			simulation.addSimulationObject(drops);
 			simulation.addSimulationObject(buffers);
 			simulation.addSimulationObject(routing);
-			simulation.addSimulationObject(routingProtocol);
 			simulation.addSimulationObject(topology);			
 			simulation.addSimulationObject(sequencesContainer.sent);
 			simulation.addSimulationObject(sequencesContainer.recv);
@@ -172,7 +168,6 @@ package com.bienvisto
 			parser.addTraceSource(drops);
 			parser.addTraceSource(buffers);
 			parser.addTraceSource(routing);
-			parser.addTraceSource(routingProtocol);
 			parser.addTraceSource(topology);
 			parser.addTraceSource(sequencesContainer.sent);
 			parser.addTraceSource(sequencesContainer.recv);
@@ -274,6 +269,8 @@ package com.bienvisto
 			window.topologyWindows.setNodeContainer(nodeContainer);
 			window.topologyWindows.setRouting(routing);
 			window.topologyWindows.setTopology(topology);
+			
+			window.sequencesWindow.setSequencesContainer(sequencesContainer);
 			
 			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
 				debug();

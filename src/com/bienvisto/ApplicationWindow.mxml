@@ -68,7 +68,8 @@
 			{
 				nodeWindows.setTime(time);
 				playback.setTime(time);
-				topologyWindows.setTime(time);	
+				topologyWindows.setTime(time);
+				sequencesWindow.setTime(time);
 			}
 			
 			/**

@@ -1,24 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sequences:SequencesWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 								   xmlns:s="library://ns.adobe.com/flex/spark" 
-								   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:sequences="com.bienvisto.ui.sequences.*" width="400" height="250" title="Sequences Stats" fontSize="16">
+								   xmlns:mx="library://ns.adobe.com/flex/mx" 
+								   xmlns:sequences="com.bienvisto.ui.sequences.*" 
+								   width="400" height="250" title="Sequences">
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace node "com.bienvisto.ui.node.*";
+		.heading {
+			fontSize: 13px;
+			textDecoration: underline;
+		}
+		.label{
+			fontSize: 12px;
+		}
+		.value {
+			fontFamily: "DejaVuSansMono";
+			fontSize: 10px;
+		}
+	</fx:Style>
+	
 	<sequences:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
 	</sequences:controlBarLayout>
-	<s:Label x="10" y="10" text="Sent" textDecoration="underline"/>
-	<s:Label x="20" y="34" text="Total:" fontSize="14"/>
-	<s:Label x="110" y="35" text="0" fontSize="14" id="totalSent"/>
-	<s:Label x="20" y="110" text="Total:" fontSize="14"/>
-	<s:Label x="20" y="55" text="Last Seq:" fontSize="14"/>
-	<s:Label x="110" y="55" text="0" fontSize="14" id="lastSeqNumSent"/>
 	
-	<s:Label x="10" y="87" text="Recv" textDecoration="underline"/>
-	<s:Label x="110" y="111" text="0" fontSize="14" id="totalRecv"/>
-	<s:Label x="20" y="131" text="Last Seq:" fontSize="14"/>
-	<s:Label x="110" y="131" text="0" fontSize="14" id="lastSeqNumRecv"/>
-	<s:Label x="20" y="152" text="Perc:" fontSize="14"/>
-	<s:Label x="110" y="152" text="0" fontSize="14" id="percRecv"/>
-	<mx:ProgressBar x="10" y="174" width="378" label=" " id="progressBar" height="20" mode="manual" />
+	<s:Group x="10" y="10">
+		<s:Label text="Sent" styleName="heading"/>
+		<s:Group y="25">
+			<s:Label text="Source:" styleName="label" /><s:Label x="80" y="2" styleName="value" id="sourceValue" text="–" />
+			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="totalSent"/>
+			<s:Label y="40" text="Last Seq:" styleName="label" /><s:Label x="80" y="42" text="–" styleName="value" id="lastSeqNumSent"/>
+			<s:Label y="60" text="Avg Pck/s:" styleName="label" /><s:Label x="80" y="62" text="0" styleName="value" id="avgRateSent"/>
+		</s:Group>
+	</s:Group>
+	
+	<s:Group x="200" y="10">
+		<s:Label text="Recv" styleName="heading"/>
+		<s:Group y="25">
+			<s:Label text="Dest:" styleName="label" /><s:Label x="80" y="2" styleName="value" id="destValue" text="–" />
+			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="totalRecv"/>
+			<s:Label y="40" text="Last Seq:" styleName="label" /><s:Label x="80" y="42" text="–" styleName="value" id="lastSeqNumRecv"/>
+			<s:Label y="60" text="Avg Time:" styleName="label" /><s:Label x="80" y="62" text="0" styleName="value" id="avgTimeRecv"/>
+		</s:Group>
+	</s:Group>
+
+	<s:Group visible="false">
+		<s:Label x="110" y="152" text="0" fontSize="14" id="percRecv"/>
+		<mx:ProgressBar x="10" y="174" width="378" label=" " id="progressBar" height="20" mode="manual" />
+	</s:Group>
 	
 
 </sequences:SequencesWindowContainer>
