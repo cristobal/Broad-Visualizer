@@ -10,40 +10,11 @@ package com.bienvisto.elements.sequences
 	public final class SequencesContainer
 	{
 		public function SequencesContainer(nodeContainer:NodeContainer)
-		{
-			_destinations = new SequencesDestinations(nodeContainer);
-			_sources	  = new SequencesSources(nodeContainer);
-			
+		{	
 			_recv = new SequencesRecv(nodeContainer);
 			_sent = new SequencesSent(nodeContainer);
 			_inserted = new SequencesInserted(nodeContainer);
 			_forwarded = new SequencesForwarded(nodeContainer);
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _destinations:SequencesDestinations;
-		
-		/**
-		 * @readonly destinations
-		 */ 
-		public function get destinations():SequencesDestinations
-		{
-			return _destinations;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _sources:SequencesSources;
-		
-		/**
-		 * @readonly sources
-		 */ 
-		public function get sources():SequencesSources
-		{
-			return _sources;
 		}
 		
 		/**

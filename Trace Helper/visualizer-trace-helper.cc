@@ -399,15 +399,17 @@ VisualizerTraceHelper::DtsOverlayForwardMessage (std::string text,  Ptr<const Pa
 	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
 	
     // Write to file,
-    // format: sf <node id> <time> <destAddr>
-  
-    outputStream << "sf "; // Line type: Buffer Enqueue
-    outputStream << nodeId << " " ;
-    outputStream << Simulator::Now ().GetMilliSeconds() << " ";
-    // std::cout << lastAddr << " ";
-    outputStream << destAddr<< " ";
-    outputStream << endl;
-	
+    // format: sf <node id> <time> <seqNum> <destAddr>
+  	if (PacketHasSeqTsHeader(packet)) {
+  	  	uint32_t seqNum = GetSeqTsSeqNum(packet);
+		
+    	outputStream << "sf "; // Line type: Buffer Enqueue
+    	outputStream << nodeId << " " ;
+    	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+    	outputStream << seqNum << " ";
+    	outputStream << destAddr<< " ";
+    	outputStream << endl;
+	}	
 }
 
 void
@@ -417,14 +419,16 @@ VisualizerTraceHelper::DtsOverlayInsertMessage (std::string text, Ptr<const Pack
 	sscanf(text.c_str(), "/NodeList/%i/", &nodeId);
 	
     // Write to file,
-    // format: si <node id> <time>
-  
-    outputStream << "si "; // Line type: Buffer Enqueue
-    outputStream << nodeId << " " ;
-    outputStream << Simulator::Now ().GetMilliSeconds() << " ";
-    // std::cout << lastAddr << " ";
-    // std::cout << destAddr<< " ";
-    outputStream << endl;
+    // format: si <node id> <time> <seqNum>
+  	if (PacketHasSeqTsHeader(packet)) {
+		uint32_t seqNum = GetSeqTsSeqNum(packet);
+		
+    	outputStream << "si "; // Line type: Buffer Enqueue
+    	outputStream << nodeId << " " ;
+    	outputStream << Simulator::Now ().GetMilliSeconds() << " ";
+		outputStream << seqNum;
+		outputStream << endl;
+	}
 	
 }
 
@@ -477,37 +481,33 @@ VisualizerTraceHelper::PacketHasSeqTsHeader (Ptr<const Packet> packet)
 	return found;
 }
 
-SeqTsHeader*
-VisualizerTraceHelper::GetSeqTsHeader (Ptr<const Packet> packet)
+/**
+ * @brief Get the seqNum from a packet that contains a SeqTsHeader
+ */
+uint32_t
+VisualizerTraceHelper::GetSeqTsSeqNum (ns3::Ptr<const ns3::Packet> packet)
 {
-	SeqTsHeader *seqTs;
-	PacketMetadata::ItemIterator i = packet->BeginItem();
-	string name;
-	string needle = "SeqTsHeader";
-	size_t pos;
-	while (i.HasNext()) {
-		PacketMetadata::Item item = i.Next();
-		if (!item.isFragment) {
-			if (item.type == PacketMetadata::Item::HEADER) {
-				name = item.tid.GetName ();
-				pos = name.find(needle);
-				if (pos != string::npos) {
-					NS_ASSERT(item.tid.HasConstructor ());
-					Callback<ObjectBase *> constructor = item.tid.GetConstructor();
-					NS_ASSERT(!constructor.IsNull ());
-					ObjectBase *instance = constructor();
-					NS_ASSERT(instance != 0);
-					Chunk *chunk = dynamic_cast<Chunk *>(instance);
-					NS_ASSERT(seqTs != 0);
-					chunk->Deserialize (item.current);
-					seqTs = dynamic_cast<SeqTsHeader *>(chunk);
-					break;
-				}
-			}
-		}
+	uint32_t seqNum = 0;
+	
+	std::ostringstream stream;
+	stream << *packet;
+	string str =  stream.str();
+	
+	string needle = "seq=";
+	size_t start  = str.find(needle);
+	if (start != string::npos) {
+		string ws = "time=";
+		size_t end   = str.find(ws);
+		
+		start += 4;
+		string value = str.substr (start, end - (start + 1));
+		sscanf(value.c_str(), "%u", &seqNum);
+		// std::cout << "GetSeqTsSeqNum "<< str << " got: " << seqNum << std::endl; 
 	}
-	return seqTs;
+	
+	return seqNum;
 }
+
 
 void 
 VisualizerTraceHelper::PacketContents (Ptr<const Packet> packet, std::stringstream &ss)

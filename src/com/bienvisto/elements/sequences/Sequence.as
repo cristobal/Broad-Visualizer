@@ -12,7 +12,7 @@ package com.bienvisto.elements.sequences
 		/**
 		 * Constructor
 		 */ 
-		public function Sequence(time:uint, seqNum:int)
+		public function Sequence(time:uint, seqNum:uint)
 		{
 			super(time);
 			

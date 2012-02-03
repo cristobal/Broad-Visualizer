@@ -85,9 +85,6 @@ package com.bienvisto.ui.sequences
 		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
 			this.sequencesContainer = sequencesContainer;
-			
-			this.sequencesContainer.sources.addEventListener(Event.CHANGE, handleSourcesChange);
-			this.sequencesContainer.destinations.addEventListener(Event.CHANGE, handleDestinationsChange);
 		}
 		
 		/**
@@ -191,26 +188,6 @@ package com.bienvisto.ui.sequences
 					progressBar.setProgress(value, 100);
 				}
 			}*/
-		}
-		
-		/**
-		 * Handle source change
-		 * 
-		 * @param event
-		 */ 
-		private function handleSourcesChange(event:Event):void
-		{
-			
-		}
-		
-		/**
-		 * Handle destunations change
-		 * 
-		 * @param event
-		 */ 
-		private function handleDestinationsChange(event:Event):void
-		{
-			
 		}
 		
 		/**

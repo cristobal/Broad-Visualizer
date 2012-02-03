@@ -38,8 +38,8 @@ package com.bienvisto.elements.sequences
 		{
 			var id:int    = int(params[0]);
 			var time:uint = uint(params[1]);
-			var dest:int  = int(params[2]);
-			var seqNum:int = -1;
+			var seqNum:int = uint(params[2]);
+			var dest:int  = int(params[3]);
 			
 			if (!(id in collections)) {
 				collections[id] = new SequencesCollection();

@@ -171,13 +171,16 @@ public:
 	SeqTsSent (std::string text, ns3::Ptr<const ns3::Packet> packet, uint32_t sequenceNumber);
 	
 	/**
+	 * @brief Get the seqNum from a packet that contains a SeqTsHeader
+	 */
+	uint32_t
+	GetSeqTsSeqNum (ns3::Ptr<const ns3::Packet> packet);
+	
+	/**
 	 * @brief Check wether a packet contains a SeqTsHeader
 	 */
 	bool
 	PacketHasSeqTsHeader (ns3::Ptr<const ns3::Packet> packet);
-	
-	SeqTsHeader* 
-	GetSeqTsHeader (ns3::Ptr<const ns3::Packet> packet);
 	
 	/**
 	 * @brief Direct the packet print contents into a string stream 

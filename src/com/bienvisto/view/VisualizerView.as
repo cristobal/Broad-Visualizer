@@ -117,13 +117,20 @@ package com.bienvisto.view
 				viewComponent = _viewComponents[i];
 				viewComponent.update(time);
 			}
-			/*if (s != time) {
-				trace("time:", s, " total elapsed:", getTimer() - tt);
+			if (s != time) {
 				s = time;
-			}*/
+				sum += (getTimer() - tt);
+				total++;
+				if (total % 10 == 0) {
+					trace("Avg update time:", String(sum / total), "ms");
+				}
+				
+			}
 		}
 		
-		private var s:int = -1;
+		private var total:Number = 0;
+		private var sum:Number = 0;
+		private var s:int      = -1;
 		
 		/**
 		 * Invalidate

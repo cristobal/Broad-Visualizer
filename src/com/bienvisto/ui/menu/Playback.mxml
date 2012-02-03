@@ -102,6 +102,8 @@
 		<s:Label id="timeLabel">00:00:00</s:Label>
 		<s:Label>/</s:Label>
 		<s:Label id="durationLabel">00:00:00</s:Label>
-		
+		<s:Label id="fps">
+			fps: …
+		</s:Label>
 	</s:Group>
 </menu:PlaybackContainer>

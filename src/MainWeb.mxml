@@ -11,8 +11,6 @@
 	<fx:Script>
 		<![CDATA[
 			import com.bienvisto.Bienvisto;
-			
-			import flash.utils.getTimer;
 		
 			/**
 			 * Init app

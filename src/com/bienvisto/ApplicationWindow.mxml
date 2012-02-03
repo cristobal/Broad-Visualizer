@@ -13,6 +13,8 @@
 			import com.bienvisto.core.events.TimedEvent;
 			import com.bienvisto.ui.menu.ProgressTimeSlider;
 			
+			import flash.utils.getTimer;
+			
 			import mx.events.FlexEvent;
 			
 			/**
@@ -43,7 +45,7 @@
 			private function initComponent(event:FlexEvent):void
 			{
 				addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
-				
+
 				playback.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
 				playback.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
 				
@@ -167,6 +169,17 @@
 			{
 				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 				stage.addEventListener(Event.RESIZE, handleResize);
+				
+				var tt:int = getTimer();
+				var frames:int = 0;
+				stage.addEventListener(Event.ENTER_FRAME, function(event:Event):void{
+					frames++;
+					if ((getTimer() - tt) >= 1000) {
+						playback.fps.text = "fps: " + frames;
+						tt = getTimer();
+						frames = 0;
+					}
+				});
 			}
 			
 			/**

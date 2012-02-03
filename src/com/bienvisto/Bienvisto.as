@@ -73,7 +73,7 @@ package com.bienvisto
 			bindWindow(window);
 			
 			this.app 	= app;
-			this.app.frameRate = 24;
+			this.app.frameRate = 30; // 30fps
 			this.window = window; 
 		}
 		
@@ -137,7 +137,13 @@ package com.bienvisto
 			topology		= new Topology(nodeContainer);
 			
 			sequencesContainer = new SequencesContainer(nodeContainer);
+
+			// Listen to simulation object first change
+			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
+			routing.addEventListener(Event.CHANGE, handleRoutingChange);
+			topology.addEventListener(Event.CHANGE, handleTopologyChange);
 			
+			// Add simulation objects			
 			simulation.addSimulationObject(nodeContainer);
 			simulation.addSimulationObject(mobility);
 			simulation.addSimulationObject(mobilityArea);
@@ -148,23 +154,16 @@ package com.bienvisto
 			simulation.addSimulationObject(routing);
 			simulation.addSimulationObject(routingProtocol);
 			simulation.addSimulationObject(topology);			
-			simulation.addSimulationObject(sequencesContainer.sources);
-			simulation.addSimulationObject(sequencesContainer.destinations);
 			simulation.addSimulationObject(sequencesContainer.sent);
 			simulation.addSimulationObject(sequencesContainer.recv);
 			simulation.addSimulationObject(sequencesContainer.inserted);
 			simulation.addSimulationObject(sequencesContainer.forwarded);
 			
-			
-			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
-			routing.addEventListener(Event.CHANGE, handleRoutingChange);
-			topology.addEventListener(Event.CHANGE, handleTopologyChange);
-			
-			
 			// Reader Part
 			reader = new FileReferenceReader();
 			parser = new TraceSourceParser(reader);
 			
+			// Add trace sources
 			parser.addTraceSource(simulation);
 			parser.addTraceSource(nodeContainer);
 			parser.addTraceSource(mobility);
@@ -175,8 +174,6 @@ package com.bienvisto
 			parser.addTraceSource(routing);
 			parser.addTraceSource(routingProtocol);
 			parser.addTraceSource(topology);
-			parser.addTraceSource(sequencesContainer.sources);
-			parser.addTraceSource(sequencesContainer.destinations);
 			parser.addTraceSource(sequencesContainer.sent);
 			parser.addTraceSource(sequencesContainer.recv);
 			parser.addTraceSource(sequencesContainer.inserted);
@@ -304,6 +301,9 @@ package com.bienvisto
 			updateTime();
 		}
 		
+		/**
+		 * Debug
+		 */ 
 		private function debug():void
 		{
 			var graph:Graph = routing.getGlobalGraph(simulation.time);
@@ -324,9 +324,6 @@ package com.bienvisto
 				vertex = vertices[i];
 				trace("vertex:", vertex, "adjacent vertices:", adjacencyMatrix.getAdjacentVertices(vertex));
 			}
-			
-/*			trace("app WxH:", app.width, app.height);
-			trace("window WxH", window.width, window.height);*/
 			
 		}
 		
