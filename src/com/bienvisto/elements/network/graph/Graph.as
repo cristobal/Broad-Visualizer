@@ -1,5 +1,7 @@
 package com.bienvisto.elements.network.graph
 {
+	import com.bienvisto.util.OIDUtil;
+	
 	import flash.utils.Dictionary;
 
 	/**
@@ -11,6 +13,20 @@ package com.bienvisto.elements.network.graph
 	{
 		public function Graph()
 		{
+			_oid = String("ng-") + String(OIDUtil.getNext());
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _oid:String;
+		
+		/**
+		 * @return uuid
+		 */ 
+		public function get oid():String
+		{
+			return _oid;
 		}
 		
 		/**

@@ -13,6 +13,7 @@ package com.bienvisto.elements.routing
 	 */ 
 	public final class RoutingTable extends Aggregate
 	{
+		
 		public function RoutingTable(time:uint, node:Node, entries:Vector.<RoutingTableEntry>)
 		{
 			super(time);

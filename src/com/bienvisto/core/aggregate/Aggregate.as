@@ -1,6 +1,6 @@
 package com.bienvisto.core.aggregate
 {
-	import mx.utils.UIDUtil;
+	import com.bienvisto.util.OIDUtil;
 
 	/**
 	 * Aggregate.as
@@ -26,7 +26,7 @@ package com.bienvisto.core.aggregate
 		public function Aggregate(time:uint)
 		{
 			_time = time;
-			_uuid = UIDUtil.createUID();
+			_oid  = "ca-" + String(time) + "-" + OIDUtil.getNext();
 		}
 		
 		
@@ -37,20 +37,21 @@ package com.bienvisto.core.aggregate
 
 		
 		//----------------------------------
-		// uuid 
+		// oid 
 		//---------------------------------- 
 		/**
 		 * @private
 		 */
-		private var _uuid:String;
+		private var _oid:String;
 		
 		/**
 		 * @readonly time
 		 */ 
-		public function get uuid():String
+		public function get oid():String
 		{
-			return _uuid;
+			return _oid;
 		}
+		
 		//--------------------------------------------------------------------------
 		
 		//----------------------------------
