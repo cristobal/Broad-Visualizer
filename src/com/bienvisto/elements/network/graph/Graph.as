@@ -19,6 +19,11 @@ package com.bienvisto.elements.network.graph
 		/**
 		 * @private
 		 */ 
+		private var _paths:Dictionary;
+		
+		/**
+		 * @private
+		 */ 
 		private var _oid:String;
 		
 		/**
@@ -28,16 +33,6 @@ package com.bienvisto.elements.network.graph
 		{
 			return _oid;
 		}
-		
-		/**
-		 * @priavte
-		 */ 
-		private var _pathDijkstra:Vector.<Edge>;
-		
-		/**
-		 * @priavte
-		 */
-		private var _pathBSF:Vector.<Edge>;
 		
 		/**
 		 * @private
@@ -81,8 +76,7 @@ package com.bienvisto.elements.network.graph
 				edge = new Edge(from, to, weight);
 				_edges.push(edge);
 				_adjacencyMatrix = null;
-				_pathDijkstra = null;
-				_pathBSF = null;
+				_paths = new Dictionary();
 			}
 		}
 		
@@ -109,8 +103,7 @@ package com.bienvisto.elements.network.graph
 			
 			if (removed) {
 				_adjacencyMatrix = null;
-				_pathDijkstra = null;
-				_pathBSF = null;
+				_paths = new Dictionary();
 			}
 		}
 		
@@ -269,13 +262,15 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function findShortestPathDijkstra(from:int, to:int):Vector.<Edge>
 		{
-			if (_pathDijkstra) {
-				return _pathDijkstra;
+			var key:String = "pd-" + String(from) + "-" + String(to);
+			if (key in _paths) {
+				return Vector.<Edge>(_paths[key]);	
 			}
 			
-			_pathDijkstra = GraphSearch.findShortestPathDijkstra(this, from, to);
+			var path:Vector.<Edge> = GraphSearch.findShortestPathDijkstra(this, from, to);
+			_paths[key] = path;
 			
-			return _pathDijkstra;
+			return path;
 		}
 		
 		/**
@@ -286,12 +281,15 @@ package com.bienvisto.elements.network.graph
 		 */ 
 		public function findShortestPathBFS(from:int, to:int):Vector.<Edge>
 		{
-			if (_pathBSF) {
-				return _pathBSF;
+			var key:String = "pb-" + String(from) + "-" + String(to);
+			if (key in _paths) {
+				return Vector.<Edge>(_paths[key]);	
 			}
-			_pathBSF = GraphSearch.findShortestPathBFS(this, from, to);
 			
-			return _pathBSF;
+			var path:Vector.<Edge> = GraphSearch.findShortestPathBFS(this, from, to);
+			_paths[key] = path;
+			
+			return path;
 		}
 		
 		/**

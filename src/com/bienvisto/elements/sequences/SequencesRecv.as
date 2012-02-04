@@ -45,6 +45,16 @@ package com.bienvisto.elements.sequences
 		 * @private
 		 */ 
 		private var stats:Dictionary = new Dictionary();
+
+		/**
+		 * @private
+		 */ 
+		private var recv:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
+		private var recvCache:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
@@ -70,19 +80,6 @@ package com.bienvisto.elements.sequences
 		}
 		
 		/**
-		 * @private
-		 */ 
-		private var _lastSeqNum:int;
-		
-		/**
-		 * @readonly lastSeqNum
-		 */ 
-		public function get lastSeqNum():int
-		{
-			return _lastSeqNum;
-		}
-		
-		/**
 		 * @override
 		 */ 
 		override public function update(params:Vector.<String>):uint
@@ -93,6 +90,7 @@ package com.bienvisto.elements.sequences
 			
 			if (!(id in collections)) {
 				collections[id] = new SequencesCollection();
+				recv[id]		= new SequencesCollection();
 				stats[id]	    = new AggregateCollection();
 				drops[id]		= new AggregateCollection();
 			}
@@ -122,14 +120,9 @@ package com.bienvisto.elements.sequences
 		 */ 
 		private function updateDrops(id:int, sequence:Sequence):void
 		{
-			var seqNum:int = sequence.seqNum;
-			var time:uint  = sequence.time;
-			
-			if (seqNum in map) {
-				var collection:AggregateCollection = AggregateCollection(drops[id]);
-				collection.add(sequence);
+			if (sequence.seqNum in map) {
+				AggregateCollection(drops[id]).add(sequence);
 			}
-			
 		}
 		
 		/**
@@ -159,9 +152,35 @@ package com.bienvisto.elements.sequences
 					collection.add(item);
 				}
 				
-				_lastSeqNum  = seqNum;	
+				SequencesCollection(recv[id]).add(sequence);
 			}
 		}
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample total
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * Sample dest total
@@ -193,6 +212,13 @@ package com.bienvisto.elements.sequences
 			return SequencesCollection(collections[id]).sampleTotal(time);
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample drops
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * Sample dest total
 		 * 
@@ -223,8 +249,29 @@ package com.bienvisto.elements.sequences
 			return AggregateCollection(drops[id]).sampleTotal(time);
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample rate
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
-		 * Samplerate
+		 * Sample dest rate
+		 * 
+		 * @param time
+		 */ 
+		public function sampleDestRate(time:uint):int
+		{
+			if (!destNode) {
+				return 0;
+			}
+			
+			return sampleRate(destNode, time);
+		}
+		
+		/**
+		 * Sample rate
 		 * 
 		 * @param node
 		 * @param time
@@ -252,26 +299,124 @@ package com.bienvisto.elements.sequences
 			return rate;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample dest time
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
-		 * Sample dest  
+		 * Sample dest time
+		 * 
+		 * @param time  
 		 */
 		public function sampleDestTime(time:uint):uint
 		{
-			var id:int = destNode ? destNode.id : -1;
-			if (!(id in stats)) {
+			if (!destNode) {
 				return 0;	
+			}
+			
+			return sampleTime(destNode, time);
+		}
+		
+		/**
+		 * Sample time
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleTime(node:Node, time:uint):uint
+		{
+			var id:int = node.id;
+			if (!(id in stats)) {
+				return 0;
 			}
 			
 			var item:SequencesStats = SequencesStats(AggregateCollection(stats[id]).findNearest(time));
 			return item ? uint(item.avg) : 0;
 		}
 		
+		//--------------------------------------------------------------------------
+		//
+		// Sample dest recv
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Sample dest recv
+		 * 
+		 * @param time
+		 * @param ordered
+		 */ 
+		public function sampleDestRecv(time:uint, ordered:Boolean = false):Vector.<Sequence>
+		{
+			if (!destNode) {
+				return null;
+			}
+			
+			return sampleRecv(destNode, time, ordered);
+		}
+		
+		/**
+		 * Sample dest recv
+		 * 
+		 * @param node
+		 * @param time
+		 * @param ordered
+		 */ 
+		public function sampleRecv(node:Node, time:uint, ordered:Boolean = false):Vector.<Sequence>
+		{
+			var id:int = node.id;
+			if (!(id in recv)) {
+				return null;
+			}
+			var key:String = String(id) + "-" + String(time) + "-" + (ordered ? "t" : "f");
+			if (key in recvCache) {
+				return Vector.<Sequence>(recvCache[key]);
+			}
+			
+			var samples:Array = SequencesCollection(recv[id]).sampleItemsAsArray(time, time);
+			if (samples.length > 0 && ordered == true) {
+				samples.sortOn("seqNum", Array.NUMERIC);
+			}
+			
+			var items:Vector.<Sequence> = Vector.<Sequence>(samples);
+			recvCache[key] = items;
+			
+			return items;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample seq num
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * Sample dest  
+		 * 
+		 * @param time
 		 */
 		public function sampleDestLastSeqNum(time:uint):int
 		{
-			var id:int = destNode ? destNode.id : -1;
+			if (!destNode) {
+				return -1;
+			}
+			
+			return sampleLastSeqNum(destNode, time);
+		}
+		
+		/**
+		 * Sample last seq num
+		 * 
+		 * @param node 
+		 * @param time
+		 */ 
+		public function sampleLastSeqNum(node:Node, time:uint):int
+		{
+			var id:int = node.id;
 			if (!(id in collections)) {
 				return -1;	
 			}
@@ -290,25 +435,6 @@ package com.bienvisto.elements.sequences
 			return Sequence(map[seqNum]);
 		}
 		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */
-		public function setDuration(duration:uint):void
-		{
-			
-		}
 
 	}
 }

@@ -1,4 +1,4 @@
-package com.bienvisto.ui.node
+package com.bienvisto.ui.windows.node
 {
 	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
 	

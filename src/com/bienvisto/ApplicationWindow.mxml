@@ -4,9 +4,9 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:menu="com.bienvisto.ui.menu.*" 
 		 xmlns:view="com.bienvisto.view.*" 
-		 xmlns:node="com.bienvisto.ui.node.*"
+		 xmlns:node="com.bienvisto.ui.windows.node.*"
 		 width="100%" height="100%"
-		 creationComplete="initComponent(event)" xmlns:topology="com.bienvisto.ui.topology.*" xmlns:sequences="com.bienvisto.ui.sequences.*">
+		 creationComplete="initComponent(event)" xmlns:topology="com.bienvisto.ui.windows.topology.*" xmlns:sequences="com.bienvisto.ui.windows.sequences.*">
 	
 	<fx:Script>
 		<![CDATA[

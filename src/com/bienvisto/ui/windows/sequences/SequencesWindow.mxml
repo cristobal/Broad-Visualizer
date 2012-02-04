@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sequences:SequencesWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+								   xmlns:s="library://ns.adobe.com/flex/spark" 
+								   xmlns:mx="library://ns.adobe.com/flex/mx" 
+								   xmlns:sequences="com.bienvisto.ui.windows.sequences.*"
+								   width="400" height="250" title="Sequences">
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace sequences "com.bienvisto.ui.windows.sequences.*";
+		.heading {
+			fontSize: 13px;
+			textDecoration: underline;
+		}
+		.label{
+			fontSize: 12px;
+		}
+		.value {
+			fontFamily: "DejaVuSansMono";
+			fontSize: 10px;
+		}
+	</fx:Style>
+	
+	<sequences:controlBarLayout>
+		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
+	</sequences:controlBarLayout>
+	
+	<s:Group x="10" y="10">
+		<s:Label text="Sent" styleName="heading"/>
+		<s:Group y="25">
+			<s:Label text="Source:" styleName="label" /><s:Label x="80" y="2" styleName="value" id="sourceValue" text="–" />
+			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="sourceSent"/>
+			<s:Label y="40" text="Unique:" styleName="label" /><s:Label x="80" y="42" text="0" styleName="value" id="sourceUnique" />
+			<s:Label y="60" text="Last Seq:" styleName="label" /><s:Label x="80" y="62" text="–" styleName="value" id="sourceLastSeqNum"/>
+			<s:Label y="80" text="Avg Pck/s:" styleName="label" /><s:Label x="80" y="82" text="0" styleName="value" id="sourceAvgRate"/>
+		</s:Group>
+	</s:Group>
+	
+	<s:Group x="200" y="10">
+		<s:Label text="Recv" styleName="heading"/>
+		<s:Group y="25">
+			<s:Label text="Dest:" styleName="label" /><s:Label x="80" y="2" styleName="value" id="destValue" text="–" />
+			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="destRecv"/>
+			<s:Label y="40" text="Dropped:" styleName="label" /><s:Label x="80" y="42" text="0" styleName="value" id="destDropped" />
+			<s:Label y="60" text="Last Seq:" styleName="label" /><s:Label x="80" y="62" text="–" styleName="value" id="destLastSeqNum"/>
+			<s:Label y="80" text="Avg Pck/s:" styleName="label" /><s:Label x="80" y="82" text="–" styleName="value" id="destAvgRate"/>
+			<s:Label y="100" text="Avg Time:" styleName="label" /><s:Label x="80" y="102" text="0 ms" styleName="value" id="destAvgTimeRecv"/>
+		</s:Group>
+	</s:Group>
+
+	<s:Group id="progressGroup" x="10" y="165">
+		<s:Label styleName="label" id="percLabel" text="–" />
+		<!-- <s:Label x="110" y="152" text="0" fontSize="14" id="percRecv"/> -->
+		
+	</s:Group>
+	
+
+</sequences:SequencesWindowContainer>
+	

@@ -1,6 +1,7 @@
 package com.bienvisto.elements.sequences
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
@@ -35,6 +36,11 @@ package com.bienvisto.elements.sequences
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
+		 * @private
+		 */ 
+		private var unique:Dictionary = new Dictionary();
+		
+		/**
 		 * @priavte
 		 */ 
 		private var map:Dictionary = new Dictionary();
@@ -63,19 +69,6 @@ package com.bienvisto.elements.sequences
 		}
 		
 		/**
-		 * @private
-		 */ 
-		private var _lastSeqNum:int;
-		
-		/**
-		 * @readonly lastSeqNum
-		 */ 
-		public function get lastSeqNum():int
-		{
-			return _lastSeqNum;
-		}
-		
-		/**
 		 * @override
 		 */ 
 		override public function update(params:Vector.<String>):uint
@@ -86,14 +79,17 @@ package com.bienvisto.elements.sequences
 			
 			if (!(id in collections)) {
 				collections[id] = new SequencesCollection();
+				unique[id]		= new AggregateCollection();
 			}
 			
 			var sequence:Sequence = new Sequence(time, seqNum);
 			SequencesCollection(collections[id]).add(sequence);
+			
+			// add unique
 			if (!(seqNum in map)) {
+				AggregateCollection(unique[id]).add(sequence);
 				map[seqNum] = sequence;
 			}
-			_lastSeqNum = seqNum;
 			
 			if (first) {
 				_sourceNode = parent.nodeContainer.getNode(id);
@@ -104,6 +100,48 @@ package com.bienvisto.elements.sequences
 			}
 			
 			return time;
+		}
+
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample total
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Sample total
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleSourceTotal(time:uint):int
+		{
+			if (!sourceNode) {
+				return 0;
+			}
+			
+			return sampleTotal(sourceNode, time);
 		}
 		
 		/**
@@ -122,16 +160,63 @@ package com.bienvisto.elements.sequences
 			return SequencesCollection(collections[id]).sampleTotal(time);
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample unique
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
-		 * Sample total
+		 * Sample source unique
+		 * 
+		 * @param time
+		 */ 
+		public function sampleSourceUnique(time:uint):int
+		{
+			if (!sourceNode) {
+				return 0;
+			}
+			
+			return sampleUnique(sourceNode, time);
+		}
+		
+		/**
+		 * Sample unique
 		 * 
 		 * @param node
 		 * @param time
 		 */ 
-		public function sampleSourceTotal(time:uint):int
+		public function sampleUnique(node:Node, time:uint):int
 		{
-			return sampleTotal(sourceNode, time);
+			var id:int = node.id;
+			if (!(id in unique)) {
+				return 0;
+			}
+			
+			return AggregateCollection(unique[id]).sampleTotal(time);
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample source rate
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Sample source rate
+		 * 
+		 * @param time
+		 */ 
+		public function sampleSourceRate(time:uint):int
+		{
+			if (!sourceNode) {
+				return 0;
+			}
+			
+			return sampleRate(sourceNode, time);
+		}		
 		
 		/**
 		 * Samplerate
@@ -160,25 +245,39 @@ package com.bienvisto.elements.sequences
 			
 			return rate;
 		}
+
+		
+		//--------------------------------------------------------------------------
+		//
+		// Sample seq num
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
-		 * Sample source rate
-		 * 
+		 * Sample source last seq num
+		 *   
 		 * @param time
-		 */ 
-		public function sampleSourceRate(time:uint):int
+		 */
+		public function sampleSourceLastSeqNum(time:uint):int
 		{
-			return sampleRate(sourceNode, time);
+			if (!sourceNode) {
+				return -1;
+			}
+			
+			return sampleLastSeqNum(sourceNode, time);
 		}
 		
 		/**
-		 * Sample dest  
-		 */
-		public function sampleSourcelastSeqNum(time:uint):int
+		 * Sample last seq num
+		 * 
+		 * @param node 
+		 * @param time
+		 */ 
+		public function sampleLastSeqNum(node:Node, time:uint):int
 		{
-			var id:int = sourceNode ? sourceNode.id : -1;
+			var id:int = node.id;
 			if (!(id in collections)) {
-				return -1;	
+				return -1;
 			}
 			
 			var item:Sequence = Sequence(SequencesCollection(collections[id]).findNearest(time));
@@ -194,27 +293,6 @@ package com.bienvisto.elements.sequences
 		{
 			return Sequence(map[seqNum]);
 		}
-		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */
-		public function setDuration(duration:uint):void
-		{
-			
-		}
-
 		
 	}
 }

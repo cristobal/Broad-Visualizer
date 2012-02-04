@@ -155,6 +155,42 @@ package com.bienvisto.core.aggregate
 		}
 		
 		/**
+		 * Sample items as array
+		 * 
+		 * @param time
+		 * @param windowSize
+		 */ 
+		public function sampleItemsAsArray(time:uint, windowSize:uint):Array
+		{
+			var samples:Array = [];
+			if (time > 0) {
+				
+				var startTime:Number = time - windowSize;
+				if (startTime < 0) {
+					startTime = 0;
+				}
+				
+				var key:int = findNearestKey(time);	
+				var sample:Aggregate;
+				for (var i:int = key + 1; i--;) {
+					sample = _items[i];
+					if (sample.time < startTime) {
+						break;
+					}
+					
+					// add only if inside window
+					if (sample.time > time) {
+						continue;
+					}
+					
+					samples.push(sample);
+				}
+			}
+			
+			return samples;
+		}
+		
+		/**
 		 * Sample total
 		 * 
 		 * @param time

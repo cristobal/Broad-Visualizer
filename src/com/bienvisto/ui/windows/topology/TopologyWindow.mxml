@@ -2,13 +2,13 @@
 <topology:TopologyWindowContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 								  xmlns:s="library://ns.adobe.com/flex/spark" 
 								  xmlns:mx="library://ns.adobe.com/flex/mx" 
-								  xmlns:topology="com.bienvisto.ui.topology.*" 
-								  xmlns:node="com.bienvisto.ui.node.*"
+								  xmlns:topology="com.bienvisto.ui.windows.topology.*" 
+								  xmlns:node="com.bienvisto.ui.windows.node.*"
 								  width="500" height="500">
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
-		@namespace node "com.bienvisto.ui.node.*";
+		@namespace topology "com.bienvisto.ui.windows.topology.*";
 		.label{
 			fontSize: 12px;
 		}
