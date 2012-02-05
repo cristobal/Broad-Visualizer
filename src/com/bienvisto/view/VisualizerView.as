@@ -2,6 +2,7 @@ package com.bienvisto.view
 {
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.view.components.MiniMapView;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.ViewComponent;
 	import com.bienvisto.view.drawing.IDrawingManager;
@@ -10,6 +11,7 @@ package com.bienvisto.view
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
 	import flash.utils.Timer;
@@ -17,8 +19,13 @@ package com.bienvisto.view
 	
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
+	import mx.effects.Tween;
 	
 	import spark.components.Group;
+	import spark.effects.Animate;
+	import spark.effects.animation.MotionPath;
+	import spark.effects.animation.SimpleMotionPath;
+	import spark.effects.easing.EaseInOutBase;
 	
 	/**
 	 * VisualizerView.as
@@ -147,6 +154,28 @@ package com.bienvisto.view
 			}
 		}
 
+		//--------------------------------------------------------------------------
+		//
+		//  Mini map view
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var miniMapView:ViewComponent;
+		
+		
+		/**
+		 * Set loader view
+		 * 
+		 * @param view
+		 */ 
+		public function setMiniMapView(view:ViewComponent):void
+		{
+			miniMapView = view;
+		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -232,7 +261,7 @@ package com.bienvisto.view
 			dragTimer = new Timer(dragTimerDelay, 1);
 			dragTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleDragTimerComplete);
 			
-			
+			addEventListener(MouseEvent.CLICK, handleMouseClick);
 			addEventListener(MouseEvent.MOUSE_DOWN, handleMouseDown);
 			addEventListener(MouseEvent.MOUSE_UP, handleMouseUp);
 			addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
@@ -245,6 +274,83 @@ package com.bienvisto.view
 				Mouse.cursor = MouseCursor.HAND;
 				isDragging = true;
 			}
+		}
+		
+		/**
+		 * Handle mouse click
+		 * 
+		 * @param event
+		 */ 
+		private function handleMouseClick(event:MouseEvent):void
+		{
+			if (miniMapView && !miniMapView.visible) {
+				return;
+			}
+			
+	
+				
+			var sx:Number  = event.stageX;
+			var sy:Number  = event.stageY;
+			
+			var w:Number   = miniMapView.width;
+			var h:Number   = miniMapView.height;
+			
+			var dx:Number  = miniMapView.x;
+			var dx2:Number = dx + w;
+			var dy:Number  = miniMapView.y;
+			var dy2:Number = dy + h;
+			if (sx > dx && sx < dx2 && sy > dy && sy < dy2) {
+				var rect:Rectangle = MiniMapView(miniMapView).displacedRect;
+				if (rect && rect.width > 0 && rect.height > 0) {
+					
+					// TODO: Tune Pan to
+					
+					var aw:Number = rect.width;
+					var ah:Number = rect.height;
+						
+					var tx:Number = (sx - dx);
+					var ty:Number = (sy - dy);
+					
+					tx *= aw / w;
+					ty *= ah / h;
+					
+					var cx:Number = draggableView.x;
+					var cy:Number = draggableView.y;
+					
+					var pw:Number = parent.width;
+					var ph:Number = parent.height;
+					var px:Number = pw / 2;
+					var py:Number = ph / 4;
+					
+					var animate:Animate = new Animate(draggableView);
+					var easer:EaseInOutBase = new EaseInOutBase();
+					animate.easer = easer;
+					
+					var nx:Number;
+					if (tx > cx || tx > px) {
+						nx = -tx + px;
+					}
+					else {
+						nx = tx  + px;
+					}
+/*					var ny:Number;
+					if (ty > cy || ty > py) {
+						ny = ty + py;
+					}
+					else {
+						ny = -ty + py;
+					}
+					*/
+					animate.motionPaths = Vector.<MotionPath>([
+						new SimpleMotionPath("x", cx, nx)
+						// new SimpleMotionPath("y", cy, ny)
+					]);
+					
+					animate.play();
+					trace("cx:", cx, "tx:", tx);
+				}
+			}
+			
 		}
 		
 		/**

@@ -1,5 +1,7 @@
 package com.bienvisto.view.components
 {
+	import flash.events.Event;
+	
 	import mx.core.UIComponent;
 	
 	/**
@@ -11,6 +13,7 @@ package com.bienvisto.view.components
 	 */ 
 	public class ViewComponent extends UIComponent
 	{
+		
 		public function ViewComponent()
 		{
 			super();

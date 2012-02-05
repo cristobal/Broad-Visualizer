@@ -79,6 +79,7 @@
 			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="15" paddingLeft="5" />
 		</s:layout>
 		<s:CheckBox id="gridCheckbox" label="Grid" />
+		<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
 		<s:CheckBox id="statsCheckbox" label="Stats" />
 	</s:Group>
 	

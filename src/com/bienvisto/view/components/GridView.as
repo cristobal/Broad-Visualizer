@@ -1,5 +1,7 @@
 package com.bienvisto.view.components
 {
+	import com.bienvisto.util.sprintf;
+	
 	import flash.events.Event;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
@@ -10,6 +12,8 @@ package com.bienvisto.view.components
 	
 	import spark.components.Application;
 
+	[Event(name="change", type="flash.events.Event")];
+	
 	/**
 	 * GridView.as
 	 * 	View component that manages the grid.
@@ -18,6 +22,7 @@ package com.bienvisto.view.components
 	 */ 
 	public final class GridView extends ViewComponent
 	{
+		
 		/**
 		 * @private
 		 */ 
@@ -60,11 +65,36 @@ package com.bienvisto.view.components
 		private var textFormat:TextFormat;
 		
 		/**
+		 * @private
+		 */ 
+		private var _totalVerticalBoxes:Number = 0;
+		
+		/**
+		 * @readonly totalThickLines
+		 */ 
+		public function get totalVerticalBoxes():Number
+		{
+			return _totalVerticalBoxes;
+		}
+		
+		/**
+		 * @private
+		 */ 
+		private var _verticalLineYPos:Number = 0;
+		
+		/**
+		 * @readonly verticalSpace
+		 */ 
+		public function get verticalLineYPos():Number
+		{
+			return _verticalLineYPos;
+		}
+		
+		/**
 		 * Setup
 		 */ 
 		private function setup():void
 		{
-			draw();
 			stage.addEventListener(Event.RESIZE, handleResize);	
 			
 			textFormat = new TextFormat("DejaVuSansDF3", 11, scaleColor, true);
@@ -80,6 +110,7 @@ package com.bienvisto.view.components
 			textField.backgroundColor = 0xFF00FF;
 			textField.background = false;
 			addChild(textField);
+			
 			draw();
 		}
 		
@@ -129,10 +160,11 @@ package com.bienvisto.view.components
 			*/
 			
 			graphics.clear();
-			
+			_totalVerticalBoxes = 0;
 			// draw horizontal lines
 			for (var y:int = -1, pos:int = -1; y < h; y += spacing, pos++) {
 				if (pos % 5 == 0) {
+					_totalVerticalBoxes++;
 					graphics.lineStyle(1, thickLineColor, 0.65);
 				}
 				else {
@@ -165,6 +197,7 @@ package com.bienvisto.view.components
 			if ((h - y) < (bottomSpacing + (spacing / 2))) {
 				y -= spacing;
 			}
+			_verticalLineYPos = y;
 			
 			graphics.lineStyle(2, scaleColor);
 			graphics.moveTo(x, y);
@@ -179,10 +212,12 @@ package com.bienvisto.view.components
 			
 			if (textField) {
 				var meters:int = int(100 * scale);
-				textField.text = [meters, "meters"].join(" ");
+				textField.text = sprintf("%d meters", meters);
 				textField.setTextFormat(textFormat);
 				textField.y    = y - 15;
 			}
+			
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		/**

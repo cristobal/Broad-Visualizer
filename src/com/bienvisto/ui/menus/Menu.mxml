@@ -102,7 +102,7 @@
 			 */ 
 			private function invalidate():void
 			{
-				var index:int = 1;
+				var index:int = 0;
 				if (sequencesButton.visible) {
 					buttons.addElementAt(sequencesButton, index++);
 				}
@@ -144,7 +144,6 @@
 			<s:layout>
 				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
 			</s:layout>
-			<s:Button id="debugButton" label="Debug" />
 			<s:Button id="optionsButton" label="Options" />
 		</s:Group>
 	</s:BorderContainer>

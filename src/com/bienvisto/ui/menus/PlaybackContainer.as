@@ -2,8 +2,6 @@ package com.bienvisto.ui.menus
 {
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.util.sprintf;
-	import com.bienvisto.view.components.GridView;
-	import com.bienvisto.view.components.StatsView;
 	import com.bienvisto.view.components.ViewComponent;
 	
 	import flash.events.Event;
@@ -71,6 +69,12 @@ package com.bienvisto.ui.menus
 		 */ 
 		public var gridCheckbox:CheckBox;
 		
+		
+		/**
+		 * @public
+		 */ 
+		public var miniMapCheckbox:CheckBox;
+		
 		/**
 		 * @public
 		 */ 
@@ -96,11 +100,16 @@ package com.bienvisto.ui.menus
 		 * @protected
 		 */ 
 		protected var gridView:ViewComponent;
+
+		/**
+		 * @protected
+		 */ 
+		protected var miniMapView:ViewComponent;
 		
 		/**
 		 * @protected
 		 */ 
-		protected var statsView:StatsView;
+		protected var statsView:ViewComponent;
 		
 		/**
 		 * @readonly buffering
@@ -144,13 +153,35 @@ package com.bienvisto.ui.menus
 				}
 			}
 		}
+
+		/**
+		 * Set mini map view
+		 * 
+		 * @param miniMapView
+		 */ 
+		public function setMiniMapView(miniMapView:ViewComponent):void
+		{
+			this.miniMapView = miniMapView;
+			invalidateMiniMapView();
+		}
+		
+		/**
+		 * Invalidate stats
+		 */ 
+		protected function invalidateMiniMapView():void
+		{
+			trace("invalidateMiniMapView");
+			if (miniMapView && miniMapCheckbox) {
+				miniMapView.visible = miniMapCheckbox.selected;
+			}
+		}
 		
 		/**
 		 * Set stats view
 		 * 
 		 * @param statsView
 		 */ 
-		public function setStatsView(statsView:StatsView):void
+		public function setStatsView(statsView:ViewComponent):void
 		{
 			this.statsView = statsView;
 			this.statsView.x = 10;
@@ -163,10 +194,11 @@ package com.bienvisto.ui.menus
 		 */ 
 		protected function invalidateStatsView():void
 		{
-			if (statsView) {
+			if (statsView && statsCheckbox) {
 				statsView.visible = statsCheckbox.selected;
 			}
 		}
+		
 		
 		/**
 		 * Set gridview
@@ -177,21 +209,6 @@ package com.bienvisto.ui.menus
 		{
 			this.gridView = view;
 			invalidateGridView();
-		}
-		
-		/**
-		 * @readwrite grid view visible
-		 */ 
-		public function get gridViewVisible():Boolean
-		{
-			return gridView ? gridView.visible : false;
-		}
-		
-		public function set gridViewVisible(value:Boolean):void
-		{
-			if (gridCheckbox) {
-				gridCheckbox.selected = value;
-			}
 		}
 		
 		protected function invalidateGridView():void
@@ -219,6 +236,9 @@ package com.bienvisto.ui.menus
 			
 			if (gridCheckbox) {
 				gridCheckbox.addEventListener(Event.CHANGE, handleGridCheckboxChange);
+			}
+			if (miniMapCheckbox) {
+				miniMapCheckbox.addEventListener(Event.CHANGE, handleMiniMapCheckboxChange);
 			}
 			if (statsCheckbox) {
 				statsCheckbox.addEventListener(Event.CHANGE, handleStatsCheckboxChange);
@@ -308,6 +328,16 @@ package com.bienvisto.ui.menus
 			
 			
 			return sprintf("%02d:%02d:%02d", hours, minutes, value);
+		}
+		
+		/**
+		 * Handle mini map check box change
+		 * 
+		 * @param event
+		 */ 
+		protected function handleMiniMapCheckboxChange(event:Event):void
+		{
+			invalidateMiniMapView();	
 		}
 		
 		/**

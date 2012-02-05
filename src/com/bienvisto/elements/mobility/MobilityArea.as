@@ -40,15 +40,12 @@ package com.bienvisto.elements.mobility
 		override public function update(params:Vector.<String>):uint
 		{
 			// FORMAT: ma x1_area1 x2_area1 y1_area1 y2_area1
-			var x1:Number = Number(params[1]);
-			var x2:Number = Number(params[2]);
-			var y1:Number = Number(params[3]);
-			var y2:Number = Number(params[4]);
+			var x:Number = Number(params[0]);
+			var y:Number = Number(params[1]);
+			var width:Number = Number(params[2]);
+			var height:Number = Number(params[3]);
 			
-			var width:Number = Math.abs(x2 - x1);
-			var height:Number = Math.abs(y2 - y1);
-			
-			_area = new Rectangle(x1, y1, width, height);
+			_area = new Rectangle(x, width, width, height);
 			dispatchEvent(new Event(Event.INIT));
 			
 			return 0;

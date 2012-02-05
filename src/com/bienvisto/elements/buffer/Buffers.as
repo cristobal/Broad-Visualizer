@@ -65,7 +65,7 @@ package com.bienvisto.elements.buffer
 				return null;
 			}
 			
-			return Buffer(BufferCollection(collections[id]).findNearest(time));
+			return Buffer(BufferCollection(collections[id]).findNearest(time));;
 		}
 		
 		/**

@@ -347,7 +347,7 @@ package com.bienvisto.ui.windows.sequences
 							// start point
 							// end point
 							// drawing width
-							var sp:Number = ((start / sent) * length)+ offset; 
+							var sp:Number = ((start / sent) * length) + offset; 
 							var ep:Number = (end / sent) * length;
 							var dw:Number = ep - sp;
 							
@@ -376,19 +376,17 @@ package com.bienvisto.ui.windows.sequences
 				
 				// Left border
 				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-				graphics.drawRect(0, 5, 0, 7);
+				graphics.drawRect(0, 5, 1, 7);
 				graphics.endFill();
 				
 				// Right border	
 				if (perc == 1) {
 					graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-					graphics.drawRect(w - 1, 5, 0, 7);
+					graphics.drawRect(w - 1, 5, 1, 7);
 					graphics.endFill();
 				}
 			}
 			else if (perc == 1) {
-				
-				matrix.createGradientBox(1, 5, (Math.PI / 180) * 90, 0, 0);
 				
 				// fill rect
 				graphics.beginFill(0x3A95DC);
@@ -405,12 +403,12 @@ package com.bienvisto.ui.windows.sequences
 				
 				// Left border
 				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-				graphics.drawRect(0, 5, 0, 7);
+				graphics.drawRect(0, 5, 1, 7);
 				graphics.endFill();
 				
 				// Right border	
 				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-				graphics.drawRect(w - 1, 5, 0, 7);
+				graphics.drawRect(w - 1, 5, 1, 7);
 				graphics.endFill();
 			}
 			

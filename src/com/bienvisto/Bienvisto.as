@@ -31,6 +31,7 @@ package com.bienvisto
 	import com.bienvisto.view.VisualizerView;
 	import com.bienvisto.view.components.GridView;
 	import com.bienvisto.view.components.LoaderView;
+	import com.bienvisto.view.components.MiniMapView;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
 	import com.bienvisto.view.components.StatsView;
@@ -100,7 +101,9 @@ package com.bienvisto
 		private var nodeView:NodeView;
 		private var gridView:GridView;
 		private var statsView:StatsView;
+		private var miniMapView:MiniMapView;
 		private var loaderView:LoaderView;
+		
 		private var nodeIDDrawingManager:NodeDrawingManager;
 		private var mobilityDrawingManager:NodeMobilityDrawingManager;
 		private var transmissionsDrawingManager:NodeTransmissionsDrawingManager;
@@ -164,6 +167,7 @@ package com.bienvisto
 			
 			// Add trace sources
 			parser.addTraceSource(simulation);
+			parser.addTraceSource(mobilityArea);
 			parser.addTraceSource(nodeContainer);
 			parser.addTraceSource(mobility);
 			parser.addTraceSource(transmissions);
@@ -184,7 +188,7 @@ package com.bienvisto
 			// 1. Append nodes
 			view = window.visualizerView;
 			
-			// Add views
+			// 2. Add views
 			gridView = new GridView();
 			view.addViewComponent(gridView);
 			
@@ -192,11 +196,16 @@ package com.bienvisto
 			view.addViewComponent(nodeView);
 			view.setDraggableView(nodeView);
 			
+			statsView = new StatsView();
+			view.addViewComponent(statsView);
+			
+			miniMapView = new MiniMapView(nodeView, gridView, nodeContainer, mobilityArea);
+			view.addViewComponent(miniMapView);
+			view.setMiniMapView(miniMapView);
+			
 			loaderView = new LoaderView();
 			view.setLoaderView(loaderView);
 			
-			statsView = new StatsView();
-			view.addViewComponent(statsView);
 			
 			// 3 Append node drawing managers
 			nodeIDDrawingManager = new NodeIDDrawingManager();
@@ -257,7 +266,7 @@ package com.bienvisto
 			window.playback.addZoomView(nodeView);
 			window.playback.setGridView(gridView);
 			window.playback.setStatsView(statsView);
-			window.playback.gridViewVisible = false;
+			window.playback.setMiniMapView(miniMapView);
 			
 			// window nodeWindows set the trace source components
 			window.nodeWindows.setMobility(mobility);
@@ -278,10 +287,6 @@ package com.bienvisto
 			window.topologyWindows.setTopology(topology);
 			
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
-			
-			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
-				debug();
-			});
 		}
 		
 		/**
@@ -303,32 +308,6 @@ package com.bienvisto
 		{
 			simulation.jumpToTime(elapsed);
 			updateTime();
-		}
-		
-		/**
-		 * Debug
-		 */ 
-		private function debug():void
-		{
-			var graph:Graph = routing.getGlobalGraph(simulation.time);
-			trace("-- Graph ---");
-			trace(graph);
-			
-			var adjacencyMatrix:AdjacencyMatrix = graph.getAdjacencyMatrix();
-			
-			trace("-- AdjacencyMatrix ---");
-			trace(adjacencyMatrix);
-			
-			trace("-- Adjacent Vertices ---");
-			
-			var vertices:Vector.<int> = adjacencyMatrix.vertices;
-			var size:int 			  = adjacencyMatrix.size;
-			var vertex:int;
-			for (var i:int = 0; i < size; i++) {
-				vertex = vertices[i];
-				trace("vertex:", vertex, "adjacent vertices:", adjacencyMatrix.getAdjacentVertices(vertex));
-			}
-			
 		}
 		
 		/**
