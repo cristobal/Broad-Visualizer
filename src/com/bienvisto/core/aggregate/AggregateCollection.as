@@ -246,7 +246,6 @@ package com.bienvisto.core.aggregate
 			return key;
 		}
 		
-		
 		/**
 		 * Find nearest key mid
 		 * 
@@ -283,5 +282,6 @@ package com.bienvisto.core.aggregate
 			
 			return key;
 		}
+		
 	}
 }

@@ -16,7 +16,7 @@ package com.bienvisto.elements.routing
 	
 	import mx.utils.ObjectProxy;
 	
-	[Event(name="change", type="flash.events.Event")]
+	[Event(name="init", type="flash.events.Event")]
 	/**
 	 * Routing.as
 	 * 
@@ -102,7 +102,7 @@ package com.bienvisto.elements.routing
 			);
 			
 			if (!flag) {
-				dispatchEvent(new Event(Event.CHANGE));
+				dispatchEvent(new Event(Event.INIT));
 				flag = true;
 			}
 			

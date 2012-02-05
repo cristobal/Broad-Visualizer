@@ -76,6 +76,11 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
+		private var states:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
 		private var lastTime:uint = 0;
 		
 		
@@ -124,42 +129,54 @@ package com.bienvisto.view.drawing
 			
 			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 				nodeSprite = nodeSprites[i];
+				id    = nodeSprite.node.id;
+				shape = Shape(shapes[id]);
 				
 				packetStats = receptions.samplePacketStats(nodeSprite.node, time, windowSize);
-				if (packetStats) {
-					
-					// If the reception is after the moment visualized, we just return
-					if (time < packetStats.time) {
-						return;
+				if (!packetStats) {
+					if (states[id]) {
+						states[id] = false;
+						shape.graphics.clear();
 					}
-					
-					id = nodeSprite.node.id;
-					if (!(id in shapes)) {
-						shape = new Shape();
-						shape.visible = enabled;
-						nodeSprite.addChildAt(shape, 0);
-						shapes[id] = shape;
-					}
-					else {
-						shape = Shape(shapes[id]);
-					}
-					
-					var cx:Number = nodeSprite.cx;
-					var cy:Number = nodeSprite.cy;
-					var radius:Number = 9 +  0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
-						
-					shape.graphics.clear();
-					
-					shape.graphics.beginFill(highlightColorOther, 0.5);
-					shape.graphics.drawCircle(cx, cy, radius);
-					shape.graphics.endFill();
-						
-					radius =  9 + 0.5 * packetStats.totalOwn;
-						
-					shape.graphics.beginFill(highlightColor);
-					shape.graphics.drawCircle(cx, cy, radius); 
-					shape.graphics.endFill();
+					continue;	
 				}
+				
+				
+				// If the reception is after the moment visualized, we just return
+				if (time > packetStats.time) {
+					if (states[id]) {
+						states[id] = false;
+						shape.graphics.clear();
+					}
+					continue;
+				}
+				
+				
+				if (!shape) {
+					shape = new Shape();
+					shape.visible = enabled;
+					nodeSprite.addChildAt(shape, 0);
+					shapes[id] = shape;
+				}
+				
+				var cx:Number = nodeSprite.cx;
+				var cy:Number = nodeSprite.cy;
+				var radius:Number = 9 +  0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
+				
+				shape.graphics.clear();
+				
+				shape.graphics.beginFill(highlightColorOther, 0.5);
+				shape.graphics.drawCircle(cx, cy, radius);
+				shape.graphics.endFill();
+				
+				radius =  9 + 0.5 * packetStats.totalOwn;
+				
+				shape.graphics.beginFill(highlightColor);
+				shape.graphics.drawCircle(cx, cy, radius); 
+				shape.graphics.endFill();
+				
+				states[id] = true;
+				
 			}
 			
 		}

@@ -9,7 +9,7 @@ package com.bienvisto.elements.sequences
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
-	[Event(name="change", type="flash.events.Event")]
+	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * SequencesSent.as
@@ -94,9 +94,8 @@ package com.bienvisto.elements.sequences
 			if (first) {
 				_sourceNode = parent.nodeContainer.getNode(id);
 				
-				dispatchEvent(new Event(Event.CHANGE));
+				dispatchEvent(new Event(Event.INIT));
 				first = false;
-
 			}
 			
 			return time;

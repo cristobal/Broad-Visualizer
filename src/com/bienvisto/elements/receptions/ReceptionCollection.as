@@ -42,9 +42,11 @@ package com.bienvisto.elements.receptions
 				return PacketStats(cache[key]);
 			}
 			var packetStats:PacketStats = processPacketStats(time, windowSize);
-			cache[key] = packetStats;
+			if (packetStats) {
+				cache[key] = packetStats;
+			}
 			
-			return packetStats
+			return packetStats;
 		}
 		
 		/**
@@ -87,7 +89,7 @@ package com.bienvisto.elements.receptions
 					}
 				}
 				
-				if ((totalOwn +  totalOther) > 0) {
+				if ((totalOwn + totalOther) > 0) {
 					packetStats = new PacketStats(id, _items[key].time, totalOwn, totalOther);
 				}
 			}

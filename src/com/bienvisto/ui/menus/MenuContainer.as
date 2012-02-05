@@ -1,4 +1,4 @@
-package com.bienvisto.ui.menu
+package com.bienvisto.ui.menus
 {
 	import com.bienvisto.view.drawing.NodeDrawingManager;
 	

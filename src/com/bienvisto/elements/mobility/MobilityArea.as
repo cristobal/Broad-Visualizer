@@ -6,7 +6,7 @@ package com.bienvisto.elements.mobility
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	
-	[Event(name="change", type="flash.events.Event")]
+	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * MobilityArea.as
@@ -49,7 +49,7 @@ package com.bienvisto.elements.mobility
 			var height:Number = Math.abs(y2 - y1);
 			
 			_area = new Rectangle(x1, y1, width, height);
-			dispatchEvent(new Event(Event.CHANGE));
+			dispatchEvent(new Event(Event.INIT));
 			
 			return 0;
 		}

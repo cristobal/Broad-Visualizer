@@ -94,6 +94,11 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var dirty:Boolean;
 		
+		/**
+		 * @private
+		 */ 
+		private var states:Dictionary = new Dictionary();
+		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
@@ -172,6 +177,10 @@ package com.bienvisto.view.drawing
 				
 				item = transmissions.findNearest(nodeSprite.node, time);
 				if (!item || time < item.time) {
+					if (states[id]) {
+						states[id] = false;
+						shape.graphics.clear();
+					}
 					continue;
 				}
 				
@@ -186,6 +195,10 @@ package com.bienvisto.view.drawing
 				
 				packets = transmissions.samplePackets(nodeSprite.node, time, windowSizePackets); 
 				if (!packets) {
+					if (states[id]) {
+						states[id] = false;
+						shape.graphics.clear();
+					}
 					continue;
 				}
 				
@@ -204,7 +217,9 @@ package com.bienvisto.view.drawing
 					end	   = new Point(nodeSpriteDest.x + offset, nodeSpriteDest.y + offset);
 					
 					drawArrow(shape, origin, end, offset);
+					states[id] = true;
 				}
+				
 			}	
 			
 		}

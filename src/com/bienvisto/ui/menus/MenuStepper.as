@@ -1,4 +1,4 @@
-package com.bienvisto.ui.menu
+package com.bienvisto.ui.menus
 {
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;

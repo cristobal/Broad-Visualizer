@@ -21,7 +21,6 @@ package com.bienvisto.ui.windows.sequences
 	import spark.components.Label;
 	import spark.components.TitleWindow;
 	
-	
 	/**
 	 * SequencesWindowContainer
 	 * 	This is the code behind controller class for the SequencesWindow.mxml
@@ -35,7 +34,7 @@ package com.bienvisto.ui.windows.sequences
 			super();
 			addEventListener(CloseEvent.CLOSE, handleClose);
 			
-			updateTime = 500; // NodeDrawingManager.DRAW_UPDATE_TIME;
+			clampTimeValue = 500;
 		}
 		
 		/**
@@ -101,7 +100,7 @@ package com.bienvisto.ui.windows.sequences
 		/**
 		 * @private
 		 */ 
-		private var updateTime:uint;
+		private var clampTimeValue:uint;
 		
 		/**
 		 * @private
@@ -179,7 +178,7 @@ package com.bienvisto.ui.windows.sequences
 		{
 			_time = value;
 			
-			elapsed = value - (value % updateTime);
+			elapsed = value - (value % clampTimeValue);
 			// only invalidate around 1/2 second or every 500ms.
 			if (elapsed != lastUpdateTime) {
 				lastUpdateTime = elapsed;
@@ -283,7 +282,7 @@ package com.bienvisto.ui.windows.sequences
 			
 			var component:UIComponent = new UIComponent();
 			var graphics:Graphics     = component.graphics;
-			
+			var matrix:Matrix;
 			var w:int = 378;
 			var h:int = 12;
 			
@@ -298,7 +297,7 @@ package com.bienvisto.ui.windows.sequences
 			graphics.drawRect(1, 1, (w - 2) * perc, 4);
 			graphics.endFill();
 			
-			var matrix:Matrix = new Matrix();
+			matrix = new Matrix();
 			matrix.createGradientBox(1, 5, (Math.PI / 180) * 90, 0, 0);
 			
 			// Left border
@@ -372,6 +371,9 @@ package com.bienvisto.ui.windows.sequences
 					lastSeqNum = seqNum;
 				}
 				
+				matrix = new Matrix();
+				matrix.createGradientBox(1, 7, (Math.PI / 180) * 90, 0, 0);
+				
 				// Left border
 				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
 				graphics.drawRect(0, 5, 0, 7);
@@ -383,6 +385,33 @@ package com.bienvisto.ui.windows.sequences
 					graphics.drawRect(w - 1, 5, 0, 7);
 					graphics.endFill();
 				}
+			}
+			else if (perc == 1) {
+				
+				matrix.createGradientBox(1, 5, (Math.PI / 180) * 90, 0, 0);
+				
+				// fill rect
+				graphics.beginFill(0x3A95DC);
+				graphics.drawRect(1, 5, w - 2, 6);
+				graphics.endFill();
+				
+				// bottom border
+				graphics.beginFill(0x3178B1);
+				graphics.drawRect(0, 11, w, 1);
+				graphics.endFill();
+				
+				matrix = new Matrix();
+				matrix.createGradientBox(1, 7, (Math.PI / 180) * 90, 0, 0);
+				
+				// Left border
+				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
+				graphics.drawRect(0, 5, 0, 7);
+				graphics.endFill();
+				
+				// Right border	
+				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
+				graphics.drawRect(w - 1, 5, 0, 7);
+				graphics.endFill();
 			}
 			
 			if (progressBarContent) {

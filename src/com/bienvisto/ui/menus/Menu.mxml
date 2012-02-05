@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu:MenuContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<menus:MenuContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					xmlns:s="library://ns.adobe.com/flex/spark" 
 					xmlns:mx="library://ns.adobe.com/flex/mx" 
-					xmlns:menu="com.bienvisto.ui.menu.*" creationComplete="initComponent(event)">
+					xmlns:menus="com.bienvisto.ui.menus.*" creationComplete="initComponent(event)">
 	<fx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
@@ -148,4 +148,4 @@
 			<s:Button id="optionsButton" label="Options" />
 		</s:Group>
 	</s:BorderContainer>
-</menu:MenuContainer>
+</menus:MenuContainer>

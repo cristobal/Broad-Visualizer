@@ -7,7 +7,7 @@
 			   scriptTimeLimit="60"
 			   width="100%"
 			   height="100%"
-			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.windows.node.*" xmlns:sequences="com.bienvisto.ui.windows.sequences.*" xmlns:components="com.bienvisto.ui.components.*" xmlns:menu="com.bienvisto.ui.menu.*">
+			   creationComplete="initApp()" enterFrame="enterFrame(event)" xmlns:node="com.bienvisto.UIComponents.node.*" xmlns:node1="com.bienvisto.ui.windows.node.*" xmlns:sequences="com.bienvisto.ui.windows.sequences.*" xmlns:components="com.bienvisto.ui.components.*" xmlns:menus="com.bienvisto.ui.menus.*">
 	
 	<s:layout>
 		<s:BasicLayout/>
@@ -28,7 +28,7 @@
 		
 	</fx:Declarations>
 	
-	<menu:Menu id="menu" />
+	<menus:Menu id="menu" />
 	
 	<!--<s:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="left"  />
@@ -86,7 +86,7 @@
 	</s:BorderContainer>
 	
 	<!-- Playback menu -->
-	<menu:Playback id="playback" height="50" bottom="0" />
+	<menus:Playback id="playback" height="50" bottom="0" />
 	
 	<!-- Old Menu -->
 	<s:BorderContainer id="oldMenu" visible="false" width="100%" bottom="{-LOG_HEIGHT}"

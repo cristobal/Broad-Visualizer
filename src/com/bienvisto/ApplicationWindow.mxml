@@ -2,16 +2,18 @@
 <s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
-		 xmlns:menu="com.bienvisto.ui.menu.*" 
+		 xmlns:menus="com.bienvisto.ui.menus.*" 
 		 xmlns:view="com.bienvisto.view.*" 
 		 xmlns:node="com.bienvisto.ui.windows.node.*"
+		 xmlns:topology="com.bienvisto.ui.windows.topology.*" 
+		 xmlns:sequences="com.bienvisto.ui.windows.sequences.*"
 		 width="100%" height="100%"
-		 creationComplete="initComponent(event)" xmlns:topology="com.bienvisto.ui.windows.topology.*" xmlns:sequences="com.bienvisto.ui.windows.sequences.*">
+		 creationComplete="initComponent(event)">
 	
 	<fx:Script>
 		<![CDATA[
 			import com.bienvisto.core.events.TimedEvent;
-			import com.bienvisto.ui.menu.ProgressTimeSlider;
+			import com.bienvisto.ui.menus.ProgressTimeSlider;
 			
 			import flash.utils.getTimer;
 			
@@ -56,7 +58,6 @@
 				menu.addEventListener(Menu.SEQUENCES_CLICK, handleSequencesButtonClick);
 				menu.addEventListener(Menu.LOCAL_TOPOLOGY_CLICK, handleLocalTopologyButtonClick);
 				menu.addEventListener(Menu.TOPOLOGY_CLICK, handleTopologyButtonClick);
-				
 			}
 			
 			/**
@@ -170,17 +171,6 @@
 			{
 				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 				stage.addEventListener(Event.RESIZE, handleResize);
-				
-				var tt:int = getTimer();
-				var frames:int = 0;
-				stage.addEventListener(Event.ENTER_FRAME, function(event:Event):void{
-					frames++;
-					if ((getTimer() - tt) >= 1000) {
-						playback.fps.text = "fps: " + frames;
-						tt = getTimer();
-						frames = 0;
-					}
-				});
 			}
 			
 			/**
@@ -230,16 +220,16 @@
 	<view:VisualizerView id="visualizerView" />
 	
 	<!-- Top Menu -->
-	<menu:Menu id="menu" top="0" width="100%" height="60"  />	
+	<menus:Menu id="menu" top="0" width="100%" height="60"  />	
 
 	<!-- Playback Controller -->
-	<menu:Playback id="playback" bottom="0" width="100%" height="50" />
+	<menus:Playback id="playback" bottom="0" width="100%" height="50" />
 	
 	<!-- TopologyWindow -->
 	<topology:TopologyWindows id="topologyWindows" right="10" top="40" />
 	
 	<!-- SequencesWindow -->
-	<sequences:SequencesWindow id="sequencesWindow" left="10" bottom="60" />
+	<sequences:SequencesWindow id="sequencesWindow" left="10" bottom="60" visible="false" />
 	
 	<!-- Node windows -->
 	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />

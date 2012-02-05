@@ -58,6 +58,11 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
+		private var states:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
 		private var lastTime:uint = 0;
 	
 		
@@ -101,48 +106,39 @@ package com.bienvisto.view.drawing
 		{
 			if (time != lastTime) {
 				
-				var nodeSprite:NodeSprite, shape:Shape, buffer:Buffer, size:Number;		
+				var nodeSprite:NodeSprite,  id:int; 
+				var shape:Shape, buffer:Buffer, size:Number;		
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
 					buffer = buffers.findBuffer(nodeSprite.node, time);
-					shape  = getShape(nodeSprite);
-					shape.graphics.clear();
+					shape  = Shape(shapes[id]);
 					
 					if (!buffer || time < buffer.time) {	
+						if (states[id]) {
+							states[id] = false;
+							shape.graphics.clear();
+						}
 						continue;
+					}
+					
+					if (!shape) {
+						shape = new Shape();
+						shape.x = nodeSprite.cx;
+						shape.y = nodeSprite.cy;
+						nodeSprite.addChild(shape);
+						shapes[id] = shape;
 					}
 					
 					size = buffer.size;
 					if (size > 0) {
 						shape.graphics.lineStyle(5, fillColor);
 						shape.graphics.lineTo(0, -(size / 100));
+						states[id] = true;
 					}
 				}
 				
 				lastTime = time;
 			}
-		}
-		
-		/**
-		 * Get shape
-		 * 
-		 * @param id
-		 * @param nodeSprite
-		 */ 
-		private function getShape(nodeSprite:NodeSprite):Shape
-		{
-			var id:int = nodeSprite.node.id;
-			if (id in shapes) {
-				return Shape(shapes[id]);
-			}
-			
-			var shape:Shape = new Shape();
-			shape.x = nodeSprite.cx;
-			shape.y = nodeSprite.cy;
-			nodeSprite.addChild(shape);
-			shapes[id] = shape;
-			
-			return shape;
 		}
 		
 	}

@@ -1,8 +1,9 @@
-package com.bienvisto.ui.menu
+package com.bienvisto.ui.menus
 {
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.util.sprintf;
 	import com.bienvisto.view.components.GridView;
+	import com.bienvisto.view.components.StatsView;
 	import com.bienvisto.view.components.ViewComponent;
 	
 	import flash.events.Event;
@@ -73,6 +74,12 @@ package com.bienvisto.ui.menu
 		/**
 		 * @public
 		 */ 
+		public var statsCheckbox:CheckBox;
+		
+		
+		/**
+		 * @public
+		 */ 
 		public var zoomLevel:NumericStepper;
 		
 		/**
@@ -85,11 +92,15 @@ package com.bienvisto.ui.menu
 		 */ 
 		protected var zoomViews:Vector.<ViewComponent> = new Vector.<ViewComponent>();
 		
-		
 		/**
 		 * @protected
 		 */ 
 		protected var gridView:ViewComponent;
+		
+		/**
+		 * @protected
+		 */ 
+		protected var statsView:StatsView;
 		
 		/**
 		 * @readonly buffering
@@ -111,7 +122,7 @@ package com.bienvisto.ui.menu
 		public function addZoomView(view:ViewComponent):void
 		{
 			zoomViews.push(view);
-			invalidate();
+			invalidateGridView();
 		}
 		
 		/**
@@ -135,6 +146,29 @@ package com.bienvisto.ui.menu
 		}
 		
 		/**
+		 * Set stats view
+		 * 
+		 * @param statsView
+		 */ 
+		public function setStatsView(statsView:StatsView):void
+		{
+			this.statsView = statsView;
+			this.statsView.x = 10;
+			this.statsView.y = 40;
+			invalidateStatsView();
+		}
+		
+		/**
+		 * Invalidate stats
+		 */ 
+		protected function invalidateStatsView():void
+		{
+			if (statsView) {
+				statsView.visible = statsCheckbox.selected;
+			}
+		}
+		
+		/**
 		 * Set gridview
 		 * 
 		 * @param view
@@ -142,7 +176,7 @@ package com.bienvisto.ui.menu
 		public function setGridView(view:ViewComponent):void
 		{
 			this.gridView = view;
-			invalidate();
+			invalidateGridView();
 		}
 		
 		/**
@@ -160,7 +194,7 @@ package com.bienvisto.ui.menu
 			}
 		}
 		
-		protected function invalidate():void
+		protected function invalidateGridView():void
 		{
 			if (gridView && gridCheckbox) {
 				gridView.visible = gridCheckbox.selected;
@@ -182,14 +216,15 @@ package com.bienvisto.ui.menu
 		 */ 
 		protected function initComponents():void
 		{
+			
 			if (gridCheckbox) {
-				gridCheckbox.addEventListener(Event.CHANGE, handleGridCheckboxChange, false, 0, true);
+				gridCheckbox.addEventListener(Event.CHANGE, handleGridCheckboxChange);
+			}
+			if (statsCheckbox) {
+				statsCheckbox.addEventListener(Event.CHANGE, handleStatsCheckboxChange);
 			}
 			if (zoomLevel) {
-				zoomLevel.addEventListener(Event.CHANGE, handleZoomLevelChange, false, 0, true);
-			}
-			if (playbackSpeed) {
-				// playbackSpeed.incrementButton.addEventListener(MouseEvent.CLICK, handlePlaybackSpeedIncrement, false, int.MAX_VALUE, true);
+				zoomLevel.addEventListener(Event.CHANGE, handleZoomLevelChange);
 			}
 		}
 		
@@ -282,7 +317,17 @@ package com.bienvisto.ui.menu
 		 */ 
 		protected function handleGridCheckboxChange(event:Event):void
 		{
-			invalidate();
+			invalidateGridView();
+		}
+		
+		/**
+		 * Handle stats checkbox change
+		 * 
+		 * @param event
+		 */ 
+		protected function handleStatsCheckboxChange(event:Event):void
+		{
+			invalidateStatsView();
 		}
 		
 		/**
@@ -292,7 +337,7 @@ package com.bienvisto.ui.menu
 		 */ 
 		protected function handleZoomLevelChange(event:Event):void
 		{
-			invalidate();
+			invalidateGridView();
 		}
 		
 		/**

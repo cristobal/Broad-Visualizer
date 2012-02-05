@@ -10,7 +10,7 @@ package com.bienvisto.elements.sequences
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
-	[Event(name="change", type="flash.events.Event")]
+	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * SequecesRecv.as
@@ -105,7 +105,7 @@ package com.bienvisto.elements.sequences
 			if (first) {
 				_destNode = parent.nodeContainer.getNode(id);
 				
-				dispatchEvent(new Event(Event.CHANGE));
+				dispatchEvent(new Event(Event.INIT));
 				first = false;
 			}
 			

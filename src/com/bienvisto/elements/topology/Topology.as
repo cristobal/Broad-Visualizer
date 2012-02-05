@@ -9,7 +9,7 @@ package com.bienvisto.elements.topology
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
-	[Event(name="change", type="flash.events.Event")]
+	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * TopologySet.as
@@ -63,7 +63,7 @@ package com.bienvisto.elements.topology
 				collection.add(set);
 			}
 			if (!flag) {
-				dispatchEvent(new Event(Event.CHANGE));
+				dispatchEvent(new Event(Event.INIT));
 				flag = true;
 			}
 			

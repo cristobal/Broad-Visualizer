@@ -25,14 +25,15 @@ package com.bienvisto
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
-	import com.bienvisto.ui.menu.Playback;
-	import com.bienvisto.ui.menu.PlaybackContainer;
-	import com.bienvisto.ui.menu.ProgressTimeSlider;
+	import com.bienvisto.ui.menus.Playback;
+	import com.bienvisto.ui.menus.PlaybackContainer;
+	import com.bienvisto.ui.menus.ProgressTimeSlider;
 	import com.bienvisto.view.VisualizerView;
 	import com.bienvisto.view.components.GridView;
 	import com.bienvisto.view.components.LoaderView;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
+	import com.bienvisto.view.components.StatsView;
 	import com.bienvisto.view.drawing.NodeBuffersDrawingManager;
 	import com.bienvisto.view.drawing.NodeDrawingManager;
 	import com.bienvisto.view.drawing.NodeDropsDrawingManager;
@@ -72,7 +73,7 @@ package com.bienvisto
 			bindWindow(window);
 			
 			this.app 	= app;
-			this.app.frameRate = 30; // 30fps
+			// this.app.frameRate = 30; // 30fps
 			this.window = window; 
 		}
 		
@@ -98,6 +99,7 @@ package com.bienvisto
 	
 		private var nodeView:NodeView;
 		private var gridView:GridView;
+		private var statsView:StatsView;
 		private var loaderView:LoaderView;
 		private var nodeIDDrawingManager:NodeDrawingManager;
 		private var mobilityDrawingManager:NodeMobilityDrawingManager;
@@ -136,9 +138,10 @@ package com.bienvisto
 			sequencesContainer = new SequencesContainer(nodeContainer);
 
 			// Listen to simulation object first change
-			mobilityArea.addEventListener(Event.CHANGE, handleMobilityAreaChange);
-			routing.addEventListener(Event.CHANGE, handleRoutingChange);
-			topology.addEventListener(Event.CHANGE, handleTopologyChange);
+			mobilityArea.addEventListener(Event.INIT, handleMobilityAreaInit);
+			routing.addEventListener(Event.INIT, handleRoutingInit);
+			topology.addEventListener(Event.INIT, handleTopologyInit);
+			sequencesContainer.sent.addEventListener(Event.INIT, handleSequencesInit);
 			
 			// Add simulation objects			
 			simulation.addSimulationObject(nodeContainer);
@@ -182,17 +185,18 @@ package com.bienvisto
 			view = window.visualizerView;
 			
 			// Add views
-			// 2. The grid
-			// 3. The nodes
 			gridView = new GridView();
 			view.addViewComponent(gridView);
-			
-			loaderView = new LoaderView();
-			view.setLoaderView(loaderView);
 			
 			nodeView = new NodeView(nodeContainer)
 			view.addViewComponent(nodeView);
 			view.setDraggableView(nodeView);
+			
+			loaderView = new LoaderView();
+			view.setLoaderView(loaderView);
+			
+			statsView = new StatsView();
+			view.addViewComponent(statsView);
 			
 			// 3 Append node drawing managers
 			nodeIDDrawingManager = new NodeIDDrawingManager();
@@ -224,7 +228,9 @@ package com.bienvisto
 		 */ 
 		private function bindWindow(window:ApplicationWindow):void
 		{
+			window.playback.menu.enabled = false;
 			window.menu.browseFileButton.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
+			
 			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
 			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
 			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
@@ -250,6 +256,7 @@ package com.bienvisto
 			window.playback.addZoomView(gridView);
 			window.playback.addZoomView(nodeView);
 			window.playback.setGridView(gridView);
+			window.playback.setStatsView(statsView);
 			window.playback.gridViewVisible = false;
 			
 			// window nodeWindows set the trace source components
@@ -360,34 +367,43 @@ package com.bienvisto
 		}
 		
 		/**
-		 * Handle mobility area change
+		 * Handle mobility area init
 		 * 
 		 * @param event
 		 */
-		private function handleMobilityAreaChange(event:Event):void
+		private function handleMobilityAreaInit(event:Event):void
 		{
 			
 		}
 		
 		/**
-		 * Handle routing change
+		 * Handle routing init
 		 * 
 		 * @param event
 		 */ 
-		private function handleRoutingChange(event:Event):void
+		private function handleRoutingInit(event:Event):void
 		{
 			window.setTopologyEnabled(true); // enable global topology trough routing
 		}
 		
 		/**
-		 * Handle topology change
+		 * Handle topology init
 		 * 
 		 * @param event
 		 */ 
-		private function handleTopologyChange(event:Event):void
+		private function handleTopologyInit(event:Event):void
 		{
-			window.setLocalTopologyEnabled(true);
-			// window.setTopologyEnabled(true); // enable topology
+			window.setLocalTopologyEnabled(true); 
+		}
+		
+		/**
+		 * Handle sequences init
+		 * 
+		 * @param event
+		 */ 
+		private function handleSequencesInit(event:Event):void
+		{
+			window.setSequencesEnabled(true);
 		}
 		
 		/**
@@ -397,6 +413,7 @@ package com.bienvisto
 		 */ 
 		private function handleSimulationReady(event:Event):void
 		{
+			window.playback.menu.enabled = true;
 			window.playback.setDuration(
 				simulation.duration
 			);

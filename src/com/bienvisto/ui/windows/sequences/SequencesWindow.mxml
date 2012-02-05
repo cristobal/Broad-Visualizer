@@ -50,10 +50,7 @@
 
 	<s:Group id="progressGroup" x="10" y="165">
 		<s:Label styleName="label" id="percLabel" text="–" />
-		<!-- <s:Label x="110" y="152" text="0" fontSize="14" id="percRecv"/> -->
-		
+		<!-- Progressbar component(s) are added automaticall to this group by the Parent Class Container-->
 	</s:Group>
-	
-
 </sequences:SequencesWindowContainer>
 	
