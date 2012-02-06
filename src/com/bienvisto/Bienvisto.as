@@ -34,6 +34,7 @@ package com.bienvisto
 	import com.bienvisto.view.components.MiniMapView;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
+	import com.bienvisto.view.components.PerimeterView;
 	import com.bienvisto.view.components.StatsView;
 	import com.bienvisto.view.drawing.NodeBuffersDrawingManager;
 	import com.bienvisto.view.drawing.NodeDrawingManager;
@@ -102,6 +103,7 @@ package com.bienvisto
 		private var gridView:GridView;
 		private var statsView:StatsView;
 		private var miniMapView:MiniMapView;
+		private var perimeterView:PerimeterView;
 		private var loaderView:LoaderView;
 		
 		private var nodeIDDrawingManager:NodeDrawingManager;
@@ -203,6 +205,8 @@ package com.bienvisto
 			view.addViewComponent(miniMapView);
 			view.setMiniMapView(miniMapView);
 			
+			perimeterView = new PerimeterView(nodeView, mobilityArea);
+			
 			loaderView = new LoaderView();
 			view.setLoaderView(loaderView);
 			
@@ -266,6 +270,7 @@ package com.bienvisto
 			window.playback.setGridView(gridView);
 			window.playback.setStatsView(statsView);
 			window.playback.setMiniMapView(miniMapView);
+			window.playback.setPerimeterView(perimeterView);
 			
 			// window nodeWindows set the trace source components
 			window.nodeWindows.setMobility(mobility);
@@ -284,20 +289,9 @@ package com.bienvisto
 			window.topologyWindows.setNodeContainer(nodeContainer);
 			window.topologyWindows.setRouting(routing);
 			window.topologyWindows.setTopology(topology);
+			window.topologyWindows.setNodeView(nodeView);
 			
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
-			
-			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
-				debug();
-			});
-		}
-		
-		/**
-		 * Debug
-		 */ 
-		private function debug():void
-		{
-			
 		}
 		
 		/**
@@ -363,7 +357,7 @@ package com.bienvisto
 		 */
 		private function handleMobilityAreaInit(event:Event):void
 		{
-			
+			window.setPerimeterViewEnabled(true);	
 		}
 		
 		/**

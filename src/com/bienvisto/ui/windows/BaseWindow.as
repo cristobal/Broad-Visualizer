@@ -23,6 +23,14 @@ package com.bienvisto.ui.windows
 		}
 		
 		/**
+		 * Toggle
+		 */ 
+		public function toggle():void
+		{
+			visible = !visible;
+		}
+		
+		/**
 		 * On close
 		 */ 
 		protected function onClose():void

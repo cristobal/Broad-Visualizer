@@ -566,7 +566,7 @@ package com.bienvisto.elements.routing
 				entry = entries[i];
 				dest  = entry.destination;
 				
-				route 			= new SimpleRoute(from, dest, entry.next, entry.distance);
+				route 			= new SimpleRoute(from, dest, (entry.distance == 1 ? -1 : entry.next), entry.distance);
 				route.paths     = resolvePaths(from, entry, lut);
 				route.traceback = tracebackPath(from, entry, lut);
 					

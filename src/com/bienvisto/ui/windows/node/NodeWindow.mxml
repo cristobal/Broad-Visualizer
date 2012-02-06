@@ -98,10 +98,12 @@
 						sortableColumns="true">
 				<s:columns>
 					<s:ArrayList>
-						<s:GridColumn sortable="true" width="50" dataField="destination" headerText="D." ></s:GridColumn>
-						<s:GridColumn sortable="true" width="50" dataField="distance" headerText="Hc."></s:GridColumn>
-						<s:GridColumn sortable="false" width="50" dataField="complete" headerText="C."></s:GridColumn>
-						<s:GridColumn sortable="false" width="50" dataField="traceback" headerText="Tb."></s:GridColumn>
+						<s:GridColumn sortable="true" width="40" dataField="destination" headerText="D." ></s:GridColumn>
+						<s:GridColumn sortable="false" width="40" dataField="next" headerText="N."></s:GridColumn>
+						<s:GridColumn sortable="true" width="40" dataField="distance" headerText="Hc."></s:GridColumn>
+						<s:GridColumn sortable="false" width="40" dataField="realDistance" headerText="Rc."></s:GridColumn>
+						<s:GridColumn sortable="false" width="40" dataField="complete" headerText="C."></s:GridColumn>
+						<s:GridColumn sortable="false" width="40" dataField="traceback" headerText="Tb."></s:GridColumn>
 						<s:GridColumn sortable="false" dataField="paths" headerText="Paths"></s:GridColumn>
 					</s:ArrayList>
 				</s:columns>

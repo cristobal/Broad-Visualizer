@@ -76,10 +76,14 @@ package com.bienvisto.ui.menus
 		public var miniMapCheckbox:CheckBox;
 		
 		/**
+		 * @public 
+		 */ 
+		public var perimeterCheckbox:CheckBox;
+		
+		/**
 		 * @public
 		 */ 
 		public var statsCheckbox:CheckBox;
-		
 		
 		/**
 		 * @public
@@ -105,6 +109,11 @@ package com.bienvisto.ui.menus
 		 * @protected
 		 */ 
 		protected var miniMapView:ViewComponent;
+		
+		/**
+		 * @protected
+		 */ 
+		protected var perimeterView:ViewComponent;
 		
 		/**
 		 * @protected
@@ -166,13 +175,33 @@ package com.bienvisto.ui.menus
 		}
 		
 		/**
-		 * Invalidate stats
+		 * Invalidate mini map
 		 */ 
 		protected function invalidateMiniMapView():void
 		{
-			trace("invalidateMiniMapView");
 			if (miniMapView && miniMapCheckbox) {
 				miniMapView.visible = miniMapCheckbox.selected;
+			}
+		}
+		
+		/**
+		 * Set perimeter view
+		 * 
+		 * @param perimeterView
+		 */ 
+		public function setPerimeterView(perimeterView:ViewComponent):void
+		{
+			this.perimeterView = perimeterView;
+			invalidatePerimeterView();
+		}
+		
+		/**
+		 * Invalidate perimeter
+		 */ 
+		protected function invalidatePerimeterView():void
+		{
+			if (perimeterView && perimeterCheckbox) {
+				perimeterView.visible = perimeterCheckbox.selected;
 			}
 		}
 		
@@ -239,6 +268,9 @@ package com.bienvisto.ui.menus
 			}
 			if (miniMapCheckbox) {
 				miniMapCheckbox.addEventListener(Event.CHANGE, handleMiniMapCheckboxChange);
+			}
+			if (perimeterCheckbox) {
+				perimeterCheckbox.addEventListener(Event.CHANGE, handlePerimeterCheckboxChange);
 			}
 			if (statsCheckbox) {
 				statsCheckbox.addEventListener(Event.CHANGE, handleStatsCheckboxChange);
@@ -338,6 +370,16 @@ package com.bienvisto.ui.menus
 		protected function handleMiniMapCheckboxChange(event:Event):void
 		{
 			invalidateMiniMapView();	
+		}
+		
+		/**
+		 * Handle perimeter check box change
+		 * 
+		 * @param event
+		 */ 
+		protected function handlePerimeterCheckboxChange(event:Event):void
+		{
+			invalidatePerimeterView();
 		}
 		
 		/**

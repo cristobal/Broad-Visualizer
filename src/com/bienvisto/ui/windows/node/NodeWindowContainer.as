@@ -867,7 +867,15 @@ package com.bienvisto.ui.windows.node
 					item = {};
 
 					item.destination = route.destination;
+					item.next		 = "-";
+					if (route.next > 0) {
+						item.next = route.next;
+					}
 					item.distance 	 = route.distance;
+					item.realDistance = "-";
+					if (route.complete && (route.length != route.distance)) {
+						item.realDistance = route.length;
+					}
 					item.paths       = parsePaths(route.paths);
 					item.complete    = route.complete;
 					item.traceback   = route.traceback;
@@ -889,6 +897,8 @@ package com.bienvisto.ui.windows.node
 							item = dataProvider.getItemAt(j);
 							if (item.destination == oitem.destination) {
 								if ((item.distance != oitem.distance) ||
+									(item.realDistance  != oitem.realDistance)     ||
+									(item.next     != oitem.next)     ||
 									(item.paths    != oitem.paths)    ||
 									(item.complete != oitem.complete) ||
 									(item.traceback != oitem.traceback)) {

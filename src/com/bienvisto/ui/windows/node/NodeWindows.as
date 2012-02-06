@@ -73,12 +73,12 @@ package com.bienvisto.ui.windows.node
 		private function setup():void
 		{
 			window = new NodeWindow();
-			window.visible = true;
+			window.x = -(window.width + 10);
+			window.visible = false;
 			window.addEventListener(CloseEvent.CLOSE, handleWindowClose);
 			addElement(window);
 			
 			window2 = new NodeWindow();
-			window2.x = -(window.width + 10);
 			window2.visible = false;
 			window2.addEventListener(CloseEvent.CLOSE, handleWindowClose);
 			addElement(window2);
@@ -100,61 +100,50 @@ package com.bienvisto.ui.windows.node
 				storeWindowSettings(window2.selectedNode, window2.getSettings());
 			}
 			
-			if (nodeView.selectedNodeSprite && nodeView.selectedNodeSprite2) {
-				setWindowsRTL();
-			}
-			else {
-				setWindowsLTR();
+			if (!nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2 && (window.selectedNode || window2.selectedNode)) {
+				if (window.selectedNode) {
+					window.setSelectedNode(null);
+				}
+				if (window2.selectedNode) {
+					window2.setSelectedNode(null);
+				}
+				return;
 			}
 			
 			var settings:Object;
 			
-			// set first window
-			if (!window.selectedNode && !window2.selectedNode && nodeView.selectedNodeSprite) {
+			// set first node
+			if (!window.selectedNode && !window2.selectedNode) {
 				settings = getWindowSettings(nodeView.selectedNodeSprite);
 				if (!settings) {
 					settings = window.getDefaultSettings();
 				}
-				window.setSelectedNode(nodeView.selectedNodeSprite, settings); 
+				window.setSelectedNode(nodeView.selectedNodeSprite, settings);
 			}
-			
-			// swap first window
-			else if (window.selectedNode && nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2) {
-				settings = getWindowSettings(nodeView.selectedNodeSprite);
+			// 
+			else if (nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2) {
+				if (window.selectedNode && (window.selectedNode.node.id == nodeView.selectedNodeSprite.node.id)) {
+					window2.setSelectedNode(null);
+				}
+				else {
+					window.setSelectedNode(null);
+				}
+			}
+			else if (nodeView.selectedNodeSprite && nodeView.selectedNodeSprite2) {
+				settings = getWindowSettings(nodeView.selectedNodeSprite2);
 				if (!settings) {
 					settings = window.getDefaultSettings();
 				}
-				window.setSelectedNode(nodeView.selectedNodeSprite, settings); 
-				window2.setSelectedNode(null);	
-			}
-			
-			// hide first window
-			else if (window.selectedNode && !window2.selectedNode && !nodeView.selectedNodeSprite) {
-				window.setSelectedNode(null); // hide first window
-			}
-			
-			// set second window
-			else if (window.selectedNode && !window2.selectedNode && nodeView.selectedNodeSprite2) {
-				settings = getWindowSettings(nodeView.selectedNodeSprite2);
-				if (!settings) {
-					settings = window2.getDefaultSettings();
+				
+				
+				if (window.selectedNode && (window.selectedNode.node.id == nodeView.selectedNodeSprite.node.id)) {
+					window2.setSelectedNode(nodeView.selectedNodeSprite2, settings);
 				}
-				window2.setSelectedNode(nodeView.selectedNodeSprite2);
-			}
-			
-			// swap second window
-			else if  (window.selectedNode && window2.selectedNode && nodeView.selectedNodeSprite2) {
-				settings = getWindowSettings(nodeView.selectedNodeSprite2);
-				if (!settings) {
-					settings = window2.getDefaultSettings();
+				else {
+					window.setSelectedNode(nodeView.selectedNodeSprite2, settings);
 				}
-				window2.setSelectedNode(nodeView.selectedNodeSprite2);
 			}
-			
-			// hide second window
-			else if (window.selectedNode && window2.selectedNode && nodeView.selectedNodeSprite && !nodeView.selectedNodeSprite2) {
-				window2.setSelectedNode(null);
-			}
+
 		}
 		
 		/**
@@ -304,28 +293,6 @@ package com.bienvisto.ui.windows.node
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
-		//--------------------------------------------------------------------------
-		//
-		// Windows ui 
-		//
-		//-------------------------------------------------------------------------		
-		/**
-		 * Set windows right to left
-		 */ 
-		private function setWindowsRTL():void
-		{
-			window.x  = -(window.width + 10);
-			window2.x = 0; 
-		}
-		
-		/**
-		 * Set windows left to right
-		 */ 
-		private function setWindowsLTR():void
-		{
-			window.x = 0;
-			window2.x = -(window2.width + 10);
-		}
 		
 		//--------------------------------------------------------------------------
 		//
@@ -352,8 +319,6 @@ package com.bienvisto.ui.windows.node
 		private function handleNodeSpriteSelected(event:NodeSpriteEvent):void
 		{
 			updateSelectedWindows();
-			// var nodeSprite:NodeSprite = event.nodeSprite;
-			// window.setSelectedNode(event.nodeSprite);
 		}
 		
 		/**

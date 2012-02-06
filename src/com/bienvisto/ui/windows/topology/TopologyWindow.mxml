@@ -21,14 +21,6 @@
 			fontSize: 10px;
 		}
 	</fx:Style>
-	<fx:Script>
-		<![CDATA[
-			public function toggle():void
-			{
-				visible = !visible;
-			}
-		]]>
-	</fx:Script>
 	<topology:controlBarLayout>
 		<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" />
 	</topology:controlBarLayout>

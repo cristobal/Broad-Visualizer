@@ -4,8 +4,10 @@ package com.bienvisto.core
 	
 	import flash.events.Event;
 	import flash.events.TimerEvent;
+	import flash.system.System;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	
 	/**
@@ -413,11 +415,20 @@ package com.bienvisto.core
 			if (stop) {
 				updateTime = 0;
 				dispatchEvent(new Event(COMPLETE));
+				setTimeout(gc, 10);
 			}
 			else {
 				updateTime = getTimer();
 			}
 			
+		}
+		
+		/**
+		 * Request for gc
+		 */ 
+		private function gc():void
+		{
+			System.gc(); // Garbage collect at this point
 		}
 
 	}

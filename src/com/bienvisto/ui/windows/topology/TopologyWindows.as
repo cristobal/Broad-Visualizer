@@ -1,8 +1,11 @@
 package com.bienvisto.ui.windows.topology
 {
+	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
+	import com.bienvisto.view.components.NodeView;
+	import com.bienvisto.view.events.NodeSpriteEvent;
 	
 	import mx.events.CloseEvent;
 	
@@ -38,6 +41,10 @@ package com.bienvisto.ui.windows.topology
 		 */ 
 		public var globalTopologyWindow:TopologyWindow;
 		
+		/**
+		 * @private
+		 */ 
+		private var nodeView:NodeView;
 		
 		
 		//--------------------------------------------------------------------------
@@ -63,6 +70,22 @@ package com.bienvisto.ui.windows.topology
 			globalTopologyWindow.title = "Global Topology";
 			globalTopologyWindow.visible = false;
 			addElement(globalTopologyWindow);
+		}
+		
+		/**
+		 * Update topology windows
+		 */ 
+		private function updateTopologyWindows():void
+		{
+			var from:Node = nodeView.selectedNodeSprite ? nodeView.selectedNodeSprite.node : null;
+			var to:Node   = nodeView.selectedNodeSprite2 ? nodeView.selectedNodeSprite2.node : null;
+			if (localTopologyWindow.visible && !localTopologyWindow.userDefined) {
+				localTopologyWindow.setSelectedNodes(from, to);
+			}
+			
+			if (globalTopologyWindow.visible && !globalTopologyWindow.userDefined) {
+				globalTopologyWindow.setSelectedNodes(from, to);
+			}
 		}
 		
 		/**
@@ -106,6 +129,34 @@ package com.bienvisto.ui.windows.topology
 		{
 			localTopologyWindow.setTopology(topology);
 		}
+		
+		/**
+		 * Set node view
+		 * 
+		 * @param view
+		 */ 
+		public function setNodeView(view:NodeView):void
+		{
+			nodeView = view;
+			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
+		}
+		
+		//--------------------------------------------------------------------------
+		//
+		// Events
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Handle node sprite selected
+		 * 
+		 * @param event
+		 */ 
+		private function handleNodeSpriteSelected(event:NodeSpriteEvent):void
+		{
+			updateTopologyWindows();
+		}
+		
 		
 	}
 }

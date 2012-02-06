@@ -139,7 +139,7 @@ package com.bienvisto.ui.windows.sequences
 		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
 			this.sequencesContainer = sequencesContainer;
-			this.sequencesContainer.recv.addEventListener(Event.INIT, handleSourceInit);
+			this.sequencesContainer.sent.addEventListener(Event.INIT, handleSourceInit);
 			this.sequencesContainer.recv.addEventListener(Event.INIT, handleDestInit);
 		}
 		
@@ -194,14 +194,6 @@ package com.bienvisto.ui.windows.sequences
 			super.setup();
 			updateSources();
 			update();
-		}
-		
-		/**
-		 * Toggle
-		 */ 
-		public function toggle():void
-		{
-			visible = !visible;
 		}
 		
 		/**
@@ -260,7 +252,7 @@ package com.bienvisto.ui.windows.sequences
 			
 			
 			var perc:Number = (recv / unique);
-			percLabel.text = sprintf("%d of %d sequences (%d %%)", recv, unique, int(perc * 100));
+			percLabel.text = sprintf("%d of %d sequences (%d %%)", recv, unique, int(Math.floor(perc * 100)));
 			updateProgress(unique, recv, perc, sequencesContainer.recv.sampleDestRecv(elapsed, true));
 		}
 		
@@ -323,7 +315,32 @@ package com.bienvisto.ui.windows.sequences
 			}
 			
 			/* -- Draw as sequences bar -- */
-			if (sequences && sequences.length > 0) {
+			if (perc == 1) {
+				
+				// fill rect
+				graphics.beginFill(0x3A95DC);
+				graphics.drawRect(1, 5, w - 2, 6);
+				graphics.endFill();
+				
+				// bottom border
+				graphics.beginFill(0x3178B1);
+				graphics.drawRect(0, 11, w, 1);
+				graphics.endFill();
+				
+				matrix = new Matrix();
+				matrix.createGradientBox(1, 7, (Math.PI / 180) * 90, 0, 0);
+				
+				// Left border
+				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
+				graphics.drawRect(0, 5, 1, 7);
+				graphics.endFill();
+				
+				// Right border	
+				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
+				graphics.drawRect(w - 1, 5, 1, 7);
+				graphics.endFill();
+			}
+			else if (sequences && sequences.length > 0) {
 				var color:uint = 0x3A95DC;
 				
 				var length:Number = w - 2;
@@ -395,31 +412,6 @@ package com.bienvisto.ui.windows.sequences
 					graphics.drawRect(w - 1, 5, 1, 7);
 					graphics.endFill();
 				}
-			}
-			else if (perc == 1) {
-				
-				// fill rect
-				graphics.beginFill(0x3A95DC);
-				graphics.drawRect(1, 5, w - 2, 6);
-				graphics.endFill();
-				
-				// bottom border
-				graphics.beginFill(0x3178B1);
-				graphics.drawRect(0, 11, w, 1);
-				graphics.endFill();
-				
-				matrix = new Matrix();
-				matrix.createGradientBox(1, 7, (Math.PI / 180) * 90, 0, 0);
-				
-				// Left border
-				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-				graphics.drawRect(0, 5, 1, 7);
-				graphics.endFill();
-				
-				// Right border	
-				graphics.beginGradientFill(GradientType.LINEAR, [0x3078B0, 0x3178B1], [1,1], [0x00, 0xFF], matrix, SpreadMethod.REPEAT);
-				graphics.drawRect(w - 1, 5, 1, 7);
-				graphics.endFill();
 			}
 			
 			if (progressBarContent) {

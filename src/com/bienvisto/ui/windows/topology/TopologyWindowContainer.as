@@ -7,8 +7,8 @@ package com.bienvisto.ui.windows.topology
 	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
+	import com.bienvisto.ui.windows.BaseWindow;
 	import com.bienvisto.ui.windows.node.AdjacencyMatrixGroup;
-	import com.bienvisto.view.drawing.NodeDrawingManager;
 	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -20,7 +20,6 @@ package com.bienvisto.ui.windows.topology
 	
 	import spark.components.DropDownList;
 	import spark.components.Label;
-	import spark.components.TitleWindow;
 	import spark.events.IndexChangeEvent;
 	
 	/**
@@ -29,7 +28,7 @@ package com.bienvisto.ui.windows.topology
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public class TopologyWindowContainer extends TitleWindow
+	public class TopologyWindowContainer extends BaseWindow
 	{
 
 		/**
@@ -45,11 +44,6 @@ package com.bienvisto.ui.windows.topology
 		public function TopologyWindowContainer()
 		{
 			super();
-			
-			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			addEventListener(CloseEvent.CLOSE, handleClose);
-			
-			updateTime = NodeDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
 		/**
@@ -60,7 +54,7 @@ package com.bienvisto.ui.windows.topology
 		/**
 		 * @private
 		 */ 
-		private var updateTime:uint;
+		private var sampleTime:uint = 500;
 		
 		/**
 		 * @private
@@ -80,7 +74,7 @@ package com.bienvisto.ui.windows.topology
 		/**
 		 * @private
 		 */ 
-		private var elapsed:uint = 0;
+		private var elapsed:Number = -1;
 		
 		/**
 		 * @private
@@ -100,8 +94,32 @@ package com.bienvisto.ui.windows.topology
 		/**
 		 * @private
 		 */ 
+		private var nodeFrom:Node;
+		
+		/**
+		 * @private
+		 */ 
+		private var nodeTo:Node;
+		
+		/**
+		 * @private
+		 */ 
 		private var needsInvalidation:Boolean;
-		7
+		
+		/**
+		 * @private
+		 */ 
+		private var _userDefined:Boolean = false;
+		
+		
+		/**
+		 * @public
+		 */ 
+		public function get userDefined():Boolean
+		{
+			return _userDefined;
+		}
+		
 		/**
 		 * @override
 		 */ 
@@ -188,13 +206,10 @@ package com.bienvisto.ui.windows.topology
 		public function setTime(value:uint):void
 		{
 			_time = value;
-			if (elapsed != time) {
-				elapsed = time;
-				
-				// only update around 1/3 second or every 300ms.
-				if ((time % updateTime) == 0) { 
-					invalidate();
-				}
+			value = value - (value % sampleTime); // update every half second
+			if (elapsed != value) {
+				elapsed = value;
+				invalidate();
 			}
 		}
 		
@@ -221,12 +236,74 @@ package com.bienvisto.ui.windows.topology
 		}
 		
 		/**
-		 * Setup
+		 * @override
 		 */ 
-		private function setup():void
+		override protected function setup():void
 		{
+			super.setup();
+			
 			dropDownListFrom.addEventListener(IndexChangeEvent.CHANGE, handleDropDownListChange);
 			dropDownListTo.addEventListener(IndexChangeEvent.CHANGE, handleDropDownListChange);
+		}
+		
+		/**
+		 * Set selected nodes
+		 * 
+		 * @param from
+		 * @param to
+		 */ 
+		public function setSelectedNodes(from:Node, to:Node):void
+		{
+			if (userDefined) {
+				return;
+			}
+			
+			setNodeFrom(from);
+			setNodeTo(to);
+		}
+		
+		/**
+		 * Set node from
+		 * 
+		 * @param from
+		 */ 
+		public function setNodeFrom(node:Node):void
+		{
+			if (userDefined) {
+				return;
+			}
+			
+			setSelectedOnDropdownList(dropDownListFrom, node);
+			nodeFrom = node;		
+			if (node) {
+				from = node.id;
+			}
+			else {
+				from = -1;
+			}
+			_userDefined = false; // restore state
+		}
+		
+		/**
+		 * Set node to
+		 * 
+		 * @param to
+		 */ 
+		public function setNodeTo(node:Node):void
+		{
+			if (userDefined) {
+				return;
+			}
+			
+			setSelectedOnDropdownList(dropDownListTo, node);
+			nodeTo = node;
+			if (node) {
+				to = node.id;
+			}
+			else {
+				to = -1;
+			}
+			_userDefined = false; // restore state
 		}
 		
 		/**
@@ -392,24 +469,28 @@ package com.bienvisto.ui.windows.topology
 		}
 		
 		/**
-		 * Handle creation complete
+		 * Set selected on dropdown list
 		 * 
-		 * @param event
+		 * @param list
+		 * @param node
 		 */ 
-		private function handleCreationComplete(event:FlexEvent):void
+		private function setSelectedOnDropdownList(dropDownList:DropDownList, node:Node):void
 		{
-			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			setup();
-		}
-		
-		/**
-		 * Handle close
-		 * 
-		 * @param event
-		 */ 
-		private function handleClose(event:CloseEvent):void
-		{
-			visible = false;
+			var list:ArrayCollection = ArrayCollection(dropDownList.dataProvider);
+			
+			if (!node) {
+				dropDownList.selectedItem = list[0];
+			}
+			else {
+				var item:Object;
+				for (var i:int = 0, l:int = list.length; i < l; i++) {
+					item = list.getItemAt(i);
+					if (item.id == node.id) {
+						dropDownList.selectedItem = item;
+						break;
+					}
+				}
+			}
 		}
 		
 		/**
@@ -445,6 +526,7 @@ package com.bienvisto.ui.windows.topology
 			else {
 				to  = id;
 			}
+			// _userDefined = true; // ucomment if we want user defined
 			setTimeout(update, 10); // call later
 		}
 	

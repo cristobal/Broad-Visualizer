@@ -56,6 +56,21 @@
 				return playButtonState == PAUSE;
 			}
 				
+			/**
+			 * Set perimeter view enabled
+			 */ 
+			public function setPerimeterViewEnabled(value:Boolean):void
+			{
+				if (perimeterCheckbox.visible != value) {
+					if (value) {
+						checkboxes.addElementAt(perimeterCheckbox, checkboxes.numElements - 2);
+					}
+					else {
+						checkboxes.addElementAt(perimeterCheckbox, checkboxes.numElements - 1);
+					}
+					perimeterCheckbox.visible = value;	
+				}
+			}
 			
 			
 			/**
@@ -74,13 +89,14 @@
 			
 		]]>
 	</fx:Script>
-	<s:Group width="20%" height="50" top="0">
+	<s:Group id="checkboxes" width="20%" height="50" top="0">
 		<s:layout>
 			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="15" paddingLeft="5" />
 		</s:layout>
 		<s:CheckBox id="gridCheckbox" label="Grid" />
 		<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
-		<s:CheckBox id="statsCheckbox" label="Stats" />
+		<s:CheckBox id="statsCheckbox" label="Hi-res Stats" />
+		<s:CheckBox id="perimeterCheckbox" label="Perimeter" visible="false" />
 	</s:Group>
 	
 	<s:Group id="menu" width="100%" height="50" top="0" left="20%">

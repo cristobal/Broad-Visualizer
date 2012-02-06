@@ -143,11 +143,9 @@ package com.bienvisto.elements.topology
 			}
 			
 			var tuples:Vector.<TopologyTuple> = parseTuples(params.splice(2, params.length - 2));
-			if (tuples.length) {
-				AggregateCollection(collections[id]).add(
-					new TopologySet(time, tuples)
-				);
-			}
+			AggregateCollection(collections[id]).add(
+				new TopologySet(time, tuples)
+			);
 			
 			if (!init) {
 				dispatchEvent(new Event(Event.INIT));

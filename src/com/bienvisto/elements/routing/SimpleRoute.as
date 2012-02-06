@@ -77,6 +77,14 @@ package com.bienvisto.elements.routing
 		}
 		
 		/**
+		 * @readonly
+		 */ 
+		public function get length():int
+		{
+			return _paths ? _paths.length - 1 : 0;
+		}
+		
+		/**
 		 * To string
 		 */ 
 		override public function toString():String 

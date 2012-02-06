@@ -109,6 +109,46 @@ package com.bienvisto.elements.sequences
 		
 		//--------------------------------------------------------------------------
 		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			unique      = new Dictionary();
+			map		    = new Dictionary();
+			
+			complete = false;
+			init     = false;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
 		//  Override TraceSource Methods
 		//
 		//--------------------------------------------------------------------------
@@ -147,51 +187,11 @@ package com.bienvisto.elements.sequences
 			
 			if (!init) {
 				_sourceNode = parent.nodeContainer.getNode(id);
-				
 				dispatchEvent(new Event(Event.INIT));
 				init = true;
 			}
 			
 			return time;
-		}
-
-		//--------------------------------------------------------------------------
-		//
-		//  ISimulation Object Implementation
-		//
-		//--------------------------------------------------------------------------
-		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */
-		public function setDuration(duration:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Reset
-		 */ 
-		public function reset():void
-		{
-			collections = new Dictionary();
-			unique      = new Dictionary();
-			map		    = new Dictionary();
-			
-			complete = false;
-			init     = false;
 		}
 		
 		

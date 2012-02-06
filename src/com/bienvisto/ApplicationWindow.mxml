@@ -23,21 +23,6 @@
 			 * @private
 			 */ 	
 			private var resize:Boolean;
-
-			/**
-			 * @private
-			 */ 
-			private var sequencesEnabled:Boolean;
-			
-			/**
-			 * @private
-			 */ 
-			private var topologyEnabled:Boolean;
-			
-			/**
-			 * @private
-			 */ 
-			private var localTopologyEnabled:Boolean;
 			
 			/**
 			 * Init component
@@ -81,7 +66,6 @@
 			public function setSequencesEnabled(value:Boolean):void
 			{
 				menu.setSequencesEnabled(value);
-				sequencesEnabled = value;
 			}
 			
 			/**
@@ -92,17 +76,28 @@
 			public function setTopologyEnabled(value:Boolean):void
 			{
 				menu.setTopologyEnabled(value);
-				topologyEnabled = value;
 			}
 			
 			/**
+			 * Set local topolgy enabled
 			 * 
+			 * @param value
 			 */ 
 			public function setLocalTopologyEnabled(value:Boolean):void
 			{
 				menu.setLocalTopologyEnabled(value);
-				localTopologyEnabled = value;
 			}
+			
+			/**
+			 * Set perimeter view enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setPerimeterViewEnabled(value:Boolean):void
+			{
+				playback.setPerimeterViewEnabled(value);
+			}
+			
 			
 			/**
 			 * @override
@@ -229,7 +224,7 @@
 	<topology:TopologyWindows id="topologyWindows" right="10" top="40" />
 	
 	<!-- SequencesWindow -->
-	<sequences:SequencesWindow id="sequencesWindow" left="10" bottom="60" visible="false" />
+	<sequences:SequencesWindow id="sequencesWindow" right="10" bottom="400" visible="false" />
 	
 	<!-- Node windows -->
 	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />
