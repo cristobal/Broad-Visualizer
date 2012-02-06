@@ -52,6 +52,11 @@ package com.bienvisto.ui.menus
 		/**
 		 * @public
 		 */ 
+		public var statsButton:Button;
+		
+		/**
+		 * @public
+		 */ 
 		public var sequencesButton:Button;
 		
 		/**

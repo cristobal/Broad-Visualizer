@@ -14,6 +14,7 @@ package com.bienvisto.ui.windows.node
 	
 	import flash.utils.Dictionary;
 	
+	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	
@@ -24,12 +25,11 @@ package com.bienvisto.ui.windows.node
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public class NodeWindows extends Group
+	public final class NodeWindows
 	{
-		public function NodeWindows()
+		public function NodeWindows(container:Group)
 		{
-			super();
-			setup();
+			setup(container);
 		}
 
 		//--------------------------------------------------------------------------
@@ -70,18 +70,19 @@ package com.bienvisto.ui.windows.node
 		/**
 		 * Setup
 		 */ 
-		private function setup():void
+		private function setup(container:Group):void
 		{
 			window = new NodeWindow();
-			window.x = -(window.width + 10);
+			window.setInitialPosition("", window.width + 20, 60, "");
 			window.visible = false;
 			window.addEventListener(CloseEvent.CLOSE, handleWindowClose);
-			addElement(window);
+			container.addElement(window);
 			
 			window2 = new NodeWindow();
+			window2.setInitialPosition("", 10, 60, "");
 			window2.visible = false;
 			window2.addEventListener(CloseEvent.CLOSE, handleWindowClose);
-			addElement(window2);
+			container.addElement(window2);
 			
 			windowsSettings = new Dictionary();
 		}
@@ -169,6 +170,10 @@ package com.bienvisto.ui.windows.node
 		 */ 
 		private function getWindowSettings(nodeSprite:NodeSprite):Object
 		{
+			if (!nodeSprite) {
+				return null;
+			}
+			
 			var settings:Object;
 			var id:int = nodeSprite.node.id;
 			if (id in windowsSettings) {
@@ -299,17 +304,6 @@ package com.bienvisto.ui.windows.node
 		// Events
 		//
 		//-------------------------------------------------------------------------
-		
-		/**
-		 * Handle creation complete
-		 * 
-		 * @param event
-		 */ 
-		private function handleCreationComplete(event:FlexEvent):void
-		{
-			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			setup();
-		}
 		
 		/**
 		 * Handle node sprite selected

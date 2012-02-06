@@ -194,6 +194,8 @@ package com.bienvisto.ui.windows.sequences
 			super.setup();
 			updateSources();
 			update();
+			
+			resizable = false;
 		}
 		
 		/**

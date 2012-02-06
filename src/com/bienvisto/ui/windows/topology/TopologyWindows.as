@@ -16,12 +16,11 @@ package com.bienvisto.ui.windows.topology
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public class TopologyWindows extends Group
+	public final class TopologyWindows 
 	{
-		public function TopologyWindows()
+		public function TopologyWindows(container:Group)
 		{
-			super();
-			setup();
+			setup(container);
 		}
 		
 		
@@ -56,20 +55,22 @@ package com.bienvisto.ui.windows.topology
 		/**
 		 * Setup
 		 */ 
-		private function setup():void
+		private function setup(container:Group):void
 		{
 			localTopologyWindow = new TopologyWindow();
-			localTopologyWindow.x -= (localTopologyWindow.width + 10);
+			// localTopologyWindow.x -= (localTopologyWindow.width + 10);
+			localTopologyWindow.setInitialPosition(40, localTopologyWindow.width + 20, "", "");
 			localTopologyWindow.title = "Local Topology";
 			localTopologyWindow.visible = false;
 			localTopologyWindow.windowType = TopologyWindowContainer.WINDOW_TYPE_TOPOLOGY;
-			addElement(localTopologyWindow);
+			container.addElement(localTopologyWindow);
 			
 			
 			globalTopologyWindow = new TopologyWindow();
+			globalTopologyWindow.setInitialPosition(40, 10, "", "");
 			globalTopologyWindow.title = "Global Topology";
 			globalTopologyWindow.visible = false;
-			addElement(globalTopologyWindow);
+			container.addElement(globalTopologyWindow);
 		}
 		
 		/**

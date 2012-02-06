@@ -230,13 +230,13 @@ public function timeSliderChanged():void
 public function zoomLevelChanged():void
 {
 	v.zoom = zoomLevel.value / 100.0;
-	grid.scale = v.zoom;
+	// grid.scale = v.zoom;
 }
 
 
 public function updateGrid():void
 {
-	grid.visible = showGridCheckbox.selected;
+	// grid.visible = showGridCheckbox.selected;
 }
 
 /**

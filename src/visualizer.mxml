@@ -45,7 +45,7 @@
 	</s:controlBarContent>-->
 	
 	<s:Group y="0" width="100%" height="100%">
-		<ui:Grid id="grid" visible="false" width="100%" height="100%" />
+		<!-- <ui:Grid id="grid" visible="false" width="100%" height="100%" />-->
 		<core:Visualizer id="v"/>
 	</s:Group>
 	

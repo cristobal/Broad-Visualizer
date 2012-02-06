@@ -14,15 +14,27 @@
 		<![CDATA[
 			import com.bienvisto.core.events.TimedEvent;
 			import com.bienvisto.ui.menus.ProgressTimeSlider;
+			import com.bienvisto.ui.windows.charts.ChartsWindow;
+			import com.bienvisto.ui.windows.node.NodeWindows;
+			import com.bienvisto.ui.windows.sequences.SequencesWindow;
+			import com.bienvisto.ui.windows.topology.TopologyWindows;
 			
 			import flash.utils.getTimer;
 			
+			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			
 			/**
-			 * @private
-			 */ 	
-			private var resize:Boolean;
+			 * ApplicationWindow.mxml
+			 * 
+			 * @author Cristobal Dabed
+			 */			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Initialization
+			//
+			//--------------------------------------------------------------------------
 			
 			/**
 			 * Init component
@@ -31,19 +43,102 @@
 			 */ 
 			private function initComponent(event:FlexEvent):void
 			{
+				initComponents();
+				bindComponents();
+			}
+			
+			/**
+			 * Init components
+			 */ 
+			private function initComponents():void
+			{
+				_nodeWindows = new NodeWindows(this);
+				_topologyWindows = new TopologyWindows(this);
+				
+				// setup sequences window
+				_sequencesWindow = new SequencesWindow();
+				_sequencesWindow.setInitialPosition("", 10, 400, "");
+				_sequencesWindow.visible = false;
+				addElement(_sequencesWindow);
+			}
+			
+			/**
+			 * Bind components
+			 */ 
+			private function bindComponents():void
+			{
 				addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
-
+				
+				// playback events
 				playback.addEventListener(ProgressTimeSlider.CHANGE_START, handleProgressSliderChangeStart);
 				playback.addEventListener(ProgressTimeSlider.CHANGE_END, handleProgressSliderChangeEnd);
-				
-	
 				playback.addEventListener(ProgressTimeSlider.LOAD_START, handleProgressSliderLoadStart);
 				playback.addEventListener(ProgressTimeSlider.LOAD_END, handleProgressSliderLoadEnd);
 				
-				menu.addEventListener(Menu.SEQUENCES_CLICK, handleSequencesButtonClick);
-				menu.addEventListener(Menu.LOCAL_TOPOLOGY_CLICK, handleLocalTopologyButtonClick);
-				menu.addEventListener(Menu.TOPOLOGY_CLICK, handleTopologyButtonClick);
+				// menu events
+				menu.addEventListener(Menu.STATS_CLICK, handleMenuStatsButtonClick);
+				menu.addEventListener(Menu.SEQUENCES_CLICK, handleMenuSequencesButtonClick);
+				menu.addEventListener(Menu.LOCAL_TOPOLOGY_CLICK, handleMenuLocalTopologyButtonClick);
+				menu.addEventListener(Menu.TOPOLOGY_CLICK, handleMenuTopologyButtonClick);
 			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Variables
+			//
+			//--------------------------------------------------------------------------
+			
+			/**
+			 * @private
+			 */ 	
+			private var resize:Boolean;
+			
+			/**
+			 * @private
+			 */ 
+			private var _nodeWindows:NodeWindows;
+			
+			/**
+			 * @readonly nodeWindows
+			 */ 
+			public function get nodeWindows():NodeWindows
+			{
+				return _nodeWindows;
+			}
+			
+			/**
+			 * @private
+			 */ 
+			private var _sequencesWindow:SequencesWindow;
+			
+			/**
+			 * @readonly sequencesWindow
+			 */ 
+			public function get sequencesWindow():SequencesWindow
+			{
+				return _sequencesWindow;
+			}
+			
+			/**
+			 * @private
+			 */ 
+			private var _topologyWindows:TopologyWindows;
+			
+			/**
+			 * @readonly topologyWindows
+			 */ 
+			public function get topologyWindows():TopologyWindows
+			{
+				return _topologyWindows;
+			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Methods
+			//
+			//--------------------------------------------------------------------------
 			
 			/**
 			 * Set time
@@ -52,7 +147,7 @@
 			 */ 
 			public function setTime(time:uint):void
 			{
-				nodeWindows.setTime(time);
+				_nodeWindows.setTime(time);
 				playback.setTime(time);
 				topologyWindows.setTime(time);
 				sequencesWindow.setTime(time);
@@ -118,6 +213,80 @@
 			}
 			
 			/**
+			 * Handle resize
+			 * 
+			 * @param event
+			 */ 
+			private function handleResize(event:Event):void
+			{
+				resize = true;
+				invalidateSize();
+				resize = false;
+			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Charts windows
+			//
+			//--------------------------------------------------------------------------
+			
+			/**
+			 * @private
+			 */ 
+			private var chartsWindows:Vector.<ChartsWindow> = new Vector.<ChartsWindow>();
+			
+			/**
+			 * Add charts window
+			 */ 
+			private function addChartsWindow():void
+			{
+				var window:ChartsWindow = new ChartsWindow();
+				window.x = 10;
+				window.y = 40;
+				window.addEventListener(CloseEvent.CLOSE, handleStatsWindowClose)
+				addElement(window);
+				chartsWindows.push(window);
+			}
+			
+			/**
+			 * Remove charts window
+			 * 
+			 * @param event
+			 */ 
+			private function removeChartsWindow(window:ChartsWindow):void
+			{
+				var item:ChartsWindow;
+				for (var i:int = chartsWindows.length; i--;) {
+					item = chartsWindows[i];
+					if (item == window) {
+						chartsWindows.splice(i, 1);
+						removeElement(window);
+						window = null;
+						break;
+					}
+				}
+			}
+			
+			/**
+			 * Handle stats window close
+			 * 
+			 * @param event
+			 */ 
+			private function handleStatsWindowClose(event:CloseEvent):void
+			{
+				var window:ChartsWindow = ChartsWindow(event.target);
+				removeChartsWindow(window);
+			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Playback progress events
+			//
+			//--------------------------------------------------------------------------
+			
+			/**
 			 * Handle progress slider change start
 			 * 
 			 * @param event
@@ -168,48 +337,54 @@
 				stage.addEventListener(Event.RESIZE, handleResize);
 			}
 			
+			
+			//--------------------------------------------------------------------------
+			//
+			//  Menu Buttons Events
+			//
+			//--------------------------------------------------------------------------
+			
 			/**
-			 * Handle resize
+			 * Handle menu stats button click
 			 * 
 			 * @param event
 			 */ 
-			private function handleResize(event:Event):void
+			private function handleMenuStatsButtonClick(event:Event):void
 			{
-				resize = true;
-				invalidateSize();
-				resize = false;
+				addChartsWindow();
 			}
 			
 			/**
-			 * Handle sequences button click
+			 * Handle menu sequences button click
 			 * 
 			 * @param event
 			 */ 
-			private function handleSequencesButtonClick(event:Event):void
+			private function handleMenuSequencesButtonClick(event:Event):void
 			{
 				sequencesWindow.toggle();
 			}
 			
 			/**
-			 * Handle local topology button click
+			 * Handle menu local topology button click
 			 * 
 			 * @param event
 			 */ 
-			private function handleLocalTopologyButtonClick(event:Event):void
+			private function handleMenuLocalTopologyButtonClick(event:Event):void
 			{
 				topologyWindows.localTopologyWindow.toggle();
 			}
 			
 			/**
-			 * Handle topology button click
+			 * Handle menu topology button click
 			 * 
 			 * @param event
 			 */ 
-			private function handleTopologyButtonClick(event:Event):void
+			private function handleMenuTopologyButtonClick(event:Event):void
 			{
 				// toggle topology window
 				topologyWindows.globalTopologyWindow.toggle();
 			}
+			
 		]]>
 	</fx:Script>
 	<view:VisualizerView id="visualizerView" />
@@ -220,12 +395,4 @@
 	<!-- Playback Controller -->
 	<menus:Playback id="playback" bottom="0" width="100%" height="50" />
 	
-	<!-- TopologyWindow -->
-	<topology:TopologyWindows id="topologyWindows" right="10" top="40" />
-	
-	<!-- SequencesWindow -->
-	<sequences:SequencesWindow id="sequencesWindow" right="10" bottom="400" visible="false" />
-	
-	<!-- Node windows -->
-	<node:NodeWindows id="nodeWindows" right="10" bottom="60" />
 </s:Group>
