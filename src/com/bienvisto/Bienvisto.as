@@ -250,7 +250,6 @@ package com.bienvisto
 			window.playback.addEventListener(ProgressTimeSlider.LOAD_START, handlePlaybackProgressTimerLoadStart);
 			window.playback.addEventListener(ProgressTimeSlider.LOAD_END, handlePlaybackProgressTimerLoadEnd);
 			
-			
 			// window menu add toggeable node drawing managers
 			window.menu.addToggeableNodeDrawingManager(nodeIDDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(buffersDrawingManager);
@@ -287,6 +286,18 @@ package com.bienvisto
 			window.topologyWindows.setTopology(topology);
 			
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
+			
+			window.menu.debugButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
+				debug();
+			});
+		}
+		
+		/**
+		 * Debug
+		 */ 
+		private function debug():void
+		{
+			
 		}
 		
 		/**

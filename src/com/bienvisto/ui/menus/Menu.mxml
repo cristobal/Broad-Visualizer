@@ -102,7 +102,7 @@
 			 */ 
 			private function invalidate():void
 			{
-				var index:int = 0;
+				var index:int = 1;
 				if (sequencesButton.visible) {
 					buttons.addElementAt(sequencesButton, index++);
 				}
@@ -124,7 +124,6 @@
 					buttons.removeElement(topologyButton);
 				}
 				
-				buttons.addElementAt(optionsButton, index);
 			}
 		]]>
 	</fx:Script>
@@ -140,11 +139,16 @@
 		<s:Group left="5" top="2">	
 			<s:Button id="browseFileButton" label="Load file" />		
 		</s:Group>
-		<s:Group id="buttons" right="5" top="2">
+		
+		<s:Group id="buttons" right="85" top="2">
 			<s:layout>
 				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
 			</s:layout>
-			<s:Button id="optionsButton" label="Options" />
+			<s:Button id="debugButton" label="debug" />
+		</s:Group>
+		
+		<s:Group right="5" top="2">
+			<s:Button id="optionsButton" label="Options" />	
 		</s:Group>
 	</s:BorderContainer>
 </menus:MenuContainer>

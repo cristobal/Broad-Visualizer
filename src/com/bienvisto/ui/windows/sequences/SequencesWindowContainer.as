@@ -4,6 +4,7 @@ package com.bienvisto.ui.windows.sequences
 	import com.bienvisto.elements.sequences.SequencesContainer;
 	import com.bienvisto.elements.sequences.SequencesRecv;
 	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.ui.windows.BaseWindow;
 	import com.bienvisto.util.sprintf;
 	
 	import flash.display.GradientType;
@@ -19,7 +20,6 @@ package com.bienvisto.ui.windows.sequences
 	
 	import spark.components.Group;
 	import spark.components.Label;
-	import spark.components.TitleWindow;
 	
 	/**
 	 * SequencesWindowContainer
@@ -27,12 +27,11 @@ package com.bienvisto.ui.windows.sequences
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public class SequencesWindowContainer extends TitleWindow
+	public class SequencesWindowContainer extends BaseWindow
 	{
 		public function SequencesWindowContainer()
 		{
 			super();
-			addEventListener(CloseEvent.CLOSE, handleClose);
 			
 			clampTimeValue = 500;
 		}
@@ -140,8 +139,8 @@ package com.bienvisto.ui.windows.sequences
 		public function setSequencesContainer(sequencesContainer:SequencesContainer):void
 		{
 			this.sequencesContainer = sequencesContainer;
-			this.sequencesContainer.recv.addEventListener(Event.CHANGE, handleSourceChange);
-			this.sequencesContainer.recv.addEventListener(Event.CHANGE, handleDestChange);
+			this.sequencesContainer.recv.addEventListener(Event.INIT, handleSourceInit);
+			this.sequencesContainer.recv.addEventListener(Event.INIT, handleDestInit);
 		}
 		
 		/**
@@ -187,13 +186,14 @@ package com.bienvisto.ui.windows.sequences
 		}
 		
 		/**
-		 * Invalidate
+		 * @override
 		 */ 
-		private function invalidate():void
+		override protected function setup():void
 		{
-			if (visible) {
-				update();
-			}
+
+			super.setup();
+			updateSources();
+			update();
 		}
 		
 		/**
@@ -202,6 +202,16 @@ package com.bienvisto.ui.windows.sequences
 		public function toggle():void
 		{
 			visible = !visible;
+		}
+		
+		/**
+		 * Invalidate
+		 */ 
+		private function invalidate():void
+		{
+			if (visible) {
+				update();
+			}
 		}
 		
 		/**
@@ -472,10 +482,14 @@ package com.bienvisto.ui.windows.sequences
 		 */ 
 		private function updateSources():void
 		{
-			if (sequencesContainer.sent.sourceNode) {
+			if (!sequencesContainer) {
+				return;	
+			}
+			
+			if (sequencesContainer.sent.sourceNode && sourceValue) {
 				sourceValue.text = "#" + String(sequencesContainer.sent.sourceNode.id);
 			}
-			if (sequencesContainer.recv.destNode) {
+			if (sequencesContainer.recv.destNode && destValue) {
 				destValue.text  =  "#" + String(sequencesContainer.recv.destNode.id);
 			}
 		}
@@ -485,7 +499,7 @@ package com.bienvisto.ui.windows.sequences
 		 * 
 		 * @param event
 		 */ 
-		private function handleSourceChange(event:Event):void
+		private function handleSourceInit(event:Event):void
 		{
 			updateSources();
 		}
@@ -495,19 +509,10 @@ package com.bienvisto.ui.windows.sequences
 		 * 
 		 * @param event
 		 */ 
-		private function handleDestChange(event:Event):void
+		private function handleDestInit(event:Event):void
 		{
 			updateSources();
 		}
-
-		/**
-		 * Handle close
-		 * 
-		 * @param event
-		 */ 
-		private function handleClose(event:CloseEvent):void
-		{
-			visible = false;
-		}
+		
 	}
 }
