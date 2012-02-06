@@ -18,6 +18,7 @@ package com.bienvisto.ui.windows.node
 	import com.bienvisto.elements.sequences.SequencesContainer;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
+	import com.bienvisto.ui.windows.BaseWindow;
 	import com.bienvisto.view.components.NodeSprite;
 	import com.bienvisto.view.components.NodeView;
 	import com.bienvisto.view.drawing.NodeDrawingManager;
@@ -47,7 +48,6 @@ package com.bienvisto.ui.windows.node
 	import spark.components.Label;
 	import spark.components.NavigatorContent;
 	import spark.components.RichText;
-	import spark.components.TitleWindow;
 	import spark.components.gridClasses.GridColumn;
 	import spark.components.gridClasses.GridItemRenderer;
 	import spark.events.GridSelectionEvent;
@@ -59,13 +59,11 @@ package com.bienvisto.ui.windows.node
 	 * 
 	 * @author Cristobal Dabed}
 	 */ 
-	public class NodeWindowContainer extends TitleWindow
+	public class NodeWindowContainer extends BaseWindow
 	{
 		public function NodeWindowContainer()
 		{
 			super();
-			bind();	
-			
 			updateTime = NodeDrawingManager.DRAW_UPDATE_TIME;
 		}
 		
@@ -601,10 +599,12 @@ package com.bienvisto.ui.windows.node
 		//-------------------------------------------------------------------------
 		
 		/**
-		 * Setup
+		 * @override
 		 */ 
-		private function setup():void
+		override protected function setup():void
 		{
+			super.setup();
+			
 			compassShape = new UIComponent();
 			compassGroup.addElement(compassShape);
 			
@@ -614,12 +614,15 @@ package com.bienvisto.ui.windows.node
 		}
 		
 		/**
-		 * Bind events
+		 * @override
 		 */ 
-		private function bind():void
+		override protected function onClose():void
 		{
-			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			addEventListener(CloseEvent.CLOSE, handleClose);
+			super.onClose();
+			if (_selectedNode) {
+				_selectedNode.selected = false; // deselect current node
+				_selectedNode = null;
+			}
 		}
 		
 		/**
@@ -1108,31 +1111,6 @@ package com.bienvisto.ui.windows.node
 		// Events
 		//
 		//-------------------------------------------------------------------------
-		
-		/**
-		 * Handle creation complete
-		 * 
-		 * @param event
-		 */ 
-		protected function handleCreationComplete(event:FlexEvent):void
-		{
-			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			setup();
-		}
-		
-		/**
-		 * Handle close
-		 * 
-		 * @param event The close event
-		 */ 
-		protected function handleClose(event:CloseEvent):void 
-		{
-			visible = false;
-			if (_selectedNode) {
-				_selectedNode.selected = false; // deselect current node
-				_selectedNode = null;
-			}
-		}
 		
 		/**
 		 * Handle tab navigator content change 

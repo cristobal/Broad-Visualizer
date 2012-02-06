@@ -1,6 +1,7 @@
 package com.bienvisto.elements.sequences
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
@@ -9,31 +10,90 @@ package com.bienvisto.elements.sequences
 	
 	/**
 	 * SequencesForwarded.as
+	 * 	 Class responsible of parsing "sequences forwarded" from the trace source.
 	 * 
 	 * @author Cristobal Dabed
 	 */
 	public class SequencesForwarded extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param parent
+		 */ 
 		public function SequencesForwarded(parent:SequencesContainer)
 		{
 			super("Sequences Forwarded", "sf");
 			this.parent = parent;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
+		 * 	The parent sequence container
 		 */ 
 		private var parent:SequencesContainer;
 		
 		/**
 		 * @private
+		 * 	A collection of AggregateCollection that store sequences that have been forwaded from a node
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
-		 * @private
+		 * On time update
+		 * 
+		 * @param elapsed
 		 */ 
-		private var map:Dictionary = new Dictionary();
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @override
@@ -47,21 +107,27 @@ package com.bienvisto.elements.sequences
 			var dest:int  = int(params[3]);
 			
 			if (!(id in collections)) {
-				collections[id] = new SequencesCollection();
+				collections[id] = new AggregateCollection();
 			}
 			
 			var sequence:Sequence = new Sequence(time, seqNum);
-			SequencesCollection(collections[id]).add(sequence);
+			AggregateCollection(collections[id]).add(sequence);
 			
-			if (!seqNum in map) {
-				map[seqNum] = sequence;
-			}
+			// Tell the sequences inserted trace source that the sequence has been removed.
+			// Since it has been forwarded from the current node
 			parent.inserted.removeSequence(
 				parent.nodeContainer.getNode(id), sequence
 			);
 			
 			return time;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Sample total
@@ -76,15 +142,8 @@ package com.bienvisto.elements.sequences
 				return 0;
 			}
 			
-			return SequencesCollection(collections[id]).sampleTotal(time);
+			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
-		public function onTimeUpdate(elapsed:uint):void
-		{
-		}
-		
-		public function setDuration(duration:uint):void
-		{
-		}
 	}
 }

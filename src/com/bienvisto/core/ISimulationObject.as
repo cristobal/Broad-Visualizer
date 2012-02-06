@@ -9,5 +9,6 @@ package com.bienvisto.core
 	{
 		function onTimeUpdate(elapsed:uint):void;
 		function setDuration(duration:uint):void;
+		function reset():void;
 	}
 }

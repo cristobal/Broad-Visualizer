@@ -2,20 +2,22 @@ package com.bienvisto.core.aggregate
 {
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
-
-	// TODO: Optimize lookup's
+	
 	/**
 	 * AggregateCollection.as
-	 *  
+	 * 
+	 * @author Miguel Santirso 
 	 * @author Cristobal Dabed
 	 */ 
-	public class AggregateCollection
+	public final class AggregateCollection
 	{
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Constants
 		//
 		//--------------------------------------------------------------------------
+		
 		/**
 		 * @public 
 		 */ 
@@ -36,6 +38,7 @@ package com.bienvisto.core.aggregate
 		 * 	A map of aggregate keys for this collection
 		 */ 
 		protected var keys:Dictionary = new Dictionary();
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -64,6 +67,7 @@ package com.bienvisto.core.aggregate
 		{
 			return _items.length;
 		}
+		
 		
 		//--------------------------------------------------------------------------
 		//

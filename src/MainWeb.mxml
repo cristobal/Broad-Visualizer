@@ -11,8 +11,11 @@
 	<fx:Style source="visualizer.css" />
 	<fx:Script>
 		<![CDATA[
+			import com.bienvisto.ui.windows.BaseWindowSkin;
 			import com.bienvisto.Bienvisto;
-		
+			
+			private var com_bienvisto_ui_windows_BaseWindowSkin_obj:com.bienvisto.ui.windows.BaseWindowSkin;
+			
 			/**
 			 * Init app
 			 */ 

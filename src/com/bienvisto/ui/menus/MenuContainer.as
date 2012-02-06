@@ -151,7 +151,6 @@ package com.bienvisto.ui.menus
 		{
 			var element:CheckBox = CheckBox(event.target);
 			var name:String = element.label;
-			// trace("handle change for name", name);
 			if (name in managers) {
 				var manager:NodeDrawingManager = NodeDrawingManager(managers[name]);
 				manager.enabled = element.selected;

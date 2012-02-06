@@ -347,7 +347,7 @@ package com.bienvisto.view
 					]);
 					
 					animate.play();
-					trace("cx:", cx, "tx:", tx);
+					// trace("cx:", cx, "tx:", tx);
 				}
 			}
 			

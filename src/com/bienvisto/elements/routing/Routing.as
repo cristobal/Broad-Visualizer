@@ -1,6 +1,7 @@
 package com.bienvisto.elements.routing
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
 	import com.bienvisto.elements.network.graph.Edge;
@@ -10,25 +11,35 @@ package com.bienvisto.elements.routing
 	import com.bienvisto.util.fnv;
 	
 	import flash.events.Event;
-	import flash.sampler.Sample;
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;
 	
-	import mx.utils.ObjectProxy;
-	
+	/**
+	 * @Event
+	 * 	The init event will be dispatched when the first routing change has been parsed.
+	 */
 	[Event(name="init", type="flash.events.Event")]
+	
 	/**
 	 * Routing.as
+	 * 	Class responsible of parsing "routing changes" from the trace source.
 	 * 
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
 	 */ 
 	public final class Routing extends TraceSource implements ISimulationObject
 	{
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 */
 		public function Routing(nodeContainer:NodeContainer)
 		{
 			super("Routing", "rc");
-			
 			this.nodeContainer 			  = nodeContainer;
 		}
 		
@@ -77,12 +88,65 @@ package com.bienvisto.elements.routing
 		/**
 		 * @private
 		 */ 
-		private var flag:Boolean = false;
+		private var init:Boolean = false;
 		
 		/**
-		 * Update
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
 		 * 
-		 * @params 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			init     = false;
+			complete = false;
+		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Parsing Methods
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override 
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
+		}
+		
+		/**
+		 * @override
 		 */ 
 		override public function update(params:Vector.<String>):uint
 		{
@@ -94,16 +158,16 @@ package com.bienvisto.elements.routing
 			var node:Node  = nodeContainer.getNode(id);
 			
 			if (!(id in collections)) {
-				collections[id] = new RoutingCollection();
+				collections[id] = new AggregateCollection();
 			}
 			
-			RoutingCollection(collections[id]).add(
+			AggregateCollection(collections[id]).add(
 				new RoutingTable(time, node, entries)
 			);
 			
-			if (!flag) {
+			if (!init) {
 				dispatchEvent(new Event(Event.INIT));
-				flag = true;
+				init = true;
 			}
 			
 			return time;
@@ -139,6 +203,49 @@ package com.bienvisto.elements.routing
 		}
 		
 		
+		/**
+		 * @private
+		 */ 
+		private var lastLUTTime:Number = -1;
+		
+		/**
+		 * @private
+		 */ 
+		private var _tables:Dictionary;
+		
+		/**
+		 * Get lut
+		 * 
+		 * @param time
+		 */ 
+		private function getTables(time:uint):Dictionary
+		{
+			
+			/*			if (lastLUTTime != time) {
+			lastLUTTime = time;	
+			lut = null;
+			}
+			
+			if (!lut) {*/
+			_tables = new Dictionary();
+			var table:RoutingTable;
+			
+			var collection:AggregateCollection;
+			var id:int;
+			var node:Node;
+			var nodes:Vector.<Node> = nodeContainer.nodes;
+			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+				node = nodes[i];
+				id   = node.id;
+				collection = AggregateCollection(collections[id]);
+				table	   = RoutingTable(collection.findNearest(time));
+				_tables[id]	   = table;
+			}
+			//}
+			
+			return _tables;
+		}
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Routes
@@ -152,14 +259,14 @@ package com.bienvisto.elements.routing
 		 */ 
 		public function findSimpleRoutes(time:uint):Vector.<SimpleRoute>
 		{
-			if (time in simpleRoutes) {
+/*			if (time in simpleRoutes) {
 				return Vector.<SimpleRoute>(simpleRoutes[time]);
 			}
 			
 			var routes:Vector.<SimpleRoute> = resolveSimpleRoutes(time);
-			simpleRoutes[time] = routes;
+			simpleRoutes[time] = routes;*/
 			
-			return routes;
+			return resolveSimpleRoutes(time);;
 		}
 		
 		/**
@@ -222,15 +329,19 @@ package com.bienvisto.elements.routing
 		 */ 
 		public function findSimpleRoutesWithNode(time:uint, node:Node):Vector.<SimpleRoute>
 		{
-			var key:String = String(node.id) + "-" + String(time);
+/*			var key:String = String(node.id) + "-" + String(time);
 			if (key in routesWithNode) {
 				return Vector.<SimpleRoute>(routesWithNode[key]);
 			}
 			
 			var routes:Vector.<SimpleRoute> = resolveSimpleRoutesWithNode(time, node);
-			routesWithNode[key]  = routes;
+			if (routes) {
+				routesWithNode[key]  = routes;
+			}
 			
-			return routes;
+			return routes;*/
+			
+			return resolveSimpleRoutesWithNode(time, node);
 		}
 		
 		/**
@@ -242,10 +353,10 @@ package com.bienvisto.elements.routing
 		private function resolveSimpleRoutesWithNode(time:uint, node:Node):Vector.<SimpleRoute>
 		{
 			var from:int      		 = node.id;
-			var lut:Dictionary       = getLUT(time);
+			var tables:Dictionary    = getTables(time);
 			
 			var routes:Vector.<SimpleRoute> = findSimpleRoutes(time).concat();	
-			var table:RoutingTable          = RoutingTable(lut[from]);
+			var table:RoutingTable          = RoutingTable(tables[from]);
 			
 			if (table) {
 				
@@ -292,15 +403,19 @@ package com.bienvisto.elements.routing
 		 */ 
 		public function findCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):SimpleRoute
 		{
-			var key:String = String(nodeFrom.id) + "-" + String(nodeTo.id) + "-" + String(time);
+/*			var key:String = String(nodeFrom.id) + "-" + String(nodeTo.id) + "-" + String(time);
 			if (key in completeRoutes) {
 				return SimpleRoute(completeRoutes[key]);
 			}
 			
 			var	route:SimpleRoute = resolveCompleteRoute(time, nodeFrom, nodeTo, key);
-			completeRoutes[key] = route;
+			if (route) {
+				completeRoutes[key] = route;
+			}
 			
-			return route;
+			return route;*/
+			
+			return resolveCompleteRoute(time, nodeFrom, nodeTo);
 		}
 		
 		/**
@@ -310,12 +425,12 @@ package com.bienvisto.elements.routing
 		 * @param nodeFrom
 		 * @param nodeTo
 		 */ 
-		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node, key:String):SimpleRoute
+		private function resolveCompleteRoute(time:uint, nodeFrom:Node, nodeTo:Node):SimpleRoute
 		{
 			var from:int = nodeFrom.id;
 			var to:int   = nodeTo.id;
 				
-			var lut:Dictionary = getLUT(time);
+			var lut:Dictionary = getTables(time);
 			var table:RoutingTable = RoutingTable(lut[from]);
 			
 			var route:SimpleRoute;
@@ -366,7 +481,7 @@ package com.bienvisto.elements.routing
 				return null;
 			}
 			
-			return RoutingTable(RoutingCollection(collections[id]).findNearest(time));
+			return RoutingTable(AggregateCollection(collections[id]).findNearest(time));
 		}
 		
 		/**
@@ -378,19 +493,19 @@ package com.bienvisto.elements.routing
 		public function resolveTableRoutes(node:Node, time:uint):Vector.<SimpleRoute>
 		{
 			
-			var key:String = String(node.id) + "-" + String(time);
+/*			var key:String = String(node.id) + "-" + String(time);
 			if (key in tableRoutes) {
 				return Vector.<SimpleRoute>(tableRoutes[key]);
 			}
 			var routes:Vector.<SimpleRoute> = resolveRoutes(node, time);
-			tableRoutes[key] = routes;
- 			
-			return routes;
+			if (routes) {
+				tableRoutes[key] = routes;
+			}
+			
+			return routes;*/
+			
+			return resolveRoutes(node, time);
 		}
-		
-		private var pass:int = 0;
-		private var created:int = 0;
-		private var lookup:int = 0;
 		
 		/**
 		 * Resolve table routes
@@ -401,7 +516,7 @@ package com.bienvisto.elements.routing
 		private function resolveRoutes(node:Node, time:uint):Vector.<SimpleRoute>
 		{
 			
-			var lut:Dictionary     = getLUT(time);
+			var lut:Dictionary     = getTables(time);
 			var from:int           = node.id;
 			var table:RoutingTable = RoutingTable(lut[from]);
 			if (!table) {
@@ -557,14 +672,14 @@ package com.bienvisto.elements.routing
 		 */ 
 		public function getGlobalGraph(time:uint):Graph
 		{
-			if (time in graphs) {
+/*			if (time in graphs) {
 				return Graph(graphs[time]);
 			}
 			
 			var	graph:Graph = resolveGlobalGraph(time);
-			graphs[time] = graph;
+			graphs[time] = graph;*/
 			
-			return graph;
+			return resolveGlobalGraph(time);;
 		}
 		
 		/**
@@ -577,7 +692,7 @@ package com.bienvisto.elements.routing
 		{
 
 			var nodes:Vector.<Node> = nodeContainer.nodes;
-			var tables:Dictionary   = getLUT(time);			
+			var tables:Dictionary   = getTables(time);			
 			var table:RoutingTable;
 			
 			var entries:Vector.<RoutingTableEntry>;
@@ -607,13 +722,9 @@ package com.bienvisto.elements.routing
 					}
 				}
 			}
-			
-/*			var key:String = MD5.hash(
-				uids.join("-") 
-			);*/
 			var value:String = uids.join("-");
-			var key:String  = fnv(value);
-			var graph:Graph = Graph(graphs[key]);
+			var key:String   = fnv(value);
+			var graph:Graph  = Graph(graphs[key]);
 			
 			if (!graph) {
 				// Create new graph
@@ -622,16 +733,7 @@ package com.bienvisto.elements.routing
 					edge = edges[i];
 					graph.addEdge(edge.from, edge.to, edge.weight);
 				}
-				graphs[key] = graph; // store referencce
-				vt[key] = value;
-				// trace("new key added:", key, "value:", value);
-			}
-			else {
-				var ovalue:String = String(vt[key]);
-				if (ovalue != value) {
-					trace("houston seems we have a problem:", ovalue, "!=", value);
-				}
-				
+				// graphs[key] = graph; // store referencce
 			}
 			edges = null;
 			
@@ -640,71 +742,6 @@ package com.bienvisto.elements.routing
 			// meaning that storing a reference with a md5 key reduces the amount of graph objects created around ~30-40 
 			
 			return graph;
-		}
-		
-		private var vt:Dictionary = new Dictionary();
-		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */
-		public function setDuration(duration:uint):void
-		{
-			
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var lastLUTTime:Number = -1;
-		
-		/**
-		 * @private
-		 */ 
-		private var lut:Dictionary;
-		
-		/**
-		 * Get lut
-		 * 
-		 * @param time
-		 */ 
-		private function getLUT(time:uint):Dictionary
-		{
-			
-			if (lastLUTTime != time) {
-				lastLUTTime = time;	
-				lut = null;
-			}
-			
-			if (!lut) {
-				lut = new Dictionary();
-				var table:RoutingTable;
-			
-				var collection:RoutingCollection;
-				var id:int;
-				var node:Node;
-				var nodes:Vector.<Node> = nodeContainer.nodes;
-				for (var i:int = 0, l:int = nodes.length; i < l; i++) {
-					node = nodes[i];
-					id   = node.id;
-					collection = RoutingCollection(collections[id]);
-					table	   = RoutingTable(collection.findNearest(time));
-					lut[id]	   = table;
-				}
-			}
-			
-			return lut;
 		}
 		
 	}

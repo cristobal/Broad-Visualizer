@@ -20,44 +20,60 @@ package com.bienvisto.elements.transmissions
 	 */ 
 	public final class Transmissions extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param nodeContainer
+		 */
 		public function Transmissions(nodeContainer:NodeContainer)
 		{
 			super("Mac Transmissions", "mt"); // mac transmissions
-			
 			this.nodeContainer = nodeContainer;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
+		 * 	A references to the node container for all the current nodes  present in the simulation
 		 */ 
 		private var nodeContainer:NodeContainer;
 		
 		/**
 		 * @private  
+		 *  A collection of AggregateCollection that store the packet aggregates sent from each node
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
-		 * @override
+		 * @private
+		 * 	A hash map to lookup sampled items that have already been calculated
 		 */ 
-		override public function update(params:Vector.<String>):uint
-		{
-			// format: mt <node id> <time> <packet_size> <next_hop_id> 
-			var id:int = int(params[0]);
-			var time:uint = uint(params[1]);
-			var size:Number = uint(params[2]);
-			var destination:int = int(params[3]);
-			
-			if (!(id in collections)) {
-				collections[id] = new TransmissionCollection();
-			}
-			
-			TransmissionCollection(collections[id]).add(
-				new Packet(time, id, destination, size)
-			);
-			
-			return time;
-		}
+		private var samples:Dictionary	   = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * On time update
@@ -78,7 +94,61 @@ package com.bienvisto.elements.transmissions
 		{
 			
 		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			samples	    = new Dictionary();
+			complete	= false;
+		}
 
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
+
+		/**
+		 * @override
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override public function update(params:Vector.<String>):uint
+		{
+			// format: mt <node id> <time> <packet_size> <next_hop_id> 
+			var id:int = int(params[0]);
+			var time:uint = uint(params[1]);
+			var size:Number = uint(params[2]);
+			var destination:int = int(params[3]);
+			
+			if (!(id in collections)) {
+				collections[id] = new AggregateCollection();
+				samples[id]		= new Dictionary();
+			}
+			
+			AggregateCollection(collections[id]).add(
+				new Packet(time, id, destination, size)
+			);
+			
+			return time;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Find nearest
@@ -93,7 +163,7 @@ package com.bienvisto.elements.transmissions
 				return null;
 			}
 			
-			return TransmissionCollection(collections[id]).findNearest(time);
+			return AggregateCollection(collections[id]).findNearest(time);
 		}
 		
 		/**
@@ -110,7 +180,19 @@ package com.bienvisto.elements.transmissions
 				return null;
 			}
 			
-			return Vector.<Packet>(TransmissionCollection(collections[id]).sampleItems(time, windowSize));
+			var key:String = String(time) + "-" + String(windowSize);
+			if (key in samples[id]) {
+				return Vector.<Packet>(samples[id][key]);
+			}
+			
+			var packets:Vector.<Packet> = Vector.<Packet>(AggregateCollection(collections[id]).sampleItems(time, windowSize));
+			
+			// only cache if parsing complete
+			if (complete) {
+				samples[key] = packets;
+			}
+			
+			return packets;
 		}
 	
 		/**
@@ -126,7 +208,7 @@ package com.bienvisto.elements.transmissions
 				return 0;
 			}
 			
-			return TransmissionCollection(collections[id]).sampleTotal(time);
+			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
 	}

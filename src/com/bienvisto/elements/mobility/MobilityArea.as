@@ -6,20 +6,45 @@ package com.bienvisto.elements.mobility
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	
+	/**
+	 * @Event
+	 * 	The init event will be dispatched when the mobility area has been parsed.
+	 */
 	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * MobilityArea.as
+	 *  A trace source parser for the defined mobility area for an simulation.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public class MobilityArea extends TraceSource implements ISimulationObject
 	{
 		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		 
+		/**
+		 * Constructor
+		 */ 
 		public function MobilityArea()
 		{
 			super("MobilityArea", "ma");
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  area
+		//---------------------------------- 
 		
 		/**
 		 * @private
@@ -28,11 +53,19 @@ package com.bienvisto.elements.mobility
 		
 		/**
 		 * @readonly area
+		 * 	The rectable area for the simulation
 		 */ 
 		public function get area():Rectangle 
 		{
 			return _area;
+		
 		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Parsing Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @override
@@ -51,12 +84,39 @@ package com.bienvisto.elements.mobility
 			return 0;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
 		public function onTimeUpdate(elapsed:uint):void
 		{
+			
 		}
 		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
 		public function setDuration(duration:uint):void
 		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			_area = null;
 		}
 		
 	}

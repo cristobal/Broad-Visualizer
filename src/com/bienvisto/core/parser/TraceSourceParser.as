@@ -14,7 +14,7 @@ package com.bienvisto.core.parser
 	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
 	
 	/**
-	 * TraceFileParser.as
+	 * TraceSourceParser.as
 	 * 
 	 * @author Cristobal Dabed
 	 */ 

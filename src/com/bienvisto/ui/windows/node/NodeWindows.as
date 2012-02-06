@@ -73,7 +73,7 @@ package com.bienvisto.ui.windows.node
 		private function setup():void
 		{
 			window = new NodeWindow();
-			window.visible = false;
+			window.visible = true;
 			window.addEventListener(CloseEvent.CLOSE, handleWindowClose);
 			addElement(window);
 			

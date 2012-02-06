@@ -1,6 +1,7 @@
 package com.bienvisto.elements.topology
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.graph.Graph;
 	import com.bienvisto.elements.network.node.Node;
@@ -9,41 +10,123 @@ package com.bienvisto.elements.topology
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	/**
+	 * @Event
+	 * 	The init event will be dispatched when the first topology set has been parsed.
+	 */
 	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * TopologySet.as
+	 * 	Class responsible of parsing "topology sets" from the trace source.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class Topology extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 */
 		public function Topology(nodeContainer:NodeContainer)
 		{
 			super("Topology Set", "ts");
-			
 			this.nodeContainer = nodeContainer;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
-		 */ 
+		 * 	A references to the node container for all the current nodes  present in the simulation
+		 */  
 		private var nodeContainer:NodeContainer;
 		
 		/**
 		 * @private
-		 */ 
+		 * 	A collection of AggregateCollection that stores topology set aggregates for each node
+		 */  
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 *  A hash map to lookup sampled sets that have already been calculated
 		 */ 
 		private var sets:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
 		 */ 
-		private var flag:Boolean = false;
+		private var init:Boolean = false;
+		
+		/**
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			sets		= new Dictionary();
+			complete	= false;
+			init		= false;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
+		}
 		
 		/**
 		 * @override
@@ -54,40 +137,32 @@ package com.bienvisto.elements.topology
 			var id:int = int(params[0]);
 			var time:uint = uint(params[1]);
 			
+			if (!(id in collections)) {
+				collections[id] = new AggregateCollection();
+				sets[id]		= new Dictionary();
+			}
+			
 			var tuples:Vector.<TopologyTuple> = parseTuples(params.splice(2, params.length - 2));
 			if (tuples.length) {
-				
-				// trace("added new ts for node:", id, ", time:", time, " total of:", tuples.length, "tuples");
-				var set:TopologySet = new TopologySet(time, tuples);
-				var collection:TopologySetCollection = getCollection(id);	
-				collection.add(set);
+				AggregateCollection(collections[id]).add(
+					new TopologySet(time, tuples)
+				);
 			}
-			if (!flag) {
+			
+			if (!init) {
 				dispatchEvent(new Event(Event.INIT));
-				flag = true;
+				init = true;
 			}
 			
 			return time;
 		}
 		
-		/**
-		 * Get collection
-		 * 
-		 * @param id
-		 */ 
-		private function getCollection(id:int):TopologySetCollection
-		{
-			var collection:TopologySetCollection;
-			if (!(id in collections)) {
-				collection = new TopologySetCollection();	
-				collections[id] = collection;
-			}
-			else {
-				collection = TopologySetCollection(collections[id]);
-			}
-			
-			return collection;
-		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Parse tuples
@@ -141,28 +216,6 @@ package com.bienvisto.elements.topology
 		}
 		
 		/**
-		 * Get topology set
-		 * 
-		 * @param node
-		 * @param time
-		 */ 
-		public function getTopologySet(node:Node, time:uint):TopologySet
-		{
-			var set:TopologySet;
-			var key:String = [node.id, time].join("-");
-			
-			if (!(key in sets)){
-				set = resolveSet(node, time);
-				sets[key] = set;
-			}
-			else {
-				set = TopologySet(sets[key]);
-			}
-			
-			return set;
-		}
-		
-		/**
 		 * Get local graph
 		 * 
 		 * @param node
@@ -170,44 +223,39 @@ package com.bienvisto.elements.topology
 		 */ 
 		public function getLocalGraph(node:Node, time:uint):Graph
 		{
-			var graph:Graph;
-			
 			// lookup the set and get the graph for the set instead of creating new graphs reduces the amount of graphs created drastically.
 			// Since its one 1 graph per existing set, instead of creating multiple equal graphs for a same given set
 			var set:TopologySet = getTopologySet(node, time);
-			if (set) {
-				graph = set.graph;
-			}
-			
-			return graph;
+			return set ? set.graph : null;
 		}
-	
 		
 		/**
-		 * Resolve set
+		 * Get topology set
 		 * 
 		 * @param node
 		 * @param time
 		 */ 
-		private function resolveSet(node:Node, time:uint):TopologySet
+		public function getTopologySet(node:Node, time:uint):TopologySet
 		{
-			var set:TopologySet;
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
 			
-			var collection:TopologySetCollection = getCollection(node.id);
-			if (collection) {
-				set = TopologySet(collection.findNearest(time));
+			if (time in sets[id]) {
+				return TopologySet(sets[id][time]);
+			}
+			
+			
+			var set:TopologySet = TopologySet(AggregateCollection(collections[id]).findNearest(time));
+			
+			// only cache if parsing completed
+			if (complete) {
+				sets[id][time] = set;	
 			}
 			
 			return set;
 		}
 		
-		
-		public function onTimeUpdate(elapsed:uint):void
-		{
-		}
-		
-		public function setDuration(duration:uint):void
-		{
-		}
 	}
 }

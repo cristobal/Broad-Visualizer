@@ -2,24 +2,46 @@ package com.bienvisto.elements.network.node
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.util.log;
 	
 	import flash.events.Event;
 	
+	/**
+	 * @Event
+	 * 	The change event will be dispatched when a new node has been added to the container.
+	 */ 
 	[Event(name="change", type="flash.events.Event")]
+	
 	/**
 	 * NodeContainer.as
-	 * 	Manages all the nodes (basic pooling). 
+	 * 	Manages all the nodes (basic pooling) for a simulation. 
+	 *  All other objects have a reference to this node container to get a node reference by an id.
+	 *  
+	 *  The node container also parses node properties for a node if any given.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class NodeContainer extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constants
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @public
+		 * 	This event will be dispatched when node properties for a node has been read.
 		 */
 		[Event(name="propertyChange", type="flash.events.Event")]
 		public static const PROPERTY_CHANGE:String = "propertyChange";
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Constructor
@@ -27,7 +49,18 @@ package com.bienvisto.elements.network.node
 		public function NodeContainer()
 		{
 			super("Node Properties", "np");
-		}
+		}		
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  nodes
+		//---------------------------------- 
 		
 		/**
 		 * @private
@@ -42,13 +75,24 @@ package com.bienvisto.elements.network.node
 			return _nodes.concat(); // Returns a shallow copy.
 		}
 		
+		//----------------------------------
+		//  size
+		//---------------------------------- 
+		
 		/**
 		 * @readonly size
 		 */ 
-		public function get size():int 
+		public function get size():uint 
 		{
-			return int(_nodes.length);	
+			return _nodes.length;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Find node by id
@@ -71,7 +115,7 @@ package com.bienvisto.elements.network.node
 			if (!flag) {
 				node = new Node(id);
 				_nodes.push(node);	
-				invalidate();
+				dispatchEvent(new Event(Event.CHANGE));
 			}
 			
 			return node;
@@ -95,24 +139,21 @@ package com.bienvisto.elements.network.node
 			
 			node.role = role;
 			
-			log("Updated node", node.toString());
-			
 			dispatchEvent(new Event(PROPERTY_CHANGE));
 			return 0;
 		}
 		
-		/**
-		 * Invalidate
-		 */ 
-		private function invalidate():void
-		{
-			dispatchEvent(new Event(Event.CHANGE));
-		}
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * On time update
 		 * 
-		 * @parm elapsed
+		 * @param elapsed
 		 */ 
 		public function onTimeUpdate(elapsed:uint):void
 		{
@@ -122,11 +163,20 @@ package com.bienvisto.elements.network.node
 		/**
 		 * Set duration
 		 * 
-		 * @param time
-		 */ 
-		public function setDuration(time:uint):void
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
 		{
 			
 		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			_nodes = new Vector.<Node>(); 
+		}
+		
 	}
 }

@@ -9,51 +9,88 @@ package com.bienvisto.elements.sequences
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	/**
+	 * @Event
+	 * 	The init event will be dispatched when the first sent sequence has been parsed.
+	 */
 	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * SequencesSent.as
-	 * 	Class responsible of parsing "sequences sent" block of the trace.
+	 * 	Class responsible of parsing "sequences sent" from the trace source.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class SequencesSent extends TraceSource implements ISimulationObject
 	{
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param parent
+		 */ 
 		public function SequencesSent(parent:SequencesContainer)
 		{
 			super("SequencesSent", "ss");
 			this.parent = parent;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
+		 * 	The parent sequence container
 		 */ 
 		private var parent:SequencesContainer;
 		
 		/**
 		 * @private
+		 * 	A collection of SequencesCollection for each node
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 * 	A collection of AggregateColletion that stores each unique sequences sent from source node
 		 */ 
 		private var unique:Dictionary = new Dictionary();
 		
 		/**
-		 * @priavte
+		 * @private
+		 * 	A hash map to lookup sequences that have been sent by seqNum
 		 */ 
 		private var map:Dictionary = new Dictionary();
-		
-		/**
-		 * @private
-		 */ 
-		private var rateCache:Dictionary = new Dictionary();
 
 		/**
 		 * @private
 		 */	
-		private var first:Boolean = true;
+		private var init:Boolean = false;
+		
+		/**
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  sourceNode
+		//---------------------------------- 
 		
 		/**
 		 * @private
@@ -62,10 +99,26 @@ package com.bienvisto.elements.sequences
 		
 		/**
 		 * @readonly sourceNode
+		 * 	The source node where all video sequence are sent from
 		 */ 
 		public function get sourceNode():Node
 		{
 			return _sourceNode;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
 		}
 		
 		/**
@@ -78,29 +131,36 @@ package com.bienvisto.elements.sequences
 			var seqNum:uint = uint(params[2]);
 			
 			if (!(id in collections)) {
-				collections[id] = new SequencesCollection();
+				collections[id] = new AggregateCollection();
 				unique[id]		= new AggregateCollection();
+				map[id]			= new Dictionary();
 			}
 			
 			var sequence:Sequence = new Sequence(time, seqNum);
-			SequencesCollection(collections[id]).add(sequence);
+			AggregateCollection(collections[id]).add(sequence);
 			
 			// add unique
-			if (!(seqNum in map)) {
+			if (!(seqNum in map[id])) {
 				AggregateCollection(unique[id]).add(sequence);
-				map[seqNum] = sequence;
+				map[id][seqNum] = sequence;
 			}
 			
-			if (first) {
+			if (!init) {
 				_sourceNode = parent.nodeContainer.getNode(id);
 				
 				dispatchEvent(new Event(Event.INIT));
-				first = false;
+				init = true;
 			}
 			
 			return time;
 		}
 
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * On time update
 		 * 
@@ -120,7 +180,20 @@ package com.bienvisto.elements.sequences
 		{
 			
 		}
-
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			unique      = new Dictionary();
+			map		    = new Dictionary();
+			
+			complete = false;
+			init     = false;
+		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -156,7 +229,7 @@ package com.bienvisto.elements.sequences
 				return 0;
 			}
 			
-			return SequencesCollection(collections[id]).sampleTotal(time);
+			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
 		
@@ -231,7 +304,7 @@ package com.bienvisto.elements.sequences
 			}
 			
 			var rate:int = 0;
-			var collection:SequencesCollection = SequencesCollection(collections[id]);
+			var collection:AggregateCollection = AggregateCollection(collections[id]);
 			var windowSize:int = 1000;
 			var up:int = time - (time % windowSize);
 			if (up > 0) {	
@@ -279,7 +352,7 @@ package com.bienvisto.elements.sequences
 				return -1;
 			}
 			
-			var item:Sequence = Sequence(SequencesCollection(collections[id]).findNearest(time));
+			var item:Sequence = Sequence(AggregateCollection(collections[id]).findNearest(time));
 			return item ? item.seqNum : -1;
 		}
 		
@@ -288,9 +361,14 @@ package com.bienvisto.elements.sequences
 		 * 
 		 * @param seqNum
 		 */ 
-		public function findSequenceBySeqNum(seqNum:int):Sequence
+		public function findSequenceBySeqNum(node:Node, seqNum:int):Sequence
 		{
-			return Sequence(map[seqNum]);
+			var id:int = node.id;
+			if (!(id in map)) {
+				return null;
+			}
+			
+			return Sequence(map[id][seqNum]);
 		}
 		
 	}

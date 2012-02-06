@@ -11,28 +11,88 @@ package com.bienvisto.elements.mobility
 	
 	/**
 	 * Mobility.as
+	 *  When a node changes course in the simulation a new waypoint is emited and added to the tracesource.
+	 *  These waypoints are collected here in a Mobility2D aggregate collection for each node.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class Mobility extends TraceSource implements ISimulationObject
 	{
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 */ 
 		public function Mobility(nodeContainer:NodeContainer)
 		{
 			super("Course Changed", "cc");
 			this.nodeContainer = nodeContainer;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
-		 * 	A references to the node container for all the current nodes  present in the simulation
+		 * 	A reference to the node container for all the current nodes  present in the simulation
 		 */ 
 		private var nodeContainer:NodeContainer;
 		
 		/**
 		 * @private
-		 * 
+		 *  A collection of AggregateCollection that stores WayPoint2D aggregates
 		 */ 
 		private var collections:Dictionary = new Dictionary();
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @override
@@ -46,41 +106,27 @@ package com.bienvisto.elements.mobility
 			var dir:Vector2D = new Vector2D(Number(params[4]), Number(params[5]));
 			
 			if (!(id in collections)) {
-				collections[id] = new MobilityCollection();
+				collections[id] = new AggregateCollection();
 			}
 			
-			
-			MobilityCollection(collections[id]).add(
+			AggregateCollection(collections[id]).add(
 				new Waypoint2D(time, pos, dir)
 			);
 			
 			return time;
 		}
 		
-		/**
-		 * On time update
-		 * 
-		 * @parm elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-
-		}
 		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */ 
-		public function setDuration(duration:uint):void
-		{
-			
-		}
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Find waypoint
 		 * 
-		 * @param id
+		 * @param node
 		 * @param time
 		 */ 
 		public function findWaypoint(node:Node, time:uint):Waypoint2D
@@ -90,7 +136,9 @@ package com.bienvisto.elements.mobility
 				return null;
 			}
 			
-			return Waypoint2D(MobilityCollection(collections[id]).findNearest(time));
+			return Waypoint2D(AggregateCollection(collections[id]).findNearest(time));
 		}
+		
+
 	}
 }

@@ -10,61 +10,107 @@ package com.bienvisto.elements.sequences
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	
+	/**
+	 * @Event
+	 * 	The init event will be dispatched when the first sequence recv has been parsed.
+	 */
 	[Event(name="init", type="flash.events.Event")]
 	
 	/**
 	 * SequecesRecv.as
-	 * 	
+	 *  Class responsible of parsing "sequences recv" from the trace source.
+	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class SequencesRecv extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param parent
+		 */ 
 		public function SequencesRecv(parent:SequencesContainer)
 		{
 			super("SequencesRecv", "sr");
-			
 			this.parent		   = parent;
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
+		 * 	The parent sequence container
 		 */ 
 		private var parent:SequencesContainer;
 		
 		/**
 		 * @private
+		 * 	A collection of SequencesCollection for each node
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 * 	A hash map to lookup sequences that have been recv by seqNum
 		 */ 
 		private var map:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 *  A collection of AggregateCollection that stores sequences stats aggregate items for each node
 		 */ 
 		private var stats:Dictionary = new Dictionary();
 
 		/**
 		 * @private
+		 *  A collection of SequencesCollection that stores each unique sequences recv at destination node
 		 */ 
 		private var recv:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 * 	A hash map to lookup already sampled sequence items
 		 */ 
 		private var recvCache:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
+		 * 	A collection of AggregateColletion that stores sequences that have been dropped at destination node
 		 */ 
 		private var drops:Dictionary = new Dictionary();
 		
 		/**
 		 * @private
 		 */ 
-		private var first:Boolean = true;
+		private var init:Boolean = false;
+		
+		/**
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  destNode
+		//---------------------------------- 
 		
 		/**
 		 * @private
@@ -73,10 +119,26 @@ package com.bienvisto.elements.sequences
 		
 		/**
 		 * @readonly destNode
+		 * 	The destination node where all video sequence are sent to
 		 */ 
 		public function get destNode():Node
 		{
 			return _destNode;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
 		}
 		
 		/**
@@ -89,24 +151,26 @@ package com.bienvisto.elements.sequences
 			var seqNum:uint = uint(params[2]);
 			
 			if (!(id in collections)) {
-				collections[id] = new SequencesCollection();
-				recv[id]		= new SequencesCollection();
+				collections[id] = new AggregateCollection();
+				recv[id]		= new AggregateCollection();
 				stats[id]	    = new AggregateCollection();
 				drops[id]		= new AggregateCollection();
+				map[id]			= new Dictionary();
 			}
 			
 			
 			var sequence:Sequence = new Sequence(time, seqNum);
-			SequencesCollection(collections[id]).add(sequence);
+			AggregateCollection(collections[id]).add(sequence);
 			
-			updateDrops(id, sequence);
-			updateStats(id, sequence);
+			var node:Node = parent.nodeContainer.getNode(id);
+			updateDrops(node, sequence);
+			updateStats(node, sequence);
 			
-			if (first) {
-				_destNode = parent.nodeContainer.getNode(id);
+			if (!init) {
+				_destNode = node;
 				
 				dispatchEvent(new Event(Event.INIT));
-				first = false;
+				init = true;
 			}
 			
 			return time;
@@ -115,12 +179,13 @@ package com.bienvisto.elements.sequences
 		/**
 		 * Update drops
 		 * 
-		 * @param id
+		 * @param node
 		 * @param sequence
 		 */ 
-		private function updateDrops(id:int, sequence:Sequence):void
+		private function updateDrops(node:Node, sequence:Sequence):void
 		{
-			if (sequence.seqNum in map) {
+			var id:int = node.id;
+			if (sequence.seqNum in map[id]) {
 				AggregateCollection(drops[id]).add(sequence);
 			}
 		}
@@ -128,16 +193,18 @@ package com.bienvisto.elements.sequences
 		/**
 		 * Update state
 		 * 
+		 * @param node
 		 * @param sequence
 		 */ 
-		private function updateStats(id:int, sequence:Sequence):void
+		private function updateStats(node:Node, sequence:Sequence):void
 		{
+			var id:int 	   = node.id;
 			var seqNum:int = sequence.seqNum;
 			var time:uint  = sequence.time;
-			if (!(seqNum in map)) {
-				map[seqNum] = sequence;
+			if (!(seqNum in map[id])) {
+				map[id][seqNum] = sequence;
 				
-				var sent:Sequence       = parent.sent.findSequenceBySeqNum(seqNum);
+				var sent:Sequence       = parent.sent.findSequenceBySeqNum(node, seqNum);
 				if (sent) {
 					var collection:AggregateCollection = AggregateCollection(stats[id]);
 					
@@ -152,9 +219,16 @@ package com.bienvisto.elements.sequences
 					collection.add(item);
 				}
 				
-				SequencesCollection(recv[id]).add(sequence);
+				AggregateCollection(recv[id]).add(sequence);
 			}
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * On time update
@@ -175,6 +249,22 @@ package com.bienvisto.elements.sequences
 		{
 			
 		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			recv		= new Dictionary();
+			stats       = new Dictionary();
+			map		    = new Dictionary();
+			recvCache   = new Dictionary(); 
+			
+			complete = false;
+			init     = false;
+		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -209,7 +299,7 @@ package com.bienvisto.elements.sequences
 				return 0;
 			}
 			
-			return SequencesCollection(collections[id]).sampleTotal(time);
+			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
 		
@@ -285,7 +375,7 @@ package com.bienvisto.elements.sequences
 			}
 			
 			var rate:int = 0;
-			var collection:SequencesCollection = SequencesCollection(collections[id]);
+			var collection:AggregateCollection = AggregateCollection(collections[id]);
 			var windowSize:int = 1000;
 			var up:int = time - (time % windowSize);
 			if (up > 0) {	
@@ -337,6 +427,7 @@ package com.bienvisto.elements.sequences
 			return item ? uint(item.avg) : 0;
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Sample dest recv
@@ -376,13 +467,17 @@ package com.bienvisto.elements.sequences
 				return Vector.<Sequence>(recvCache[key]);
 			}
 			
-			var samples:Array = SequencesCollection(recv[id]).sampleItemsAsArray(time, time);
+			var samples:Array = AggregateCollection(recv[id]).sampleItemsAsArray(time, time);
 			if (samples.length > 0 && ordered == true) {
 				samples.sortOn("seqNum", Array.NUMERIC);
 			}
 			
 			var items:Vector.<Sequence> = Vector.<Sequence>(samples);
-			recvCache[key] = items;
+			
+			// only store if the parsing is complete
+			if (complete) {
+				recvCache[key] = items;
+			}
 			
 			return items;
 		}
@@ -421,7 +516,7 @@ package com.bienvisto.elements.sequences
 				return -1;	
 			}
 			
-			var item:Sequence = Sequence(SequencesCollection(collections[id]).findNearest(time));
+			var item:Sequence = Sequence(AggregateCollection(collections[id]).findNearest(time));
 			return item ? item.seqNum : -1;
 		}
 
@@ -430,9 +525,14 @@ package com.bienvisto.elements.sequences
 		 * 
 		 * @param seqNum
 		 */ 
-		public function findSequenceBySeqNum(seqNum:int):Sequence
+		public function findSequenceBySeqNum(node:Node, seqNum:int):Sequence
 		{
-			return Sequence(map[seqNum]);
+			var id:int = node.id;
+			if (!(id in map)) {
+				return null;
+			}
+			
+			return Sequence(map[id][seqNum]);
 		}
 		
 

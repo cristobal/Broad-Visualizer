@@ -23,7 +23,7 @@
 	</node:controlBarLayout>
 	<node:controlBarContent/>
 	
-	<mx:TabNavigator id="tabNavigator" x="0" y="-1" width="448" height="265" borderVisible="true" dropShadowVisible="false">
+	<mx:TabNavigator id="tabNavigator" left="0" right="0" top="0" bottom="-5" borderVisible="true" dropShadowVisible="false">
 		<!-- Node::Properties Tab -->
 		<s:NavigatorContent id="propertiesContent" width="100%" height="100%" label="Properties">
 			<s:Group x="10">
@@ -94,12 +94,12 @@
 		
 		<!-- Node::Topolgy/Routing tab-->
 		<s:NavigatorContent id="routingContent" width="100%" height="100%" label="Routing">
-			<s:DataGrid id="routingDataGrid" x="0" y="0" width="446" height="230" requestedRowCount="4" 
+			<s:DataGrid id="routingDataGrid" x="0" top="-7" bottom="0" left="0" right="-1" requestedRowCount="4" 
 						sortableColumns="true">
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn sortable="true" width="50" dataField="destination" headerText="D." ></s:GridColumn>
-						<s:GridColumn sortable="true" width="50" dataField="distance" headerText="H."></s:GridColumn>
+						<s:GridColumn sortable="true" width="50" dataField="distance" headerText="Hc."></s:GridColumn>
 						<s:GridColumn sortable="false" width="50" dataField="complete" headerText="C."></s:GridColumn>
 						<s:GridColumn sortable="false" width="50" dataField="traceback" headerText="Tb."></s:GridColumn>
 						<s:GridColumn sortable="false" dataField="paths" headerText="Paths"></s:GridColumn>
@@ -107,6 +107,5 @@
 				</s:columns>
 			</s:DataGrid>
 		</s:NavigatorContent>
-		
 	</mx:TabNavigator>
 </node:NodeWindowContainer>

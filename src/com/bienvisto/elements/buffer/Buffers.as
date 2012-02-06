@@ -1,6 +1,7 @@
 package com.bienvisto.elements.buffer
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.elements.network.node.Node;
 	import com.bienvisto.elements.network.node.NodeContainer;
@@ -9,16 +10,36 @@ package com.bienvisto.elements.buffer
 	
 	/**
 	 * Buffers.as
+	 * 	Class responsible of parsing "buffer enqueue" from the trace source.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class Buffers extends TraceSource implements ISimulationObject
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param nodeContainer
+		 */
 		public function Buffers(nodeContainer:NodeContainer)
 		{
 			super("Buffer", "be");
 			this.nodeContainer = nodeContainer;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -28,8 +49,51 @@ package com.bienvisto.elements.buffer
 		
 		/**
 		 * @private
+		 * 	A collection of AggregateCollection that stores buffer aggregate for each node
 		 */ 
 		private var collections:Dictionary = new Dictionary();
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Override TraceSource Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @override
@@ -42,15 +106,22 @@ package com.bienvisto.elements.buffer
 			var size:uint = int(params[2]);
 			
 			if (!(id in collections)) {
-				collections[id] = new BufferCollection();
+				collections[id] = new AggregateCollection();
 			}
 			
-			BufferCollection(collections[id]).add(
+			AggregateCollection(collections[id]).add(
 				new Buffer(time, size)
 			);
 			
 			return time;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Find buffer
@@ -65,7 +136,7 @@ package com.bienvisto.elements.buffer
 				return null;
 			}
 			
-			return Buffer(BufferCollection(collections[id]).findNearest(time));;
+			return Buffer(AggregateCollection(collections[id]).findNearest(time));;
 		}
 		
 		/**
@@ -81,30 +152,8 @@ package com.bienvisto.elements.buffer
 				return 0;
 			}
 			
-			return BufferCollection(collections[id]).sampleTotal(time);
+			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
-		
-		
-		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */ 
-		public function setDuration(duration:uint):void
-		{
-			
-		}
-
 		
 	}
 }
