@@ -37,12 +37,14 @@ package com.bienvisto.core
 		//-------------------------------------------------------------------------
 		/**
 		 * @Event
+		 * 	Distpatched when the simulation is ready
 		 */ 
 		[Event(name="ready", type="flash.events.Event")]
 		public static const READY:String = "ready";
 		
 		/**
 		 * @Event
+		 * 	Dispatched 
 		 */
 		[Event(name="complete", type="flash.events.Event")]
 		public static const COMPLETE:String = "complete";

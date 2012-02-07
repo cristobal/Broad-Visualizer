@@ -7,10 +7,12 @@ package com.bienvisto.view
 	import com.bienvisto.view.components.ViewComponent;
 	import com.bienvisto.view.drawing.IDrawingManager;
 	
+	import flash.display.DisplayObject;
 	import flash.display.Graphics;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.ui.Mouse;
 	import flash.ui.MouseCursor;
@@ -20,6 +22,7 @@ package com.bienvisto.view
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.effects.Tween;
+	import mx.events.SandboxMouseEvent;
 	
 	import spark.components.Group;
 	import spark.effects.Animate;
@@ -29,11 +32,22 @@ package com.bienvisto.view
 	
 	/**
 	 * VisualizerView.as
+	 * 	This class contains as set of view components and tells them to update(refresh) 
+	 *  their content when an update is issued to this view.
+	 * 
+	 *  Its an abstract representation for an class that contains all the views that simulate one or
+	 *  more properties from the simulation seen as a whole visualization view.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class VisualizerView extends Group
 	{	
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
 		/**
 		 * VisualizerView
 		 */ 
@@ -43,8 +57,18 @@ package com.bienvisto.view
 			setup();
 		}
 		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  viewComponents
+		//---------------------------------- 
 		/**
 		 * @private
+		 * 	Reference to all the view components that are added to this view
 		 */ 
 		private var _viewComponents:Vector.<ViewComponent> = new Vector.<ViewComponent>();
 		
@@ -56,8 +80,12 @@ package com.bienvisto.view
 			return  _viewComponents;
 		}
 		
+		//----------------------------------
+		//  time
+		//---------------------------------- 
 		/**
 		 * @private
+		 * 	The current time in this view
 		 */ 
 		private var _time:uint = 0;
 		
@@ -73,6 +101,13 @@ package com.bienvisto.view
 		{
 			_time = time;
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Setup
@@ -115,6 +150,7 @@ package com.bienvisto.view
 		
 		/**
 		 * Update
+		 * 	Tell the view to update(refresh) all its view components
 		 */ 
 		private function update():void
 		{	
@@ -128,7 +164,7 @@ package com.bienvisto.view
 				s = time;
 				sum += (getTimer() - tt);
 				total++;
-				if (total % 10 == 0) {
+				if (total % 100 == 0) {
 					trace("Avg update time:", String(sum / total), "ms");
 				}
 				
@@ -152,29 +188,7 @@ package com.bienvisto.view
 				viewComponent = _viewComponents[i];
 				viewComponent.invalidateSize();
 			}
-		}
-
-		//--------------------------------------------------------------------------
-		//
-		//  Mini map view
-		//
-		//--------------------------------------------------------------------------
-		
-		/**
-		 * @private
-		 */ 
-		private var miniMapView:ViewComponent;
-		
-		
-		/**
-		 * Set loader view
-		 * 
-		 * @param view
-		 */ 
-		public function setMiniMapView(view:ViewComponent):void
-		{
-			miniMapView = view;
-		}
+		}		
 		
 		
 		//--------------------------------------------------------------------------
@@ -235,45 +249,24 @@ package com.bienvisto.view
 		
 		//--------------------------------------------------------------------------
 		//
-		//  Draggable view
+		//  Mini map view
 		//
 		//--------------------------------------------------------------------------
 		
-		private var draggableView:ViewComponent;
-		private var draggable:Boolean = false;
-		private var isDragging:Boolean = false;
-		private var dragX:Number;
-		private var dragY:Number;
-		private var dragTimer:Timer;
-		private var dragTimerDelay:Number = 120;
+		/**
+		 * @private
+		 */ 
+		private var miniMapView:ViewComponent;
 		
-		public function setDraggableView(view:ViewComponent):void
+		/**
+		 * Set loader view
+		 * 
+		 * @param view
+		 */ 
+		public function setMiniMapView(view:ViewComponent):void
 		{
-			draggableView = view;	
-			setupDraggableView();
-		}
-		
-		
-		private function setupDraggableView():void
-		{
-			// mouseEnabled = true;
-			
-			dragTimer = new Timer(dragTimerDelay, 1);
-			dragTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleDragTimerComplete);
-			
+			miniMapView = view;
 			addEventListener(MouseEvent.CLICK, handleMouseClick);
-			addEventListener(MouseEvent.MOUSE_DOWN, handleMouseDown);
-			addEventListener(MouseEvent.MOUSE_UP, handleMouseUp);
-			addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
-			addEventListener(MouseEvent.MOUSE_OUT, handleMouseOut);
-		}
-		
-		private function handleDragTimerComplete(event:TimerEvent):void
-		{
-			if (draggable) {
-				Mouse.cursor = MouseCursor.HAND;
-				isDragging = true;
-			}
 		}
 		
 		/**
@@ -287,8 +280,8 @@ package com.bienvisto.view
 				return;
 			}
 			
-	
-				
+			
+			
 			var sx:Number  = event.stageX;
 			var sy:Number  = event.stageY;
 			
@@ -307,7 +300,7 @@ package com.bienvisto.view
 					
 					var aw:Number = rect.width;
 					var ah:Number = rect.height;
-						
+					
 					var tx:Number = (sx - dx);
 					var ty:Number = (sy - dy);
 					
@@ -333,12 +326,12 @@ package com.bienvisto.view
 					else {
 						nx = tx  + px;
 					}
-/*					var ny:Number;
+					/*					var ny:Number;
 					if (ty > cy || ty > py) {
-						ny = ty + py;
+					ny = ty + py;
 					}
 					else {
-						ny = -ty + py;
+					ny = -ty + py;
 					}
 					*/
 					animate.motionPaths = Vector.<MotionPath>([
@@ -353,18 +346,98 @@ package com.bienvisto.view
 			
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Draggable view
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 * 	Flag that tells wether the draggable state has been enabled
+		 */ 
+		private var draggable:Boolean = false;
+		
+		/**
+		 * @private
+		 * 	Flag which tells wether we are currently dragging or not
+		 */ 
+		private var isDragging:Boolean = false;
+		
+		/**
+		 * @private
+		 * 	Used to store the last point from which the drag distance is calculated
+		 */ 
+		private var lastDragPoint:Point;
+
+		/**
+		 * @private 
+		 * 	Timer used to delay time before is dragging state is enabled, 
+		 *   this ensures that user clicks around the view are interpreted as clicks and not dragging
+		 */ 
+		private var dragTimer:Timer;
+		
+		/**
+		 * @private
+		 * 	The drag timer delay before enabling as is dragging
+		 */ 
+		private var dragTimerDelay:Number = 120;
+		
+		/**
+		 * @private
+		 * 	The view which is to be dragged
+		 */ 
+		private var draggableView:ViewComponent;
+		
+		/**
+		 * Set draggable view
+		 * 
+		 * @param view
+		 */ 
+		public function setDraggableView(view:ViewComponent):void
+		{
+			draggableView = view;	
+			setupDraggableView();
+		}
+		
+		/**
+		 * Setup draggable view
+		 */ 
+		private function setupDraggableView():void
+		{
+			dragTimer = new Timer(dragTimerDelay, 1);
+			dragTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleDragTimerComplete);
+			addEventListener(MouseEvent.MOUSE_DOWN, handleDragMouseDown);
+		}
+		
+		/**
+		 * Handle drag timer complete
+		 */ 
+		private function handleDragTimerComplete(event:TimerEvent):void
+		{
+			if (draggable) {
+				Mouse.cursor = MouseCursor.HAND;
+				isDragging = true;
+			}
+		}
+		
 		/**
 		 * Handle mouse down
 		 * 
 		 * @param event
 		 */ 
-		private function handleMouseDown(event:MouseEvent):void
+		private function handleDragMouseDown(event:MouseEvent):void
 		{
 			if (!draggable) {
-				dragX = event.stageX;
-				dragY = event.stageY;
+				lastDragPoint = new Point(event.stageX, event.stageY);
 				draggable = true;
 				dragTimer.start();
+				
+				var root:DisplayObject = systemManager.getSandboxRoot();
+				root.addEventListener(MouseEvent.MOUSE_MOVE, handleDragMouseMove);
+				root.addEventListener(MouseEvent.MOUSE_UP, handleDragMouseUp);
+				root.addEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleDragMouseUp);
 			}
 		}
 		
@@ -373,16 +446,20 @@ package com.bienvisto.view
 		 * 
 		 * @param event
 		 */ 
-		private function handleMouseUp(event:MouseEvent):void
+		private function handleDragMouseUp(event:MouseEvent):void
 		{
 			if (dragTimer.running) {
 				dragTimer.stop();
 			}
+			
 			Mouse.cursor = MouseCursor.AUTO;
-			// if (isDragging) {
 			draggable  = false;	
 			isDragging = false;
-			// }
+			
+			var root:DisplayObject= systemManager.getSandboxRoot();
+			root.removeEventListener(MouseEvent.MOUSE_MOVE, handleDragMouseMove);
+			root.removeEventListener(MouseEvent.MOUSE_UP, handleDragMouseUp);
+			root.removeEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleDragMouseUp);
 		}
 		
 		/**
@@ -390,58 +467,25 @@ package com.bienvisto.view
 		 * 
 		 * @param event
 		 */ 
-		private function handleMouseMove(event:MouseEvent):void
+		private function handleDragMouseMove(event:MouseEvent):void
 		{
 			if (!draggable) {
 				return;
 			}
+			
 			var stageY:Number = event.stageY;
 			var stageX:Number = event.stageX;
-			var topOffset:Number = 60;
-			var bottomOffset:Number = parent.height - 60;
 			
 			if (isDragging) {
-				var dx:Number = (stageX - dragX) / 32;
-				var dy:Number = (stageY - dragY) / 32;
+				var dx:Number = stageX - lastDragPoint.x;
+				var dy:Number = stageY - lastDragPoint.y;
 				
 				draggableView.x += dx;
 				draggableView.y += dy;
 			}
-		}
-		
-		/**
-		 * Handle mouse out
-		 * 
-		 * @param event
-		 */ 
-		private function handleMouseOut(event:MouseEvent):void
-		{
-			if (!isDragging) {
-				Mouse.cursor = MouseCursor.AUTO;
-				draggable = false;
-			}
-		}
-		
-		
-		//--------------------------------------------------------------------------
-		//
-		//  Timer
-		//
-		//--------------------------------------------------------------------------
-		
-		public function start():void
-		{
 			
-		}
-		
-		public function pause():void
-		{
-			
-		}
-		
-		public function stop():void
-		{
-			
+			// store current position as las position.
+			lastDragPoint = new Point(stageX, stageY);
 		}
 		
 		

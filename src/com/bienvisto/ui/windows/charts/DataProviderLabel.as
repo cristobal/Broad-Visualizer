@@ -1,37 +1,34 @@
-package com.bienvisto.ui.charts
+package com.bienvisto.ui.windows.charts
 {
-	import spark.components.BorderContainer;
-	import spark.components.Label;
-	import spark.components.Group;
-	import spark.primitives.Path;
-	import spark.layouts.HorizontalLayout;
+	import com.bienvisto.core.aggregate.AggregateDataProvider;
+	import com.bienvisto.util.Tools;
 	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import com.bienvisto.util.Tools;
-
+	import spark.components.BorderContainer;
+	import spark.components.Group;
+	import spark.components.Label;
+	import spark.layouts.HorizontalLayout;
+	import spark.primitives.Path;
 
 	/**
+	 * DataProviderLabel.as 
+	 *
 	 * Graphic component that represents the label of a variable in the 
 	 * StatsWindow. Also has a "close" button which removes the variable from
 	 * the cart
+	 * 
+	 * @author Miguel Santirso
+	 * @author Cristobal Dabed
 	 */
-	public class VariableLabel extends BorderContainer
+	public final class DataProviderLabel extends BorderContainer
 	{
 		/**
 		 * Event dispatched when the user clicks on the "close" button
 		 */
+		[event(name="remove", type="flash.events.Event")]
 		public static const REMOVE:String = "remove";
-		
-		/**
-		 * Name of the associated variable
-		 */
-		protected var name_:String;
-		/**
-		 * Color assigned to this variable
-		 */
-		protected var color_:uint;
 		
 		/**
 		 * Constructs a new VariableLabel object
@@ -39,26 +36,28 @@ package com.bienvisto.ui.charts
 		 * @param variableName Name of the variable
 		 * @param color Color in which the variable is represented
 		 */
-		public function VariableLabel(variableName:String, color:uint)
+		public function DataProviderLabel(dataProvider:AggregateDataProvider)
 		{
-			name_ = variableName;
-			color_ = color;
+			_provider = dataProvider;
 			
-			this.width = 130;
-			this.height = 18;
+			width  = 130;
+			height = 18;
 			
 			initGraphics();
 		}
 		
+		/**
+		 * Name of the associated variable
+		 */
+		private var _provider:AggregateDataProvider;
 		
 		/**
-		 * The name of the associated variable
-		 */
-		public function get varName():String
+		 * @readonly provider
+		 */ 
+		public function get provider():AggregateDataProvider
 		{
-			return name_;
+			return _provider;
 		}
-		
 		
 		/**
 		 * Initializes the graphics of this component. Basically, it is a
@@ -70,9 +69,12 @@ package com.bienvisto.ui.charts
 			var label:Label = new Label();
 			var closeButton:Label = new Label();
 			
-			label.text = name_;
+			label.text = _provider.name;
 			label.setStyle("left", 17);
-			label.setStyle("top", 5);
+			label.setStyle("top", 3);
+			label.setStyle("fontSize", 12);
+			
+			var color:uint = _provider.color;
 			
 			// Draw the close button
 			closeButton.width = 15;
@@ -80,27 +82,26 @@ package com.bienvisto.ui.charts
 			closeButton.x = 0;
 			closeButton.y = 0;
 			closeButton.graphics.clear();
-			closeButton.graphics.lineStyle(3, Tools.darkenColor(color_, 0.2));
+			closeButton.graphics.lineStyle(3, Tools.darkenColor(color, 0.2));
 			closeButton.graphics.moveTo(5,5);
 			closeButton.graphics.lineTo(10,10);
 			closeButton.graphics.moveTo(5,10);
 			closeButton.graphics.lineTo(10,5);
 			
-			closeButton.addEventListener(MouseEvent.CLICK, removeClicked);
+			closeButton.addEventListener(MouseEvent.CLICK, handleCloseButtonClick);
 			
-			this.setStyle("cornerRadius", 2);
-			this.setStyle("backgroundColor", Tools.lightenColor(color_, 0.8));
-			this.setStyle("borderColor", Tools.lightenColor(color_, 0.6));
-			this.addElement(closeButton);
-			this.addElement(label);
+			setStyle("cornerRadius", 2);
+			setStyle("backgroundColor", Tools.lightenColor(color, 0.8));
+			setStyle("borderColor", Tools.lightenColor(color, 0.6));
+			addElement(closeButton);
+			addElement(label);
 		}
-		
 		
 		/**
 		 * Called when the remove button is clicked. Dispatches a new REMOVE
 		 * event
 		 */
-		protected function removeClicked(e:MouseEvent):void
+		protected function handleCloseButtonClick(event:MouseEvent):void
 		{
 			dispatchEvent(new Event(REMOVE));
 		}

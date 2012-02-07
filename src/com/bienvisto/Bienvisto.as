@@ -5,6 +5,7 @@ package com.bienvisto
 	import com.bienvisto.core.events.TimedEvent;
 	import com.bienvisto.core.parser.TraceSourceParser;
 	import com.bienvisto.elements.buffer.Buffers;
+	import com.bienvisto.elements.buffer.BuffersDataProvider;
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.MobilityArea;
@@ -53,6 +54,7 @@ package com.bienvisto
 	import flash.events.TimerEvent;
 	import flash.net.FileReference;
 	import flash.utils.Timer;
+	import flash.utils.setTimeout;
 	
 	import spark.components.Application;
 
@@ -95,6 +97,8 @@ package com.bienvisto
 		private var routing:Routing;
 		private var topology:Topology;
 		private var sequencesContainer:SequencesContainer;
+		
+		private var buffersDataProvider:BuffersDataProvider;
 		
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
@@ -232,6 +236,9 @@ package com.bienvisto
 			
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
+			
+			
+			buffersDataProvider = new BuffersDataProvider(buffers);
 		}
 		
 		/**
@@ -290,6 +297,11 @@ package com.bienvisto
 			window.topologyWindows.setRouting(routing);
 			window.topologyWindows.setTopology(topology);
 			window.topologyWindows.setNodeView(nodeView);
+			
+			
+			//
+			window.chartsWindows.setNodeContainer(nodeContainer);
+			window.chartsWindows.addDataProvider(buffersDataProvider);
 			
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
 		}
@@ -398,9 +410,10 @@ package com.bienvisto
 		private function handleSimulationReady(event:Event):void
 		{
 			window.playback.menu.enabled = true;
-			window.playback.setDuration(
+			window.setDuration(
 				simulation.duration
 			);
+			window.playback.showLoader();
 		}
 		
 		/**
@@ -443,8 +456,9 @@ package com.bienvisto
 		{
 			if (simulation.duration > 0) {
 				var value:Number = event.elapsed / simulation.duration * 100;
-				window.playback.setLoaded(value);
+				window.setLoaded(value);
 				simulation.setLoaded(value);
+				window.playback.setLoaderValue(value);
 			}
 		}
 		
@@ -455,8 +469,10 @@ package com.bienvisto
 		 */ 
 		private function handleParserEventComplete(event:Event):void
 		{
-			window.playback.setLoaded(100);	
+			window.setLoaded(100);	
 			simulation.setLoaded(100);
+			window.playback.setLoaderValue(100);
+			setTimeout(window.playback.hideLoader, 1000);
 		}
 		
 		/**

@@ -14,24 +14,35 @@ package com.bienvisto.core.aggregate
 		
 		//--------------------------------------------------------------------------
 		//
-		//  Constants
+		//  Class Constants
 		//
 		//--------------------------------------------------------------------------
 		
 		/**
 		 * @public 
 		 */ 
-		public static const SAMPLE_TIME:uint = 100; // update/normalize at each 100ms.
+		public static const SAMPLE_TIME:uint = 100; // update/normalize at every 100ms.
+		
 		
 		//--------------------------------------------------------------------------
 		//
 		//  Constructor
 		//
 		//--------------------------------------------------------------------------
+		/**
+		 * Constructor
+		 */ 
 		public function AggregateCollection()
 		{
 			
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Variables
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @private 

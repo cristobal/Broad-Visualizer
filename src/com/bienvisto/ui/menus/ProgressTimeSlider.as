@@ -20,7 +20,10 @@ package com.bienvisto.ui.menus
 	import spark.components.HSlider;
 	import spark.skins.spark.HSliderSkin;
 	
-	
+	/**
+	 * @Event
+	 * 	Dispatched when a new value has been set.
+	 */ 
 	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
 	
 	/**
@@ -32,25 +35,29 @@ package com.bienvisto.ui.menus
 	{
 		
 		/**
-		 * @public
+		 * @Event
+		 * 	Dispatched when a value starts changing its value
 		 */ 
 		[Event(name="changeStart", type="flash.events.Event")]
 		public static const CHANGE_START:String = "changeStart";
 		
 		/**
-		 * @public
+		 * @Event
+		 * 	Dispatched when a value change ends
 		 */ 
 		[Event(name="changeEnd", type="flash.events.Event")]
 		public static const CHANGE_END:String = "changeEnd";
 		
 		/**
-		 * @public
+		 * @Event
+		 * 	Dispatched when loading starts
 		 */
 		[Event(name="loadStart", type="flash.events.Event")]
 		public static const LOAD_START:String = "loadStart";
 		
 		/**
-		 * @public
+		 * @Event
+		 * 	Dispatched when loading ends
 		 */ 
 		[Event(name="loadEnd", type="flash.events.Event")]
 		public static const LOAD_END:String = "loadEnd";
@@ -61,7 +68,9 @@ package com.bienvisto.ui.menus
 		// Constructor
 		//
 		//--------------------------------------------------------------------------
-		
+		/**
+		 * Constructore
+		 */ 
 		public function ProgressTimeSlider()
 		{
 			super();
@@ -386,6 +395,13 @@ package com.bienvisto.ui.menus
 				}
 			}	
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Overriden Methods
+		//
+		//-------------------------------------------------------------------------
 				
 		/**
 		 * @override
@@ -429,6 +445,14 @@ package com.bienvisto.ui.menus
 			}
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Events
+		//
+		//-------------------------------------------------------------------------
+		
+		
 		/**
 		 * Handle creation complete
 		 * 
@@ -450,6 +474,13 @@ package com.bienvisto.ui.menus
 			bindComponents();
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Thumb skin events
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * Handle thumb button down
 		 * 
@@ -459,7 +490,7 @@ package com.bienvisto.ui.menus
 		{
 	
 			if (!thumbStart) {
-				// trace("Handle stage mouse down", thumbStart);				
+				
 		
 				thumbStart = true;
 				dispatchEvent(new Event(CHANGE_START));
@@ -474,8 +505,7 @@ package com.bienvisto.ui.menus
 		private function handleStageMouseUp(event:MouseEvent):void
 		{
 			
-			if (thumbStart) {
-				// trace("Handle stage mouse up", thumbStart);		
+			if (thumbStart) {	
 				
 				thumbStart = false;
 				dispatchEvent(new Event(CHANGE_END));

@@ -124,6 +124,21 @@ package com.bienvisto.elements.buffer
 		//--------------------------------------------------------------------------
 		
 		/**
+		 * Get Items
+		 * 
+		 * @param node
+		 */ 
+		public function getItems(node:Node):Vector.<Buffer>
+		{
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
+			
+			return Vector.<Buffer>(AggregateCollection(collections[id]).items);
+		}
+		
+		/**
 		 * Find buffer
 		 * 
 		 * @param node

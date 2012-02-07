@@ -142,6 +142,7 @@ package com.bienvisto.ui.windows.topology
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Events

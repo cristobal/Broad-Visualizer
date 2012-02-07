@@ -14,7 +14,7 @@
 		<![CDATA[
 			import com.bienvisto.core.events.TimedEvent;
 			import com.bienvisto.ui.menus.ProgressTimeSlider;
-			import com.bienvisto.ui.windows.charts.ChartsWindow;
+			import com.bienvisto.ui.windows.charts.ChartsWindows;
 			import com.bienvisto.ui.windows.node.NodeWindows;
 			import com.bienvisto.ui.windows.sequences.SequencesWindow;
 			import com.bienvisto.ui.windows.topology.TopologyWindows;
@@ -52,7 +52,8 @@
 			 */ 
 			private function initComponents():void
 			{
-				_nodeWindows = new NodeWindows(this);
+				_chartsWindows   = new ChartsWindows(this);
+				_nodeWindows     = new NodeWindows(this);
 				_topologyWindows = new TopologyWindows(this);
 				
 				// setup sequences window
@@ -91,8 +92,26 @@
 			
 			/**
 			 * @private
+			 */ 
+			private var duration:uint;
+			
+			/**
+			 * @private
 			 */ 	
 			private var resize:Boolean;
+
+			/**
+			 * @private
+			 */ 
+			private var _chartsWindows:ChartsWindows;
+			
+			/**
+			 * @readonly chartsWindows
+			 */ 
+			public function get chartsWindows():ChartsWindows
+			{
+				return _chartsWindows;
+			}
 			
 			/**
 			 * @private
@@ -151,6 +170,24 @@
 				playback.setTime(time);
 				topologyWindows.setTime(time);
 				sequencesWindow.setTime(time);
+				chartsWindows.setTime(time);
+			}
+			
+			/**
+			 * Set duration
+			 */ 
+			public function setDuration(duration:uint):void
+			{
+				playback.setDuration(duration);
+				chartsWindows.setDuration(duration);
+			}
+			
+			/**
+			 * Set loaded
+			 */ 
+			public function setLoaded(value:Number):void
+			{
+				playback.setLoaded(value);
 			}
 			
 			/**
@@ -227,61 +264,6 @@
 			
 			//--------------------------------------------------------------------------
 			//
-			//  Charts windows
-			//
-			//--------------------------------------------------------------------------
-			
-			/**
-			 * @private
-			 */ 
-			private var chartsWindows:Vector.<ChartsWindow> = new Vector.<ChartsWindow>();
-			
-			/**
-			 * Add charts window
-			 */ 
-			private function addChartsWindow():void
-			{
-				var window:ChartsWindow = new ChartsWindow();
-				window.x = 10;
-				window.y = 40;
-				window.addEventListener(CloseEvent.CLOSE, handleStatsWindowClose)
-				addElement(window);
-				chartsWindows.push(window);
-			}
-			
-			/**
-			 * Remove charts window
-			 * 
-			 * @param event
-			 */ 
-			private function removeChartsWindow(window:ChartsWindow):void
-			{
-				var item:ChartsWindow;
-				for (var i:int = chartsWindows.length; i--;) {
-					item = chartsWindows[i];
-					if (item == window) {
-						chartsWindows.splice(i, 1);
-						removeElement(window);
-						window = null;
-						break;
-					}
-				}
-			}
-			
-			/**
-			 * Handle stats window close
-			 * 
-			 * @param event
-			 */ 
-			private function handleStatsWindowClose(event:CloseEvent):void
-			{
-				var window:ChartsWindow = ChartsWindow(event.target);
-				removeChartsWindow(window);
-			}
-			
-			
-			//--------------------------------------------------------------------------
-			//
 			//  Playback progress events
 			//
 			//--------------------------------------------------------------------------
@@ -351,7 +333,7 @@
 			 */ 
 			private function handleMenuStatsButtonClick(event:Event):void
 			{
-				addChartsWindow();
+				chartsWindows.add();
 			}
 			
 			/**

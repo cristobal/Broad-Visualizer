@@ -6,16 +6,34 @@
 						backgroundColor="0xF1F1F1"
 						borderColor="0xCCCCCC" creationComplete="initComponent(event)">
 	
+	<fx:Declarations>
+		<s:Animate id="loaderHideAnimation" target="{loader}" duration="1250" effectEnd="hideLoaderEnd(event)">
+			<s:SimpleMotionPath property="alpha" valueFrom="1" valueTo="0" />
+		</s:Animate>
+	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
+			import mx.events.EffectEvent;
 			import mx.events.FlexEvent;
 			
+			/**
+			 * @Event
+			 * 	Distpatched when the play button is clicked
+			 */ 
 			[Event(name="play", type="flash.events.Event")]
 			public static const PLAY:String = "play";
-			
+			/**
+			 * @Event
+			 * 	Dispatched when the pause button is clicked
+			 */ 
 			[Event(name="pause", type="flash.events.Event")]
 			public static const PAUSE:String = "pause";
 			
+			//--------------------------------------------------------------------------
+			//
+			// Initialization
+			//
+			//-------------------------------------------------------------------------
 			
 			/**
 			 * Init component
@@ -24,6 +42,13 @@
 			{
 				playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
 			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			// Play/Pause Functionality
+			//
+			//-------------------------------------------------------------------------
 			
 			/**
 			 * @private
@@ -63,10 +88,10 @@
 			{
 				if (perimeterCheckbox.visible != value) {
 					if (value) {
-						checkboxes.addElementAt(perimeterCheckbox, checkboxes.numElements - 2);
+						left.addElementAt(perimeterCheckbox, left.numElements - 2);
 					}
 					else {
-						checkboxes.addElementAt(perimeterCheckbox, checkboxes.numElements - 1);
+						left.addElementAt(perimeterCheckbox, left.numElements - 1);
 					}
 					perimeterCheckbox.visible = value;	
 				}
@@ -87,41 +112,102 @@
 				}
 			}
 			
+			
+			//--------------------------------------------------------------------------
+			//
+			// Loader Functionality
+			//
+			//-------------------------------------------------------------------------
+			
+			/**
+			 * Show loader
+			 */ 
+			public function showLoader():void
+			{
+				loader.visible = true;	
+			}
+			
+			/**
+			 * Hide loader
+			 */ 
+			public function hideLoader():void
+			{
+				loaderHideAnimation.play();
+			}
+			
+			/**
+			 * Hide loader end
+			 * 
+			 * @param effect
+			 */ 
+			public function hideLoaderEnd(event:EffectEvent):void
+			{
+				loader.visible = false;
+				loader.alpha   = 1;
+			}
+			
+			/**
+			 * Set loader value
+			 * 
+			 * @param value
+			 */ 
+			public function setLoaderValue(value:Number):void
+			{
+				loaderValue.text = String(int(value)) + " %";
+			}
+			
 		]]>
 	</fx:Script>
-	<s:Group id="checkboxes" width="20%" height="50" top="0">
+	<s:Group width="100%" height="100%">
 		<s:layout>
-			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="15" paddingLeft="5" />
-		</s:layout>
-		<s:CheckBox id="gridCheckbox" label="Grid" />
-		<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
-		<s:CheckBox id="statsCheckbox" label="Hi-res Stats" />
-		<s:CheckBox id="perimeterCheckbox" label="Perimeter" visible="false" />
-	</s:Group>
-	
-	<s:Group id="menu" width="100%" height="50" top="0" left="20%">
-		<s:layout>
-			<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingTop="0" paddingLeft="20" />
+			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" />
 		</s:layout>
 		
-		<!-- Zoom -->
-		<s:Label>Zoom</s:Label>
-		<menus:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="250" minimum="10" />
+		<!-- left group -->
+		<s:Group id="left" width="20%">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="left" paddingTop="5" paddingLeft="5" />
+			</s:layout>
+			<s:CheckBox id="gridCheckbox" label="Grid" />
+			<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
+			<s:CheckBox id="statsCheckbox" label="Hi-res Stats" />
+			<s:CheckBox id="perimeterCheckbox" label="Perimeter" visible="false" />
+		</s:Group>
 		
-		<!-- playButton -->
-		<s:Button id="playButton" label="Play" />
+		<!-- menu group -->	
+		<s:Group id="menu" width="80%">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingTop="0" paddingLeft="20" />
+			</s:layout>
 		
-		<!-- Playback speed -->
-		<menus:IntervalStepper id="playbackSpeed" 
-						  width="45"
-						  value="1"  />
+			<!-- Zoom -->
+			<s:Label>Zoom</s:Label>
+			<menus:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="250" minimum="10" />
 		
-		<!-- Time slider -->
-		<menus:ProgressTimeSlider id="timeSlider" enabled="false" width="300" durationProgressEnabled="true" />
+			<!-- playButton -->
+			<s:Button id="playButton" label="Play" />
 		
-		<!-- Time display -->
-		<s:Label id="timeLabel">00:00:00</s:Label>
-		<s:Label>/</s:Label>
-		<s:Label id="durationLabel">00:00:00</s:Label>
+			<!-- Playback speed -->
+			<menus:IntervalStepper id="playbackSpeed" width="45" value="1"  />
+		
+			<!-- Time slider -->
+			<menus:ProgressTimeSlider id="timeSlider" enabled="false" width="300" durationProgressEnabled="true" />
+		
+			<!-- Time display -->
+			<s:Label id="timeLabel">00:00:00</s:Label>
+			<s:Label>/</s:Label>
+			<s:Label id="durationLabel">00:00:00</s:Label>
+		</s:Group>
+		
+		<!-- right group -->
+		<s:Group id="right" width="20%">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="right" paddingTop="0" paddingRight="5" />
+			</s:layout>
+			<s:Group id="loader" width="100" visible="false">
+				<s:Label text="Loading:" left="0" />
+				<s:Label id="loaderValue" text="0 %" right="0" />
+			</s:Group>
+		</s:Group>
 	</s:Group>
 </menus:PlaybackContainer>

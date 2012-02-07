@@ -1,22 +1,14 @@
 package com.bienvisto.ui.windows
-{
-	import avmplus.getQualifiedClassName;
-	
-	import com.bienvisto.ApplicationWindow;
-	
+{	
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.utils.getDefinitionByName;
-	import flash.utils.setTimeout;
 	
-	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.events.MoveEvent;
-	import mx.events.ResizeEvent;
 	import mx.events.SandboxMouseEvent;
 	import mx.graphics.SolidColor;
 	import mx.managers.PopUpManager;
@@ -27,11 +19,15 @@ package com.bienvisto.ui.windows
 	
 	/**
 	 * BaseWindow.as
+	 * 	The base window class for all the floating windows in the application.
+	 *  Manages properties such as moving and constraining the movement area.
+	 *  In addition to the resizing of the windows.
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public class BaseWindow extends TitleWindow
 	{
+		
 		//--------------------------------------------------------------------------
 		//
 		// Class Variables
@@ -62,10 +58,8 @@ package com.bienvisto.ui.windows
 		{
 			super();
 			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-			addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 			addEventListener(Event.REMOVED_FROM_STAGE, handleRemovedFromStage);
-			addEventListener(CloseEvent.CLOSE, handleClose);
-			
+			addEventListener(CloseEvent.CLOSE, handleClose);	
 		}
 		
 		
@@ -111,6 +105,29 @@ package com.bienvisto.ui.windows
 		// Properties
 		//
 		//-------------------------------------------------------------------------
+		
+		//----------------------------------
+		//  defaultAsPopUp
+		//---------------------------------- 
+		
+		/**
+		 * @private
+		 */ 
+		private var _defaultAsPopUp:Boolean = true;
+		
+		/**
+		 * @readonly get registeredAsPopUp
+		 * 	Wether this component has been registered as a popup element
+		 */ 
+		public function get defaultAsPopUp():Boolean
+		{
+			return _defaultAsPopUp;
+		}
+		
+		public function set defaultAsPopUp(value:Boolean):void
+		{
+			_defaultAsPopUp = value;
+		}
 		
 		//----------------------------------
 		//  registeredAsPopUp
@@ -168,6 +185,15 @@ package com.bienvisto.ui.windows
 		 */ 
 		protected function setup():void
 		{
+			// set the style
+/*			var titleWindowSkin:TitleWindowSkin = TitleWindowSkin(skin); 
+			titleWindowSkin.dropShadow.blurX = 10;
+			titleWindowSkin.dropShadow.blurY = 5;
+			titleWindowSkin.dropShadow.distance = 7;
+			titleWindowSkin.titleDisplay.minHeight = 28;
+			HorizontalLayout(titleWindowSkin.controlBarGroup.layout).paddingBottom = 0;
+			HorizontalLayout(titleWindowSkin.controlBarGroup.layout).gap = 0;*/
+			
 			resizeHandle = new Group();
 			resizeHandle.width  = 15;
 			resizeHandle.height = 15;
@@ -183,12 +209,13 @@ package com.bienvisto.ui.windows
 			resizeHandle.addEventListener(MouseEvent.MOUSE_DOWN, handleResizeMouseDown);
 			invalidateResizable();
 			
-			// set the style
-			setStyle("skinClass", Class(BaseWindowSkin));
 			
 			minWidth  = width;
 			minHeight = height; 
 			
+			if (defaultAsPopUp) {
+				registerAsPopup();
+			}
 		}
 		
 		/**
@@ -300,6 +327,14 @@ package com.bienvisto.ui.windows
 			}
 		}
 		
+		/**
+		 * On resize changed
+		 */ 
+		protected function onResizeChange():void
+		{
+			
+		}
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -319,25 +354,13 @@ package com.bienvisto.ui.windows
 		}
 		
 		/**
-		 * Handle added to stage
-		 * 
-		 * @param event
-		 */ 
-		protected function handleAddedToStage(event:Event):void
-		{
-			removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
-			invalidateResizeListener();
-			registerAsPopup();
-		}
-		
-		/**
 		 * Handle removed from stage
 		 * 
 		 * @param event
 		 */ 
 		protected function handleRemovedFromStage(event:Event):void
 		{
-			removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+			removeEventListener(Event.ADDED_TO_STAGE, handleRemovedFromStage);
 			unregisterAsPopup();	
 		}
 		
@@ -386,7 +409,6 @@ package com.bienvisto.ui.windows
 			var parentHeight:Number = parent.height;
 			if (y < offsetTop) {
 				y = offsetTop;
-				trace(stage.width, stage.height);
 			}
 			else if (y > parent.height - (height + offsetBottom)) {
 				y = parent.height - (height + offsetBottom);
@@ -457,6 +479,7 @@ package com.bienvisto.ui.windows
 			parent.height = parentHeight; // restore parent height
 			event.updateAfterEvent();
 			
+			onResizeChange();
 			if (positionFixed) {
 				invalidatePositionFixed();
 			}
@@ -473,8 +496,8 @@ package com.bienvisto.ui.windows
 			
 			var root:DisplayObject = systemManager.getSandboxRoot();
 			
-			root.removeEventListener(MouseEvent.MOUSE_MOVE, handleResizeMouseMove, true);
-			root.removeEventListener(MouseEvent.MOUSE_UP, handleResizeMouseUp, true);
+			root.removeEventListener(MouseEvent.MOUSE_MOVE, handleResizeMouseMove);
+			root.removeEventListener(MouseEvent.MOUSE_UP, handleResizeMouseUp);
 			root.removeEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleResizeMouseUp);		
 		}
 
