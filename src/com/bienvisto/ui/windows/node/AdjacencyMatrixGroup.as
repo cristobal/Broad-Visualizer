@@ -1,6 +1,6 @@
 package com.bienvisto.ui.windows.node
 {
-	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
+	import com.bienvisto.core.network.graph.AdjacencyMatrix;
 	
 	import mx.core.UIComponent;
 	

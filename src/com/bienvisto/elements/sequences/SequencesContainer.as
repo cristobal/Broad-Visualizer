@@ -1,6 +1,10 @@
 package com.bienvisto.elements.sequences
 {
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.node.NodeContainer;
+	import com.bienvisto.elements.sequences.sources.SequencesForwarded;
+	import com.bienvisto.elements.sequences.sources.SequencesInserted;
+	import com.bienvisto.elements.sequences.sources.SequencesRecv;
+	import com.bienvisto.elements.sequences.sources.SequencesSent;
 
 	/**
 	 * SequencesContainer.as

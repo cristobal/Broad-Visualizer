@@ -3,9 +3,9 @@ package com.bienvisto.elements.topology
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.graph.Graph;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.graph.Graph;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	
 	import flash.events.Event;
 	import flash.utils.Dictionary;

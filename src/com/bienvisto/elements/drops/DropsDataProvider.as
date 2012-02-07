@@ -1,22 +1,21 @@
-package com.bienvisto.elements.buffer
+package com.bienvisto.elements.drops
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateDataProvider;
 	import com.bienvisto.core.aggregate.IAggregateProvider;
 	
 	/**
-	 * BuffersDataProvider.as
-	 * 	Old VariableBuffers class
+	 * DropsDataProvider.as
+	 * 	Old VariableDrops class
 	 * 
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
 	 */
-	public final class BuffersDataProvider extends AggregateDataProvider
+	public final class DropsDataProvider extends AggregateDataProvider
 	{
-		
-		public function BuffersDataProvider(buffers:Buffers)
+		public function DropsDataProvider(drops:Drops)
 		{
-			super("Packets in buffer", buffers);
+			super("Packets Dropped", drops);
 		}
 		
 		/**
@@ -24,7 +23,7 @@ package com.bienvisto.elements.buffer
 		 */ 
 		override protected function aggregateSum(oldValue:Number, group:int, size:int, item:Aggregate):Number
 		{
-			return (oldValue * size + Buffer(item).size) / (size + 1);
+			return oldValue + 1; // we add one more drop
 		}
 	}
 }

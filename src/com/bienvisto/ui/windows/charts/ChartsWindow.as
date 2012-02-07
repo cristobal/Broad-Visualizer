@@ -1,21 +1,17 @@
 package com.bienvisto.ui.windows.charts
 {
 	import com.bienvisto.core.aggregate.AggregateDataProvider;
-	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.ui.windows.BaseWindow;
 	
-	import flash.display.DisplayObject;
-	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.utils.setTimeout;
 	
 	import mx.charts.AreaChart;
-	import mx.charts.chartClasses.CartesianDataCanvas;
 	import mx.charts.series.LineSeries;
 	import mx.collections.ArrayCollection;
 	import mx.controls.Spacer;
-	import mx.core.FlexShape;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.graphics.Stroke;
@@ -23,15 +19,15 @@ package com.bienvisto.ui.windows.charts
 	import spark.components.BorderContainer;
 	import spark.components.Button;
 	import spark.components.ComboBox;
+	import spark.components.DropDownList;
+	import spark.components.Group;
 	import spark.components.HSlider;
 	import spark.components.Label;
-	import spark.components.NumericStepper;
+	import spark.components.SkinnableContainer;
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.TileLayout;
 	import spark.skins.spark.HSliderSkin;
-	import spark.skins.spark.TitleWindowSkin;
 	
-	// TODO: Switch to slider if possible
 	/**
 	 * ChartsWindowContainer.as
 	 * 
@@ -40,6 +36,22 @@ package com.bienvisto.ui.windows.charts
 	 */ 
 	public class ChartsWindow extends BaseWindow
 	{
+		
+		/**
+		 * @private
+		 */ 
+		private static var lineColors:Vector.<uint> = Vector.<uint>([0x0000ff,
+			0x00FF00,
+			0xFF0000,
+			0xF6FF00,
+			0xBB00FF,
+			0xFF7300,
+			0xFF0095,
+			0xFF6622,
+			0x70FAA3,
+			0xAA8888
+		]);
+		
 		/**
 		 * @private
 		 */ 
@@ -58,12 +70,12 @@ package com.bienvisto.ui.windows.charts
 		/**
 		 * @public
 		 */ 
-		public var resolutionSlider:NumericStepper; //NumericStepper;
+		public var resolutionSlider:ResolutionSlider;
 		
 		/**
 		 * @public
 		 */ 
-		public var providersComboBox:ComboBox;
+		public var providersList:ComboBox;
 		
 		/**
 		 * @public
@@ -71,9 +83,19 @@ package com.bienvisto.ui.windows.charts
 		public var addProviderButton:Button;
 		
 		/**
+		 * @public
+		 */ 
+		public var filterNodesButton:Button;
+		
+		/**
 		 * @private
 		 */ 
 		private var labelsContainer:BorderContainer;
+		
+		/**
+		 * @private
+		 */ 
+		private var nodesContainer:BorderContainer;
 		
 		/**
 		 * @private
@@ -179,9 +201,9 @@ package com.bienvisto.ui.windows.charts
 		 */
 		public function set minResolution(value:Number):void
 		{
-			trace("new minResolution value:", value);
 			resolutionSlider.minimum = value;
-			resolutionSlider.stepSize = (resolutionSlider.maximum - resolutionSlider.minimum) / 1000;
+			resolutionSlider.stepSize    = (resolutionSlider.maximum - resolutionSlider.minimum) / 1000;
+			resolutionSlider.snapInterval = resolutionSlider.snapInterval;
 		}
 		
 		public function get minResolution():Number
@@ -197,9 +219,9 @@ package com.bienvisto.ui.windows.charts
 		 */
 		public function set maxResolution(value:Number):void
 		{
-			trace("new maxResolution value:", value);
-			resolutionSlider.maximum = value;
-			resolutionSlider.stepSize = (resolutionSlider.maximum - resolutionSlider.minimum) / 1000;
+			resolutionSlider.maximum      = value;
+			resolutionSlider.stepSize     = (resolutionSlider.maximum - resolutionSlider.minimum) / 1000;
+			resolutionSlider.snapInterval = resolutionSlider.snapInterval;
 		}
 		
 		public function get maxResolution():Number
@@ -228,7 +250,7 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		private function invalidateDataProviders():void
 		{
-			if (!providersComboBox) {
+			if (!providersList) {
 				return;
 			}
 			
@@ -237,11 +259,12 @@ package com.bienvisto.ui.windows.charts
 			var item:Object;
 			for (var i:int = 0, l:int = dataProviders.length; i < l; i++) {
 				provider = dataProviders[i];
-				item     = {label: provider.name, oid: provider.oid, id: i, color: provider.color};
+				item     = {label: provider.name, oid: provider.oid, id: i};
 				list.addItem(item);
 			}
-			
-			providersComboBox.dataProvider = list;
+
+			providersList.dataProvider = list;
+			providersList.selectedItem = list[0];
 		}
 		
 		/**
@@ -270,11 +293,12 @@ package com.bienvisto.ui.windows.charts
 				}
 				
 				if (provider) {
-					var label:DataProviderLabel = new DataProviderLabel(provider);
-					label.addEventListener(DataProviderLabel.REMOVE, handleDataProviderLabelRemove);
-					labelsContainer.addElement(label);
 					interests.push(provider);
 					invalidateInterests();
+					
+					var label:DataProviderLabel = new DataProviderLabel(item, lineColors[interests.length - 1]);
+					label.addEventListener(DataProviderLabel.REMOVE, handleDataProviderLabelRemove);
+					labelsContainer.addElement(label);
 				}
 			}
 		}
@@ -287,7 +311,7 @@ package com.bienvisto.ui.windows.charts
 		private function removeDataProviderLabel(label:DataProviderLabel):void
 		{
 		
-			var interest:AggregateDataProvider = label.provider;
+			var interest:Object = label.item;
 			var removed:Boolean = false;
 			for (var i:int = interests.length; i--;) {
 				if (interests[i].oid == interest.oid) {
@@ -298,22 +322,17 @@ package com.bienvisto.ui.windows.charts
 			}
 			
 			
+			label.removeEventListener(DataProviderLabel.REMOVE, handleDataProviderLabelRemove);
+			labelsContainer.removeElement(label);
 			if (removed) {
 				invalidateInterests();
-			}
-			
-			try {
-				labelsContainer.removeElement(label);
-			}
-			catch(error:Error) {
-					
 			}
 		}
 		
 		/**
 		 * Invalidate interests
 		 */ 
-		private function invalidateInterests():void
+		public function invalidateInterests():void
 		{
 			if (interests.length == 0 && chart.series) {
 				chart.series = [];
@@ -338,20 +357,19 @@ package com.bienvisto.ui.windows.charts
 			for (i = 0; i < l; i++) {
 				interest = interests[i];
 				lineSeries = new LineSeries();
-				lineSeries.dataProvider = interest.getList(resolution, nodes);
+				lineSeries.dataProvider = interest.getValues(resolution, nodes);
 				lineSeries.xField = "hAxis";
 				lineSeries.yField = "vAxis";
 				lineSeries.displayName = interest.name;
-				lineSeries.setStyle("lineStroke", new Stroke(interest.color, 2));
+				lineSeries.setStyle("lineStroke", new Stroke(lineColors[i], 2));
 				
 				if (ArrayCollection(lineSeries.dataProvider).length > 0) {
 					series.push(lineSeries);
 				}
 			}
 			
-			if (series.length > 0) {
-				chart.series = series;
-			}
+			
+		 chart.series = series;
 		}
 		
 		/**
@@ -395,6 +413,7 @@ package com.bienvisto.ui.windows.charts
 			var layout:TileLayout = new TileLayout();
 			layout.horizontalAlign = "left";
 			layout.verticalAlign   = "top"; 
+			layout.paddingRight    = 5;
 			labelsContainer.layout = layout;
 			contentGroup.addElement(labelsContainer);
 			
@@ -420,36 +439,34 @@ package com.bienvisto.ui.windows.charts
 			borderContainer.setStyle("right", 0);
 			borderContainer.setStyle("bottom", 0);
 			borderContainer.height = 30;
-			var hl:HorizontalLayout = new HorizontalLayout();
-			hl.horizontalAlign ="center" 
-			hl.verticalAlign ="middle";
-			borderContainer.layout = hl;
+			var horizontalLayout:HorizontalLayout = new HorizontalLayout();
+			horizontalLayout.horizontalAlign ="center";
+			horizontalLayout.verticalAlign ="middle";
+			borderContainer.layout = horizontalLayout;
 			contentGroup.addElement(borderContainer);
 		
 			var label:Label = new Label();
 			label.text = "Resolution:";
 			borderContainer.addElement(label);
-			
-			
-			resolutionSlider = new NumericStepper();
+
+			resolutionSlider = new ResolutionSlider();
 			resolutionSlider.minimum = 0;
 			resolutionSlider.maximum = 10000;
-			resolutionSlider.value = 1000;
-			resolutionSlider.stepSize = 100;
-			resolutionSlider.snapInterval = 100;
-			resolutionSlider.setStyle("liveDragging", "false");
-			// resolutionSlider.width = 100;
+			resolutionSlider.value = 10000;
+			resolutionSlider.stepSize = 1;
+			resolutionSlider.snapInterval = 1;
+			resolutionSlider.addEventListener(Event.CHANGE, handleResolutionSliderChange);
 			borderContainer.addElement(resolutionSlider);
 			
 			var spacer:Spacer = new Spacer();
 			spacer.setStyle("width", "100%");
 			borderContainer.addElement(spacer);
 			
-			providersComboBox = new ComboBox();
-			providersComboBox.width = 150;
-			providersComboBox.selectedIndex = 0;
-			providersComboBox.labelField    = "label";
-			borderContainer.addElement(providersComboBox);
+			providersList = new ComboBox();
+			providersList.width = 150;
+			providersList.selectedIndex = 0;
+			providersList.labelField    = "label";
+			borderContainer.addElement(providersList);
 			
 			addProviderButton = new Button();
 			addProviderButton.label = "add";
@@ -457,12 +474,37 @@ package com.bienvisto.ui.windows.charts
 			addProviderButton.addEventListener(MouseEvent.CLICK, handleAddProviderButtonClick);
 			borderContainer.addElement(addProviderButton);
 			
+			filterNodesButton = new Button();
+			filterNodesButton.label = "filter";
+			filterNodesButton.width = 50;
+			filterNodesButton.addEventListener(MouseEvent.CLICK, handleFilterNodesButtonClick);
+			borderContainer.addElement(filterNodesButton);
+			
+/*			nodesContainer = new BorderContainer();
+			nodesContainer.setStyle("width", "100");
+			nodesContainer.setStyle("backgroundColor", "0xAFAFAF");
+			nodesContainer.setStyle("borderColor", "0xCCCCCC" );
+			nodesContainer.setStyle("left", 0);
+			nodesContainer.setStyle("right", 0);
+			nodesContainer.setStyle("top", 0);
+			nodesContainer.setStyle("bottom", 30);
+			contentGroup.addElement(nodesContainer);*/
+			
 			super.setup();
 			updateProgress();
 			invalidateDataProviders();
 			setTimeout(updateProgress, 100);
 		}
 		
+		/**
+		 * Handle filter button click
+		 * 
+		 * @param event
+		 */ 
+		private function handleFilterNodesButtonClick(event:MouseEvent):void
+		{
+			
+		}
 		
 		/**
 		 * Handle add provider button click
@@ -471,8 +513,9 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		private function handleAddProviderButtonClick(event:MouseEvent):void
 		{
-			addSelectedDataProvider(providersComboBox.selectedItem);
-		}		
+			addSelectedDataProvider(providersList.selectedItem);
+		}
+		
 		
 		/**
 		 * Handle data provider label remove
@@ -482,6 +525,16 @@ package com.bienvisto.ui.windows.charts
 		private function handleDataProviderLabelRemove(event:Event):void
 		{
 			removeDataProviderLabel(DataProviderLabel(event.target));	
+		}
+		
+		/**
+		 * Handle resolution slider change
+		 * 
+		 * @param event
+		 */ 
+		private function handleResolutionSliderChange(event:Event):void
+		{
+			invalidateInterests();
 		}
 		
 	}

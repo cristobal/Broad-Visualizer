@@ -1,7 +1,7 @@
 package com.bienvisto.ui.windows.charts
 {
 	import com.bienvisto.core.aggregate.AggregateDataProvider;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.node.NodeContainer;
 	
 	import mx.events.CloseEvent;
 	
@@ -172,6 +172,16 @@ package com.bienvisto.ui.windows.charts
 		{
 			var window:ChartsWindow = ChartsWindow(event.target);
 			remove(window);
+		}
+		
+		/**
+		 * Invalidate windows
+		 */ 
+		public function invalidateWindows():void
+		{
+			for (var i:int = windows.length; i--;){ 
+				windows[i].invalidateInterests();
+			}
 		}
 	}
 }

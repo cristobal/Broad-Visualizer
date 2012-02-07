@@ -3,11 +3,11 @@ package com.bienvisto.elements.routing
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.AggregateCollection;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
-	import com.bienvisto.elements.network.graph.Edge;
-	import com.bienvisto.elements.network.graph.Graph;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.graph.AdjacencyMatrix;
+	import com.bienvisto.core.network.graph.Edge;
+	import com.bienvisto.core.network.graph.Graph;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.util.fnv;
 	
 	import flash.events.Event;

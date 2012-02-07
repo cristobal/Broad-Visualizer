@@ -63,6 +63,9 @@
 				<s:Label styleName="label" y="50" text="Rx total:" />
 				<s:Label styleName="label" y="70" text="Dx total:" />
 				
+				<s:Label styleName="label" y="100" text="Tx/s: " />
+				<s:Label styleName="label" y="120" text="Rx/s: " />
+				<s:Label styleName="label" y="140" text="Dx/s: " />
 			</s:Group>	
 			
 			<s:Group x="100">
@@ -71,6 +74,10 @@
 				<s:Label id="txTotalValue" styleName="value"  y="32" text="0" />
 				<s:Label id="rxTotalValue" styleName="value" y="52" text="0" />
 				<s:Label id="dxTotalValue" styleName="value" y="72" text="0" />
+				
+				<s:Label id="txRateValue" styleName="value" y="102" text="0" />
+				<s:Label id="rxRateValue" styleName="value" y="122" text="0" />
+				<s:Label id="dxRateValue" styleName="value" y="142" text="0" />
 			</s:Group>
 			
 			<s:Group x="200">

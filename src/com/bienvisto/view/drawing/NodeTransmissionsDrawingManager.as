@@ -1,8 +1,8 @@
 package com.bienvisto.view.drawing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.packet.Packet;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.packet.Packet;
 	import com.bienvisto.elements.transmissions.Transmissions;
 	import com.bienvisto.util.DashedLine;
 	import com.bienvisto.view.components.NodeSprite;

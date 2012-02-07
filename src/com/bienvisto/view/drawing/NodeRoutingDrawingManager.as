@@ -1,7 +1,7 @@
 package com.bienvisto.view.drawing
 {
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;

@@ -15,7 +15,9 @@ package com.bienvisto.ui.windows
 	
 	import spark.components.Group;
 	import spark.components.TitleWindow;
+	import spark.layouts.HorizontalLayout;
 	import spark.primitives.Path;
+	import spark.skins.spark.TitleWindowSkin;
 	
 	/**
 	 * BaseWindow.as
@@ -107,44 +109,44 @@ package com.bienvisto.ui.windows
 		//-------------------------------------------------------------------------
 		
 		//----------------------------------
-		//  defaultAsPopUp
+		//  defaultAsFloatingWindow
 		//---------------------------------- 
 		
 		/**
 		 * @private
 		 */ 
-		private var _defaultAsPopUp:Boolean = true;
+		private var _defaultAsFloatingWindow:Boolean = true;
 		
 		/**
 		 * @readonly get registeredAsPopUp
-		 * 	Wether this component has been registered as a popup element
+		 * 	Wether this component has been registered as a floating window
 		 */ 
-		public function get defaultAsPopUp():Boolean
+		public function get defaultAsFloatingWindow():Boolean
 		{
-			return _defaultAsPopUp;
+			return _defaultAsFloatingWindow;
 		}
 		
-		public function set defaultAsPopUp(value:Boolean):void
+		public function set defaultAsFloatingWindow(value:Boolean):void
 		{
-			_defaultAsPopUp = value;
+			_defaultAsFloatingWindow = value;
 		}
 		
 		//----------------------------------
-		//  registeredAsPopUp
+		//  registeredAsFloatingWindow
 		//---------------------------------- 
 		
 		/**
 		 * @private
 		 */ 
-		private var _registeredAsPopUp:Boolean = false;
+		private var _registeredAsFloatingWindow:Boolean = false;
 		
 		/**
 		 * @readonly get registeredAsPopUp
 		 * 	Wether this component has been registered as a popup element
 		 */ 
-		public function get registeredAsPopUp():Boolean
+		public function get registeredAsFloatingWindow():Boolean
 		{
-			return _registeredAsPopUp;
+			return _registeredAsFloatingWindow;
 		}
 		
 		//----------------------------------
@@ -186,13 +188,13 @@ package com.bienvisto.ui.windows
 		protected function setup():void
 		{
 			// set the style
-/*			var titleWindowSkin:TitleWindowSkin = TitleWindowSkin(skin); 
+			var titleWindowSkin:TitleWindowSkin = TitleWindowSkin(skin); 
 			titleWindowSkin.dropShadow.blurX = 10;
 			titleWindowSkin.dropShadow.blurY = 5;
 			titleWindowSkin.dropShadow.distance = 7;
 			titleWindowSkin.titleDisplay.minHeight = 28;
-			HorizontalLayout(titleWindowSkin.controlBarGroup.layout).paddingBottom = 0;
-			HorizontalLayout(titleWindowSkin.controlBarGroup.layout).gap = 0;*/
+			// HorizontalLayout(titleWindowSkin.controlBarGroup.layout).paddingBottom = 0;
+			// HorizontalLayout(titleWindowSkin.controlBarGroup.layout).gap = 0;
 			
 			resizeHandle = new Group();
 			resizeHandle.width  = 15;
@@ -213,8 +215,8 @@ package com.bienvisto.ui.windows
 			minWidth  = width;
 			minHeight = height; 
 			
-			if (defaultAsPopUp) {
-				registerAsPopup();
+			if (defaultAsFloatingWindow) {
+				registerAsFloatingWindow();
 			}
 		}
 		
@@ -237,16 +239,18 @@ package com.bienvisto.ui.windows
 		/**
 		 * Register as popup
 		 */ 
-		protected function registerAsPopup():void
+		protected function registerAsFloatingWindow():void
 		{
 			try {
+				TitleWindowSkin(skin).topGroup.addEventListener(MouseEvent.MOUSE_DOWN, handleTopGroupMouseDown);
 				addEventListener(MoveEvent.MOVE, handleMoveEvent);
-				PopUpManager.addPopUp(this, parent);
+				
+				// PopUpManager.addPopUp(this, parent);
 			}
 			catch(error:Error) {
 				// fail silently
 			}
-			_registeredAsPopUp = true;
+			_registeredAsFloatingWindow = true;
 		}
 		
 		/**
@@ -254,9 +258,10 @@ package com.bienvisto.ui.windows
 		 */ 
 		protected function unregisterAsPopup():void
 		{
-			if (_registeredAsPopUp) {
+			if (_registeredAsFloatingWindow) {
 				try {
-					PopUpManager.removePopUp(this);	
+					removeEventListener(MoveEvent.MOVE, handleMoveEvent);
+					// PopUpManager.removePopUp(this);	
 				}
 				catch (error:Error) {
 					// fail silently
@@ -393,6 +398,11 @@ package com.bienvisto.ui.windows
 		//-------------------------------------------------------------------------
 		
 		/**
+		 * @private
+		 */ 
+		private var lastMovePoint:Point;
+		
+		/**
 		 * Handle move event
 		 * 
 		 * @param event
@@ -426,6 +436,53 @@ package com.bienvisto.ui.windows
 				resized = false;
 			}
 			
+		}
+		
+		/**
+		 * Handle top group mouse down
+		 * 
+		 * @param event
+		 */ 
+		protected function handleTopGroupMouseDown(event:MouseEvent):void
+		{
+			var root:DisplayObject = systemManager.getSandboxRoot();
+			root.addEventListener(MouseEvent.MOUSE_MOVE, handleTopGroupMouseMove);
+			root.addEventListener(MouseEvent.MOUSE_UP, handleTopGroupMouseUp);
+			root.addEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleTopGroupMouseUp);
+			
+			lastMovePoint = new Point(event.stageX, event.stageY);
+		}
+		
+		/**
+		 * Handle top group mouse down
+		 * 
+		 * @param event
+		 */
+		protected function handleTopGroupMouseMove(event:MouseEvent):void
+		{
+			var stageX:Number = event.stageX;
+			var stageY:Number = event.stageY;
+			
+			var dx:Number = stageX - lastMovePoint.x;
+			var dy:Number = stageY - lastMovePoint.y;
+			
+			x += dx;
+			y += dy;
+			
+			lastMovePoint = new Point(stageX, stageY);
+		}
+		
+		/**
+		 * Handle top group mouse down
+		 * 
+		 * @param event
+		 */
+		protected function handleTopGroupMouseUp(event:MouseEvent):void
+		{
+			var root:DisplayObject = systemManager.getSandboxRoot();
+			root.removeEventListener(MouseEvent.MOUSE_MOVE, handleTopGroupMouseMove);
+			root.removeEventListener(MouseEvent.MOUSE_UP, handleTopGroupMouseUp);
+			root.removeEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleTopGroupMouseUp);
 		}
 		
 		//--------------------------------------------------------------------------
@@ -500,6 +557,7 @@ package com.bienvisto.ui.windows
 			root.removeEventListener(MouseEvent.MOUSE_UP, handleResizeMouseUp);
 			root.removeEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleResizeMouseUp);		
 		}
+		
 
 	}
 }

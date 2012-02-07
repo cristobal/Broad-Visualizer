@@ -1,10 +1,10 @@
 package com.bienvisto.ui.windows.topology
 {
-	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
-	import com.bienvisto.elements.network.graph.Edge;
-	import com.bienvisto.elements.network.graph.Graph;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.graph.AdjacencyMatrix;
+	import com.bienvisto.core.network.graph.Edge;
+	import com.bienvisto.core.network.graph.Graph;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.ui.windows.BaseWindow;

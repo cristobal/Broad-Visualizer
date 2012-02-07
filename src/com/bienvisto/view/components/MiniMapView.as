@@ -3,8 +3,8 @@ package com.bienvisto.view.components
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.MobilityArea;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.util.DashedLine;
 	import com.bienvisto.util.sprintf;
 	

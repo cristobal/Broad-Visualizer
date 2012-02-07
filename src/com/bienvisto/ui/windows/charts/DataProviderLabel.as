@@ -6,12 +6,14 @@ package com.bienvisto.ui.windows.charts
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.events.FlexEvent;
+	import mx.utils.ObjectProxy;
+	
 	import spark.components.BorderContainer;
 	import spark.components.Group;
 	import spark.components.Label;
 	import spark.layouts.HorizontalLayout;
 	import spark.primitives.Path;
-
 	/**
 	 * DataProviderLabel.as 
 	 *
@@ -30,33 +32,54 @@ package com.bienvisto.ui.windows.charts
 		[event(name="remove", type="flash.events.Event")]
 		public static const REMOVE:String = "remove";
 		
+		private static var labelOffset:int = 17;
+		
 		/**
 		 * Constructs a new VariableLabel object
 		 *
 		 * @param variableName Name of the variable
 		 * @param color Color in which the variable is represented
 		 */
-		public function DataProviderLabel(dataProvider:AggregateDataProvider)
+		public function DataProviderLabel(item:Object, color:uint)
 		{
-			_provider = dataProvider;
+			_item   = new ObjectProxy(item); 
+			_color  = color;
 			
-			width  = 130;
+			width  = 150;
 			height = 18;
 			
 			initGraphics();
 		}
 		
 		/**
+		 * @private
+		 */ 
+		private var label:Label;
+		
+		/**
 		 * Name of the associated variable
 		 */
-		private var _provider:AggregateDataProvider;
+		private var _item:Object;
 		
 		/**
 		 * @readonly provider
 		 */ 
-		public function get provider():AggregateDataProvider
+		public function get item():Object
 		{
-			return _provider;
+			return _item;
+		}
+		
+		/**
+		 * Name of the associated variable
+		 */
+		private var _color:uint;
+		
+		/**
+		 * @readonly color
+		 */ 
+		public function get color():uint
+		{
+			return _color;
 		}
 		
 		/**
@@ -64,17 +87,15 @@ package com.bienvisto.ui.windows.charts
 		 * colored rectangle containing a label (the name of the variable) and
 		 * a close button to remove the variable from the chart
 		 */
-		protected function initGraphics():void
+		private function initGraphics():void
 		{
-			var label:Label = new Label();
+			label= new Label();
 			var closeButton:Label = new Label();
 			
-			label.text = _provider.name;
-			label.setStyle("left", 17);
+			label.text = item.label;
+			label.setStyle("left", labelOffset);
 			label.setStyle("top", 3);
 			label.setStyle("fontSize", 12);
-			
-			var color:uint = _provider.color;
 			
 			// Draw the close button
 			closeButton.width = 15;
@@ -87,12 +108,13 @@ package com.bienvisto.ui.windows.charts
 			closeButton.graphics.lineTo(10,10);
 			closeButton.graphics.moveTo(5,10);
 			closeButton.graphics.lineTo(10,5);
-			
 			closeButton.addEventListener(MouseEvent.CLICK, handleCloseButtonClick);
 			
 			setStyle("cornerRadius", 2);
 			setStyle("backgroundColor", Tools.lightenColor(color, 0.8));
 			setStyle("borderColor", Tools.lightenColor(color, 0.6));
+			
+			
 			addElement(closeButton);
 			addElement(label);
 		}
@@ -101,10 +123,11 @@ package com.bienvisto.ui.windows.charts
 		 * Called when the remove button is clicked. Dispatches a new REMOVE
 		 * event
 		 */
-		protected function handleCloseButtonClick(event:MouseEvent):void
+		private function handleCloseButtonClick(event:MouseEvent):void
 		{
 			dispatchEvent(new Event(REMOVE));
 		}
+		
 	}
 }
 

@@ -2,8 +2,8 @@ package com.bienvisto.ui.windows.sequences
 {
 	import com.bienvisto.elements.sequences.Sequence;
 	import com.bienvisto.elements.sequences.SequencesContainer;
-	import com.bienvisto.elements.sequences.SequencesRecv;
-	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.sequences.sources.SequencesRecv;
+	import com.bienvisto.elements.sequences.sources.SequencesSent;
 	import com.bienvisto.ui.windows.BaseWindow;
 	import com.bienvisto.util.sprintf;
 	

@@ -3,27 +3,36 @@ package com.bienvisto
 	import com.bienvisto.core.Simulation;
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.events.TimedEvent;
+	import com.bienvisto.core.network.graph.AdjacencyMatrix;
+	import com.bienvisto.core.network.graph.Graph;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.core.parser.TraceSourceParser;
 	import com.bienvisto.elements.buffer.Buffers;
 	import com.bienvisto.elements.buffer.BuffersDataProvider;
 	import com.bienvisto.elements.drops.Drops;
+	import com.bienvisto.elements.drops.DropsDataProvider;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.MobilityArea;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
-	import com.bienvisto.elements.network.graph.Graph;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
 	import com.bienvisto.elements.receptions.Receptions;
+	import com.bienvisto.elements.receptions.ReceptionsDataProvider;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingTable;
 	import com.bienvisto.elements.routing.RoutingTableEntry;
 	import com.bienvisto.elements.routing.SimpleRoute;
 	import com.bienvisto.elements.sequences.SequencesContainer;
-	import com.bienvisto.elements.sequences.SequencesRecv;
-	import com.bienvisto.elements.sequences.SequencesSent;
+	import com.bienvisto.elements.sequences.providers.SequencesForwardedDataProvider;
+	import com.bienvisto.elements.sequences.providers.SequencesInsertedDataProvider;
+	import com.bienvisto.elements.sequences.providers.SequencesRecvDataProvider;
+	import com.bienvisto.elements.sequences.providers.SequencesSentDataProvider;
+	import com.bienvisto.elements.sequences.sources.SequencesForwarded;
+	import com.bienvisto.elements.sequences.sources.SequencesRecv;
+	import com.bienvisto.elements.sequences.sources.SequencesSent;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.elements.transmissions.Transmissions;
+	import com.bienvisto.elements.transmissions.TransmissionsBitrateDataProvider;
+	import com.bienvisto.elements.transmissions.TransmissionsDataProvider;
 	import com.bienvisto.io.FileReferenceReader;
 	import com.bienvisto.io.Reader;
 	import com.bienvisto.ui.menus.Playback;
@@ -84,8 +93,7 @@ package com.bienvisto
 		private var app:Application;
 		private var window:ApplicationWindow;
 		
-		private var view:VisualizerView;
-		
+		/* -- trace sources and simulation objects -- */
 		private var simulation:Simulation;
 		private var nodeContainer:NodeContainer;
 		private var mobility:Mobility;
@@ -98,11 +106,12 @@ package com.bienvisto
 		private var topology:Topology;
 		private var sequencesContainer:SequencesContainer;
 		
-		private var buffersDataProvider:BuffersDataProvider;
-		
+		/* -- parsed + reader -- */
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
 	
+		/* -- visualiser view & its view components-- */
+		private var view:VisualizerView;
 		private var nodeView:NodeView;
 		private var gridView:GridView;
 		private var statsView:StatsView;
@@ -110,6 +119,7 @@ package com.bienvisto
 		private var perimeterView:PerimeterView;
 		private var loaderView:LoaderView;
 		
+		/* -- Node view drawing managers -- */
 		private var nodeIDDrawingManager:NodeDrawingManager;
 		private var mobilityDrawingManager:NodeMobilityDrawingManager;
 		private var transmissionsDrawingManager:NodeTransmissionsDrawingManager;
@@ -237,8 +247,6 @@ package com.bienvisto
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
 			
-			
-			buffersDataProvider = new BuffersDataProvider(buffers);
 		}
 		
 		/**
@@ -247,20 +255,8 @@ package com.bienvisto
 		 * @param window
 		 */ 
 		private function bindWindow(window:ApplicationWindow):void
-		{
-			window.playback.menu.enabled = false;
-			window.menu.browseFileButton.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
-			
-			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
-			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
-			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
-
-			window.playback.addEventListener(TimedEvent.ELAPSED, handlePlaybackProgressTimerElapsed);
-			window.playback.addEventListener(ProgressTimeSlider.CHANGE_START, handlePlaybackProgressTimerChangeStart);
-			window.playback.addEventListener(ProgressTimeSlider.CHANGE_END, handlePlaybackProgressTimerChangeEnd);
-			window.playback.addEventListener(ProgressTimeSlider.LOAD_START, handlePlaybackProgressTimerLoadStart);
-			window.playback.addEventListener(ProgressTimeSlider.LOAD_END, handlePlaybackProgressTimerLoadEnd);
-			
+		{	
+			/* -- Menu-- */
 			// window menu add toggeable node drawing managers
 			window.menu.addToggeableNodeDrawingManager(nodeIDDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(buffersDrawingManager);
@@ -271,6 +267,10 @@ package com.bienvisto
 			window.menu.addToggeableNodeDrawingManager(routingDrawingManager.selectedDrawingManager);
 			window.menu.addToggeableNodeDrawingManager(routingDrawingManager.betweenNodesDrawingManager);
 			
+			window.menu.browseFileButton.addEventListener(MouseEvent.CLICK, handleBrowseFileClick);
+			
+			
+			/* -- Playback-- */
 			// window playback set misc view components
 			window.playback.addZoomView(gridView);
 			window.playback.addZoomView(nodeView);
@@ -279,6 +279,19 @@ package com.bienvisto
 			window.playback.setMiniMapView(miniMapView);
 			window.playback.setPerimeterView(perimeterView);
 			
+			window.playback.menu.enabled = false;
+			window.playback.playbackSpeed.addEventListener(Event.CHANGE, handlePlaybackSpeedChange);
+			window.playback.addEventListener(Playback.PLAY, handlePlayButtonStateChange);
+			window.playback.addEventListener(Playback.PAUSE, handlePlayButtonStateChange);
+			
+			window.playback.addEventListener(TimedEvent.ELAPSED, handlePlaybackProgressTimerElapsed);
+			window.playback.addEventListener(ProgressTimeSlider.CHANGE_START, handlePlaybackProgressTimerChangeStart);
+			window.playback.addEventListener(ProgressTimeSlider.CHANGE_END, handlePlaybackProgressTimerChangeEnd);
+			window.playback.addEventListener(ProgressTimeSlider.LOAD_START, handlePlaybackProgressTimerLoadStart);
+			window.playback.addEventListener(ProgressTimeSlider.LOAD_END, handlePlaybackProgressTimerLoadEnd);
+			
+			
+			/* -- Node Windows -- */
 			// window nodeWindows set the trace source components
 			window.nodeWindows.setMobility(mobility);
 			window.nodeWindows.setRouting(routing);
@@ -292,6 +305,8 @@ package com.bienvisto
 			// window nodeWindows set the node view
 			window.nodeWindows.setNodeView(nodeView);
 			
+			
+			/* -- Topology -- */
 			// Window topology window set nodeContainer + routing
 			window.topologyWindows.setNodeContainer(nodeContainer);
 			window.topologyWindows.setRouting(routing);
@@ -299,10 +314,42 @@ package com.bienvisto
 			window.topologyWindows.setNodeView(nodeView);
 			
 			
-			//
+			/* -- Charts -- */
+			// Assign the nodeContainer for the charts
 			window.chartsWindows.setNodeContainer(nodeContainer);
-			window.chartsWindows.addDataProvider(buffersDataProvider);
 			
+			// Append data providers for the charts windows
+			window.chartsWindows.addDataProvider(
+				new BuffersDataProvider(buffers)
+			);
+			window.chartsWindows.addDataProvider(
+				new DropsDataProvider(drops)
+			);
+			window.chartsWindows.addDataProvider(
+				new ReceptionsDataProvider(receptions)
+			);
+			window.chartsWindows.addDataProvider(
+				new TransmissionsDataProvider(transmissions)
+			);
+			window.chartsWindows.addDataProvider(
+				new TransmissionsBitrateDataProvider(transmissions)
+			);
+			window.chartsWindows.addDataProvider(
+				new SequencesSentDataProvider(sequencesContainer.sent)
+			);
+			window.chartsWindows.addDataProvider(
+				new SequencesInsertedDataProvider(sequencesContainer.inserted)
+			);
+			window.chartsWindows.addDataProvider(
+				new SequencesForwardedDataProvider(sequencesContainer.forwarded)
+			);
+			window.chartsWindows.addDataProvider(
+				new SequencesRecvDataProvider(sequencesContainer.recv)
+			);
+				
+			
+			/* -- Sequences window -- */
+			// Assign the sequencesContainer for the video sequences window
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
 		}
 		

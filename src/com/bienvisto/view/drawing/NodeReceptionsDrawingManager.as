@@ -1,7 +1,7 @@
 package com.bienvisto.view.drawing
 {
-	import com.bienvisto.elements.network.packet.Packet;
-	import com.bienvisto.elements.network.packet.PacketStats;
+	import com.bienvisto.core.network.packet.Packet;
+	import com.bienvisto.core.network.packet.PacketStats;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.view.components.NodeSprite;
 	

@@ -1,7 +1,7 @@
 package com.bienvisto.elements.topology
 {
 	import com.bienvisto.core.aggregate.Aggregate;
-	import com.bienvisto.elements.network.graph.Graph;
+	import com.bienvisto.core.network.graph.Graph;
 	
 	/**
 	 * TopologySet.as

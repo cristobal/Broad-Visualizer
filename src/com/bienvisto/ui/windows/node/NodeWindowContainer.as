@@ -6,9 +6,9 @@ package com.bienvisto.ui.windows.node
 	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.elements.mobility.Mobility;
 	import com.bienvisto.elements.mobility.Waypoint2D;
-	import com.bienvisto.elements.network.graph.AdjacencyMatrix;
-	import com.bienvisto.elements.network.graph.Graph;
-	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.core.network.graph.AdjacencyMatrix;
+	import com.bienvisto.core.network.graph.Graph;
+	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.routing.RoutingStatsItem;
@@ -157,6 +157,21 @@ package com.bienvisto.ui.windows.node
 		 * @public
 		 */ 
 		public var dxTotalValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var txRateValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var rxRateValue:Label;
+		
+		/**
+		 * @public
+		 */ 
+		public var dxRateValue:Label;
 		
 		
 		/**
@@ -367,6 +382,48 @@ package com.bienvisto.ui.windows.node
 		{
 			return dxTotalValue.text;
 		}
+		
+		
+		/**
+		 * @readwrite transmissions rate
+		 */ 
+		public function set txRate(value:String):void
+		{
+			txRateValue.text = value;
+		}
+		
+		public function get txRate():String
+		{
+			return txRateValue.text;
+		}
+		
+		
+		/**
+		 * @readwrite receptions rate
+		 */ 
+		public function set rxRate(value:String):void
+		{
+			rxRateValue.text = value;	
+		}
+		
+		public function get rxRate():String
+		{
+			return rxRateValue.text;
+		}
+		
+		/**
+		 * @readwrite drops rate
+		 */ 
+		public function set dxRate(value:String):void
+		{
+			dxRateValue.text = value;	
+		}
+		
+		public function get dxRate():String
+		{
+			return dxRateValue.text;
+		}
+		
 		
 		/**
 		 * @readwrite sequences size
@@ -803,17 +860,26 @@ package com.bienvisto.ui.windows.node
 			}
 			
 			if (transmissions) {
-				total = transmissions.sampleTotal(node, elapsed);
-				txTotal= String(total);
+				total  = transmissions.sampleTotal(node, elapsed);
+				txTotal = String(total);
+				
+				total  = transmissions.sampleRate(node, elapsed);
+				txRate = String(total);
 			}
 			
 			if (receptions) {
 				total = receptions.sampleTotal(node, elapsed)
 				rxTotal = String(total);
+				
+				total  = receptions.sampleRate(node, elapsed);
+				rxTotal = String(total);
 			}
 			
 			if (drops) {
 				total   = drops.sampleTotal(node, elapsed);
+				dxTotal = String(total);
+				
+				total  = drops.sampleRate(node, elapsed);
 				dxTotal = String(total);
 			}
 			

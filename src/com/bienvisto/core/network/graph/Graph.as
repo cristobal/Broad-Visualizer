@@ -1,4 +1,4 @@
-package com.bienvisto.elements.network.graph
+package com.bienvisto.core.network.graph
 {
 	import com.bienvisto.util.OIDUtil;
 	

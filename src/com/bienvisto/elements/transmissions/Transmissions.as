@@ -3,10 +3,11 @@ package com.bienvisto.elements.transmissions
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
+	import com.bienvisto.core.aggregate.IAggregateProvider;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
+	import com.bienvisto.core.network.packet.Packet;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
-	import com.bienvisto.elements.network.packet.Packet;
 	
 	import flash.utils.Dictionary;
 	
@@ -18,7 +19,7 @@ package com.bienvisto.elements.transmissions
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
 	 */ 
-	public final class Transmissions extends TraceSource implements ISimulationObject
+	public final class Transmissions extends TraceSource implements ISimulationObject, IAggregateProvider
 	{
 		
 		//--------------------------------------------------------------------------
@@ -211,5 +212,55 @@ package com.bienvisto.elements.transmissions
 			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
+		/**
+		 * Sample rate
+		 * 
+		 * @param node
+		 * @param time
+		 */ 
+		public function sampleRate(node:Node, time:int):int
+		{
+			
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return 0;	
+			}
+			
+			var rate:int = 0;
+			var collection:AggregateCollection = AggregateCollection(collections[id]);
+			var windowSize:int = 1000;
+			var up:int = time - (time % windowSize);
+			if (up > 0) {	
+				var lb:int = time - windowSize;	
+				var start:int = collection.findNearestKey(lb);
+				var end:int   = collection.findNearestKey(up);
+				
+				rate = end - start;
+			}
+			
+			return rate;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  IAggregateDataProvider Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Get items
+		 * 
+		 * @param node
+		 */ 
+		public function getItems(node:Node):Vector.<Aggregate>
+		{
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
+			
+			return AggregateCollection(collections[id]).items;
+		}
 	}
 }

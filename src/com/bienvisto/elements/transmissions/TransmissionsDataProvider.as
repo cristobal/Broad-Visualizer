@@ -1,22 +1,21 @@
-package com.bienvisto.elements.buffer
+package com.bienvisto.elements.transmissions
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateDataProvider;
 	import com.bienvisto.core.aggregate.IAggregateProvider;
 	
 	/**
-	 * BuffersDataProvider.as
-	 * 	Old VariableBuffers class
+	 * TransmissionsDataProvider.as
+	 * 	Old VariablePacketForwarded class
 	 * 
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
-	 */
-	public final class BuffersDataProvider extends AggregateDataProvider
+	 */ 
+	public class TransmissionsDataProvider extends AggregateDataProvider
 	{
-		
-		public function BuffersDataProvider(buffers:Buffers)
+		public function TransmissionsDataProvider(transmissions:Transmissions)
 		{
-			super("Packets in buffer", buffers);
+			super("Packets Forwarded", transmissions);
 		}
 		
 		/**
@@ -24,7 +23,8 @@ package com.bienvisto.elements.buffer
 		 */ 
 		override protected function aggregateSum(oldValue:Number, group:int, size:int, item:Aggregate):Number
 		{
-			return (oldValue * size + Buffer(item).size) / (size + 1);
+			// we add one packet forwarded
+			return oldValue + 1; 
 		}
 	}
 }

@@ -97,6 +97,16 @@
 			
 			/**
 			 * @private
+			 */ 
+			private var loaded:Number;
+			
+			/**
+			 * @private
+			 */ 
+			private var lastLoadedInvalidation:Number;
+			
+			/**
+			 * @private
 			 */ 	
 			private var resize:Boolean;
 
@@ -188,6 +198,13 @@
 			public function setLoaded(value:Number):void
 			{
 				playback.setLoaded(value);
+				loaded = value;
+				
+				value = value - (value % 10);
+				if (value != lastLoadedInvalidation) {
+					lastLoadedInvalidation = value;
+					chartsWindows.invalidateWindows(); // while is still loading invalidate windows
+				}
 			}
 			
 			/**
@@ -376,5 +393,4 @@
 
 	<!-- Playback Controller -->
 	<menus:Playback id="playback" bottom="0" width="100%" height="50" />
-	
 </s:Group>

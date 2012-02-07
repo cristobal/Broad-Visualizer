@@ -2,7 +2,7 @@ package com.bienvisto.view.drawing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.elements.drops.Drops;
-	import com.bienvisto.elements.network.node.Node;
+	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.view.components.NodeSprite;
 	
 	import flash.utils.Dictionary;

@@ -1,10 +1,12 @@
 package com.bienvisto.elements.buffer
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
+	import com.bienvisto.core.aggregate.IAggregateProvider;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
 	
 	import flash.utils.Dictionary;
 	
@@ -14,7 +16,7 @@ package com.bienvisto.elements.buffer
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class Buffers extends TraceSource implements ISimulationObject
+	public final class Buffers extends TraceSource implements ISimulationObject, IAggregateProvider
 	{
 		
 		//--------------------------------------------------------------------------
@@ -124,21 +126,6 @@ package com.bienvisto.elements.buffer
 		//--------------------------------------------------------------------------
 		
 		/**
-		 * Get Items
-		 * 
-		 * @param node
-		 */ 
-		public function getItems(node:Node):Vector.<Buffer>
-		{
-			var id:int = node.id;
-			if (!(id in collections)) {
-				return null;
-			}
-			
-			return Vector.<Buffer>(AggregateCollection(collections[id]).items);
-		}
-		
-		/**
 		 * Find buffer
 		 * 
 		 * @param node
@@ -170,5 +157,26 @@ package com.bienvisto.elements.buffer
 			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  IAggregateDataProvider Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Get items
+		 * 
+		 * @param node
+		 */ 
+		public function getItems(node:Node):Vector.<Aggregate>
+		{
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
+			
+			return AggregateCollection(collections[id]).items;
+		}
 	}
 }

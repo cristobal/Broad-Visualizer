@@ -1,4 +1,4 @@
-package com.bienvisto.elements.network.node
+package com.bienvisto.core.network.node
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.parser.TraceSource;

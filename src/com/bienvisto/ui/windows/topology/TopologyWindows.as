@@ -1,7 +1,7 @@
 package com.bienvisto.ui.windows.topology
 {
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.view.components.NodeView;

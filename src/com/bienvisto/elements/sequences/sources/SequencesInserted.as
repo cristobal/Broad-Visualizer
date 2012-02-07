@@ -1,10 +1,15 @@
-package com.bienvisto.elements.sequences
+package com.bienvisto.elements.sequences.sources
 {
 	import com.bienvisto.core.ISimulationObject;
+	import com.bienvisto.core.aggregate.Aggregate;
 	import com.bienvisto.core.aggregate.AggregateCollection;
+	import com.bienvisto.core.aggregate.IAggregateProvider;
+	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.core.parser.TraceSource;
-	import com.bienvisto.elements.network.node.Node;
-	import com.bienvisto.elements.network.node.NodeContainer;
+	import com.bienvisto.elements.sequences.Sequence;
+	import com.bienvisto.elements.sequences.SequencesContainer;
+	import com.bienvisto.elements.sequences.SequencesStats;
 	
 	import flash.utils.Dictionary;
 	
@@ -14,7 +19,7 @@ package com.bienvisto.elements.sequences
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class SequencesInserted extends TraceSource implements ISimulationObject
+	public final class SequencesInserted extends TraceSource implements ISimulationObject, IAggregateProvider
 	{
 		
 		//--------------------------------------------------------------------------
@@ -215,5 +220,26 @@ package com.bienvisto.elements.sequences
 			}
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  IAggregateDataProvider Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * Get items
+		 * 
+		 * @param node
+		 */ 
+		public function getItems(node:Node):Vector.<Aggregate>
+		{
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
+			
+			return AggregateCollection(collections[id]).items;
+		}
 	}
 }
