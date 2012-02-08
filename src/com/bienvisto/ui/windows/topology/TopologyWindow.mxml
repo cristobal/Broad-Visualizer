@@ -38,7 +38,7 @@
 			</s:Group>
 			
 			<s:Label text="Adjacency matrix:" styleName="label" fontWeight="bold" top="75" left="10" />
-			<node:AdjacencyMatrixGroup id="adjacencyMatrixGroup" top="95" left="15" />			
+			<topology:AdjacencyMatrixGroup id="adjacencyMatrixGroup" top="95" left="15" />			
 		</s:Group>
 	</s:Scroller>
 </topology:TopologyWindowContainer>

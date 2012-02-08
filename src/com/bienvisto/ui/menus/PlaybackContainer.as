@@ -15,15 +15,37 @@ package com.bienvisto.ui.menus
 	import spark.components.Label;
 	import spark.components.NumericStepper;
 	
+	/**
+	 * @Event
+	 * 	Dispatched when a new timed event requesting a new elapsed point in time for the simulation 
+	 * 	handled by the application window and the Bienvisto container.
+	 */ 
 	[Event(name="elapsed", type="com.bienvisto.core.events.TimedEvent")]
 	
+	/**
+	 * @Event
+	 * 	Dispatched when the playback progress has started changing
+	 */ 
 	[Event(name="changeStart", type="flash.events.Event")]
 	
+	/**
+	 * @Event
+	 * 	Dispatched when the playback progress has changed
+	 */ 
 	[Event(name="changeEnd", type="flash.events.Event")]
 	
+	/**
+	 * @Event
+	 * 	Dispatched when the playback progress has started loading
+	 */
 	[Event(name="loadStart", type="flash.events.Event")]
 	
+	/**
+	 * @Event
+	 * 	Dispatched when the playback progress has stopped loading
+	 */
 	[Event(name="loadEnd", type="flash.events.Event")]
+	
 	
 	/**
 	 * PlaybackContainer.as
@@ -262,7 +284,6 @@ package com.bienvisto.ui.menus
 		 */ 
 		protected function initComponents():void
 		{
-			
 			if (gridCheckbox) {
 				gridCheckbox.addEventListener(Event.CHANGE, handleGridCheckboxChange);
 			}

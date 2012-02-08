@@ -241,32 +241,8 @@ package com.bienvisto.ui.windows
 		 */ 
 		protected function registerAsFloatingWindow():void
 		{
-			try {
-				TitleWindowSkin(skin).topGroup.addEventListener(MouseEvent.MOUSE_DOWN, handleTopGroupMouseDown);
-				addEventListener(MoveEvent.MOVE, handleMoveEvent);
-				
-				// PopUpManager.addPopUp(this, parent);
-			}
-			catch(error:Error) {
-				// fail silently
-			}
+			TitleWindowSkin(skin).topGroup.addEventListener(MouseEvent.MOUSE_DOWN, handleTopGroupMouseDown);
 			_registeredAsFloatingWindow = true;
-		}
-		
-		/**
-		 * Unregister as popup
-		 */ 
-		protected function unregisterAsPopup():void
-		{
-			if (_registeredAsFloatingWindow) {
-				try {
-					removeEventListener(MoveEvent.MOVE, handleMoveEvent);
-					// PopUpManager.removePopUp(this);	
-				}
-				catch (error:Error) {
-					// fail silently
-				}
-			}
 		}
 		
 		/**
@@ -341,6 +317,43 @@ package com.bienvisto.ui.windows
 		}
 		
 		
+		/**
+		 * Move to
+		 * 
+		 * @param dx
+		 * @param dy
+		 */ 
+		protected function moveTo(dx:int, dy:int):void
+		{
+			var pw:Number = parentRectangle ? parentRectangle.width : parent.width;
+			var ph:Number = parentRectangle ? parentRectangle.height : parent.height;
+			
+			if (dx < 0) {
+				x = 0;
+			}
+			else if (x > (parent.width - width)) {
+				x = parent.width - width;	
+			}
+			else {
+				x = dx;
+			}
+			
+			if (dy < offsetTop) {
+				y = offsetTop;
+			}
+			else if (dy > parent.height - (height + offsetBottom)) {
+				y = parent.height - (height + offsetBottom);
+			}
+			else {
+				y = dy;
+			}
+			
+			// restore val
+			parent.width  = pw;
+			parent.height = ph;
+		}
+		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Events
@@ -366,7 +379,7 @@ package com.bienvisto.ui.windows
 		protected function handleRemovedFromStage(event:Event):void
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, handleRemovedFromStage);
-			unregisterAsPopup();	
+			_registeredAsFloatingWindow = false;
 		}
 		
 		/**
@@ -403,42 +416,6 @@ package com.bienvisto.ui.windows
 		private var lastMovePoint:Point;
 		
 		/**
-		 * Handle move event
-		 * 
-		 * @param event
-		 */ 
-		protected function handleMoveEvent(event:MoveEvent):void
-		{
-			if (x < 0) {
-				x = 0;
-			}
-			else if(x > (parent.width - width)) {
-				x = parent.width - width;
-			}
-			
-			var parentHeight:Number = parent.height;
-			if (y < offsetTop) {
-				y = offsetTop;
-			}
-			else if (y > parent.height - (height + offsetBottom)) {
-				y = parent.height - (height + offsetBottom);
-				parent.height = parentHeight; // restore parent height
-			}
-			
-			if (!positionFixed || !parent || !parentRectangle) {
-				return;
-			}
-			
-			if ((parent.width == parentRectangle.width)  && (parent.height == parentRectangle.height) && !resized) {
-				invalidatePositionFixed();
-			}
-			else if (resized) {
-				resized = false;
-			}
-			
-		}
-		
-		/**
 		 * Handle top group mouse down
 		 * 
 		 * @param event
@@ -451,6 +428,11 @@ package com.bienvisto.ui.windows
 			root.addEventListener(SandboxMouseEvent.MOUSE_UP_SOMEWHERE, handleTopGroupMouseUp);
 			
 			lastMovePoint = new Point(event.stageX, event.stageY);
+			
+			try {
+				Group(parent).addElementAt(this, Group(parent).numElements - 1); // move to top	
+			}
+			catch (error:Error){/* fail silently; should not happen */}
 		}
 		
 		/**
@@ -468,8 +450,7 @@ package com.bienvisto.ui.windows
 			var dx:Number = stageX - lastMovePoint.x;
 			var dy:Number = stageY - lastMovePoint.y;
 			
-			x += dx;
-			y += dy;
+			moveTo(x + dx, y + dy);
 			
 			lastMovePoint = new Point(stageX, stageY);
 		}

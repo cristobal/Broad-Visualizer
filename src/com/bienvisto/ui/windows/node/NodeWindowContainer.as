@@ -872,7 +872,7 @@ package com.bienvisto.ui.windows.node
 				rxTotal = String(total);
 				
 				total  = receptions.sampleRate(node, elapsed);
-				rxTotal = String(total);
+				rxRate= String(total);
 			}
 			
 			if (drops) {
@@ -880,7 +880,7 @@ package com.bienvisto.ui.windows.node
 				dxTotal = String(total);
 				
 				total  = drops.sampleRate(node, elapsed);
-				dxTotal = String(total);
+				dxRate = String(total);
 			}
 			
 			if (sequencesContainer) {

@@ -90,8 +90,13 @@ package com.bienvisto
 			this.window = window; 
 		}
 		
+		/* reference to application and the main window */
 		private var app:Application;
 		private var window:ApplicationWindow;
+		
+		/* helper variables */
+		private var first:Boolean = true;
+		private var ready:Boolean = false;
 		
 		/* -- trace sources and simulation objects -- */
 		private var simulation:Simulation;
@@ -104,8 +109,8 @@ package com.bienvisto
 		private var buffers:Buffers;
 		private var routing:Routing;
 		private var topology:Topology;
-		private var sequencesContainer:SequencesContainer;
-		
+		private var sequencesContainer:SequencesContainer;		
+
 		/* -- parsed + reader -- */
 		private var parser:TraceSourceParser;
 		private var reader:FileReferenceReader;
@@ -127,6 +132,18 @@ package com.bienvisto
 		private var dropsDrawingManager:NodeDropsDrawingManager;
 		private var routingDrawingManager:NodeRoutingDrawingManager;
 		private var buffersDrawingManager:NodeBuffersDrawingManager;
+		
+		/* --- Data Providers for charts -- */
+		private var buffersDataProvider:BuffersDataProvider;
+		private var dropsDataProvider:DropsDataProvider;
+		private var receptionsDataProvider:ReceptionsDataProvider;
+		private var transmissionsDataProvider:TransmissionsDataProvider;
+		private var transmissionsBitrateDataProvider:TransmissionsBitrateDataProvider;
+		private var sequencesSentDataProvider:SequencesSentDataProvider;
+		private var sequencesInsertedDataProvider:SequencesInsertedDataProvider;
+		private var sequencesForwardedDataProvider:SequencesForwardedDataProvider;
+		private var sequencesRecvDataProvider:SequencesRecvDataProvider;
+		
 		
 		/**
 		 * Setup
@@ -246,7 +263,17 @@ package com.bienvisto
 			
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
-			
+		
+			buffersDataProvider = new BuffersDataProvider(buffers);
+			dropsDataProvider = new DropsDataProvider(drops);
+			receptionsDataProvider = new ReceptionsDataProvider(receptions);
+			transmissionsDataProvider = new TransmissionsDataProvider(transmissions);
+			transmissionsBitrateDataProvider = new TransmissionsBitrateDataProvider(transmissions);
+			sequencesSentDataProvider = new SequencesSentDataProvider(sequencesContainer.sent);
+			sequencesInsertedDataProvider = new SequencesInsertedDataProvider(sequencesContainer.inserted);
+			sequencesForwardedDataProvider = new SequencesForwardedDataProvider(sequencesContainer.forwarded);
+			sequencesRecvDataProvider = new SequencesRecvDataProvider(sequencesContainer.recv);
+
 		}
 		
 		/**
@@ -319,33 +346,15 @@ package com.bienvisto
 			window.chartsWindows.setNodeContainer(nodeContainer);
 			
 			// Append data providers for the charts windows
-			window.chartsWindows.addDataProvider(
-				new BuffersDataProvider(buffers)
-			);
-			window.chartsWindows.addDataProvider(
-				new DropsDataProvider(drops)
-			);
-			window.chartsWindows.addDataProvider(
-				new ReceptionsDataProvider(receptions)
-			);
-			window.chartsWindows.addDataProvider(
-				new TransmissionsDataProvider(transmissions)
-			);
-			window.chartsWindows.addDataProvider(
-				new TransmissionsBitrateDataProvider(transmissions)
-			);
-			window.chartsWindows.addDataProvider(
-				new SequencesSentDataProvider(sequencesContainer.sent)
-			);
-			window.chartsWindows.addDataProvider(
-				new SequencesInsertedDataProvider(sequencesContainer.inserted)
-			);
-			window.chartsWindows.addDataProvider(
-				new SequencesForwardedDataProvider(sequencesContainer.forwarded)
-			);
-			window.chartsWindows.addDataProvider(
-				new SequencesRecvDataProvider(sequencesContainer.recv)
-			);
+			window.chartsWindows.addDataProvider(buffersDataProvider);
+			window.chartsWindows.addDataProvider(dropsDataProvider);
+			window.chartsWindows.addDataProvider(receptionsDataProvider);
+			window.chartsWindows.addDataProvider(transmissionsDataProvider);
+			window.chartsWindows.addDataProvider(transmissionsBitrateDataProvider);
+			window.chartsWindows.addDataProvider(sequencesSentDataProvider);
+			window.chartsWindows.addDataProvider(sequencesInsertedDataProvider);
+			window.chartsWindows.addDataProvider(sequencesForwardedDataProvider);
+			window.chartsWindows.addDataProvider(sequencesRecvDataProvider);
 				
 			
 			/* -- Sequences window -- */

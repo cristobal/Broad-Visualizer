@@ -117,7 +117,8 @@ package com.bienvisto.core.aggregate
 		 */ 
 		public function getValues(resolution:Number, nodes:Vector.<Node>):ArrayCollection
 		{
-			var tt:int = getTimer();
+			// var start:int = getTimer();
+			
 			var values:Array = new Array();
 			var node:Node, id:int;
 			
@@ -146,7 +147,8 @@ package com.bienvisto.core.aggregate
 					}
 				}
 			}
-			trace("Processed values for:", name, " in total of:", getTimer() - tt, "ms; total of:", values.length, " values sampled");
+			
+			// trace("Processed values for:", name, " in total of:", getTimer() - start, "ms; total of:", values.length, " values sampled");
 			return new ArrayCollection(values);
 		}
 		

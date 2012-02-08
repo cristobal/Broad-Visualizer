@@ -55,7 +55,6 @@ package com.bienvisto.io
 			fileReference.addEventListener(ProgressEvent.PROGRESS, handleProgress);
 			fileReference.addEventListener(Event.COMPLETE, handleComplete);
 			fileReference.addEventListener(IOErrorEvent.IO_ERROR, handleIOError);
-			
 		}
 		
 		/**
@@ -64,6 +63,17 @@ package com.bienvisto.io
 		public function browse(typeFilter:Array=null):void
 		{
 			fileReference.browse(typeFilter);
+		}
+		
+		/**
+		 * Cancel
+		 */ 
+		public function cancel():void
+		{
+			fileReference.cancel();
+			if (isProcessing) {
+				reset();
+			}
 		}
 
 		

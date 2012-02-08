@@ -43,23 +43,22 @@
 			 */ 
 			private function initComponent(event:FlexEvent):void
 			{	
-
-				sequencesButton = new Button();
-				sequencesButton.visible = false;
-				sequencesButton.label = "Sequences";
+				statsButton.addEventListener(MouseEvent.CLICK, handleStatsButtonClick);
 				sequencesButton.addEventListener(MouseEvent.CLICK, handleVideoButtonClick);
-				
-				localTopologyButton = new Button();
-				localTopologyButton.visible = false;
-				localTopologyButton.label = "Local Topology";
 				localTopologyButton.addEventListener(MouseEvent.CLICK, handleLocalTopologyButtonClick);
-				
-				topologyButton       = new Button();
-				topologyButton.visible = false;
-				topologyButton.label = "Topology";
 				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
 			}
-
+			
+			/**
+			 * Set stats enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setStatsEnabled(value:Boolean):void
+			{
+				statsButton.enabled = value;
+			}
+			
 			/**
 			 * Set sequences enabled
 			 * 
@@ -67,8 +66,7 @@
 			 */ 
 			public function setSequencesEnabled(value:Boolean):void
 			{
-				sequencesButton.visible = value;
-				invalidate();
+				sequencesButton.enabled = value;
 			}
 			
 			/**
@@ -78,8 +76,7 @@
 			 */ 
 			public function setLocalTopologyEnabled(value:Boolean):void
 			{
-				localTopologyButton.visible = value;
-				invalidate();
+				localTopologyButton.enabled = value;
 			}
 			
 			/**
@@ -89,8 +86,7 @@
 			 */ 
 			public function setTopologyEnabled(value:Boolean):void
 			{
-				topologyButton.visible = value;
-				invalidate();
+				topologyButton.enabled = value;
 			}
 			
 			/**
@@ -133,34 +129,6 @@
 				dispatchEvent(new Event(TOPOLOGY_CLICK));
 			}
 			
-			/**
-			 * Invalidate
-			 */ 
-			private function invalidate():void
-			{
-				var index:int = 1;
-				if (sequencesButton.visible) {
-					buttons.addElementAt(sequencesButton, index++);
-				}
-				else if (buttons.containsElement(sequencesButton)) {
-					buttons.removeElement(sequencesButton);
-				}
-				
-				if (localTopologyButton.visible) {
-					buttons.addElementAt(localTopologyButton, index++);
-				}
-				else if (buttons.contains(localTopologyButton)) {
-					buttons.removeElement(localTopologyButton);
-				}
-				
-				if (topologyButton.visible) {
-					buttons.addElementAt(topologyButton, index++);
-				}
-				else if (buttons.contains(topologyButton)) {
-					buttons.removeElement(topologyButton);
-				}	
-			}
-			
 		]]>
 	</fx:Script>
 	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
@@ -180,7 +148,10 @@
 			<s:layout>
 				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
 			</s:layout>
-			<s:Button id="statsButton" label="+ Stats" click="handleStatsButtonClick(event)"/>
+			<s:Button id="statsButton" label="+ Stats" enabled="false"/>
+			<s:Button id="sequencesButton" label="Sequences" enabled="false" />
+			<s:Button id="localTopologyButton" label="Local Topology" enabled="false" />
+			<s:Button id="topologyButton" label="Topology" enabled="false" />
 		</s:Group>
 		
 		<s:Group right="5" top="2">

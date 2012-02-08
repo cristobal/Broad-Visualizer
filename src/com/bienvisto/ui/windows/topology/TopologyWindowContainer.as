@@ -8,7 +8,6 @@ package com.bienvisto.ui.windows.topology
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
 	import com.bienvisto.ui.windows.BaseWindow;
-	import com.bienvisto.ui.windows.node.AdjacencyMatrixGroup;
 	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -340,18 +339,20 @@ package com.bienvisto.ui.windows.topology
 			var value:String = "–";
 			if (graph) {
 				adjacencyMatrix = graph.getAdjacencyMatrix();
-				if (from >= 0 && to >= 0 && from != to) {
+				if (from >= 0 && to >= 0 && from != to && adjacencyMatrix && adjacencyMatrix.size > 0) {
 					// path = graph.findShortestPathBFS(from, to); Dijkstra is about 3x and up slower than BFS but we use it anyways talking about ms in this case
+					try {
 					path = graph.findShortestPathDijkstra(from, to);
-					if (path) {
-						value = parsePath(path); // + " time:" + (getTimer() - t) + "ms";
+						if (path) {
+							value = parsePath(path);
+						}
 					}
-					
+					catch(error:Error) {
+						// fail silently
+					}
 				}
 			}
-			
 			pathValue = value;
-			
 			
 			adjacencyMatrixGroup.adjacencyMatrix = adjacencyMatrix;
 		}

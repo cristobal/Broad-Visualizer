@@ -88,6 +88,20 @@ package com.bienvisto.io
 		
 		//--------------------------------------
 		//
+		// Properties
+		//
+		//--------------------------------------
+		
+		/**
+		 * @readonly is processing
+		 */ 
+		public function get isProcessing():Boolean
+		{
+			return timer.running;
+		}
+		
+		//--------------------------------------
+		//
 		// Methods
 		//
 		//--------------------------------------
@@ -140,6 +154,18 @@ package com.bienvisto.io
 		protected function stop():void
 		{
 			complete = true;
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		protected function reset():void
+		{
+			if (timer.running) {
+				timer.stop();
+			}
+			complete = true;
+			bytes.clear();
 		}
 		
 		/**

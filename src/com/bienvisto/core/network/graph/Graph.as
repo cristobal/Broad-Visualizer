@@ -262,6 +262,10 @@ package com.bienvisto.core.network.graph
 		 */ 
 		public function findShortestPathDijkstra(from:int, to:int):Vector.<Edge>
 		{
+			if (!_paths) {
+				return null;
+			}
+				
 			var key:String = "pd-" + String(from) + "-" + String(to);
 			if (key in _paths) {
 				return Vector.<Edge>(_paths[key]);	
@@ -281,6 +285,10 @@ package com.bienvisto.core.network.graph
 		 */ 
 		public function findShortestPathBFS(from:int, to:int):Vector.<Edge>
 		{
+			if (!_paths) {
+				return null;
+			}
+			
 			var key:String = "pb-" + String(from) + "-" + String(to);
 			if (key in _paths) {
 				return Vector.<Edge>(_paths[key]);	

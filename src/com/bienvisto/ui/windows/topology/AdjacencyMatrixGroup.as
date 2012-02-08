@@ -1,4 +1,4 @@
-package com.bienvisto.ui.windows.node
+package com.bienvisto.ui.windows.topology
 {
 	import com.bienvisto.core.network.graph.AdjacencyMatrix;
 	
