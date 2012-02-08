@@ -255,7 +255,7 @@ package com.bienvisto.view.components
 		 */ 
 		public function destroy():void
 		{
-			
+			removeChildren();
 		}
 	}
 }

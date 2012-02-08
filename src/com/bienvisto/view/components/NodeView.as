@@ -206,7 +206,6 @@ package com.bienvisto.view.components
 		{
 			checkNodes();
 			
-			var tt:int =  getTimer();
 			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
 				manager = managers[i];
@@ -221,6 +220,25 @@ package com.bienvisto.view.components
 			}
 			
 			lastTime = time;
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			var manager:NodeDrawingManager;
+			for (var i:int = 0, l:int = managers.length; i < l; i++) {
+				manager = managers[i];
+				manager.reset();
+			}
+			
+			for (i = _nodeSprites.length; i--;) {
+				_nodeSprites[i].destroy();
+				removeChild(_nodeSprites[i]);					
+			}
+			
+			_nodeSprites = new Vector.<NodeSprite>();
 		}
 		
 		override public function set scale(value:Number):void
@@ -264,9 +282,6 @@ package com.bienvisto.view.components
 			else {
 				var dw:Number = lastRect.width  - parent.width;
 				var dh:Number = lastRect.height - parent.height;
-				
-				trace(lastRect.width, parent.width, dw);
-				trace(lastRect.height, parent.height, dh);
 				
 				x -= dw / 4;
 				y -= dh / 4;

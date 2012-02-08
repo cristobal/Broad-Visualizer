@@ -7,6 +7,13 @@ package com.bienvisto.io
 	import flash.utils.ByteArray;
 
 	/**
+	 * @Event
+	 * 	Will dispatch an ioError event if the user tries to upload an new file while 
+	 *  a file is already being processed.
+	 */ 
+	[Event(name="ioError", type="flash.events.IOErrorEvent")]
+
+	/**
 	 * FileReferenceReader.as
 	 * 
 	 * @author Cristobal Dabed
@@ -64,17 +71,6 @@ package com.bienvisto.io
 		{
 			fileReference.browse(typeFilter);
 		}
-		
-		/**
-		 * Cancel
-		 */ 
-		public function cancel():void
-		{
-			fileReference.cancel();
-			if (isProcessing) {
-				reset();
-			}
-		}
 
 		
 		//--------------------------------------
@@ -90,6 +86,11 @@ package com.bienvisto.io
 		 */ 
 		private function handleSelect(event:Event):void
 		{
+			if (isProcessing) {
+				dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR));
+				return;
+			}
+			
 			fileReference.load(); // automaticall start uploading the file
 			start();
 		}

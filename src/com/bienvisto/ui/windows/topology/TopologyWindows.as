@@ -142,6 +142,17 @@ package com.bienvisto.ui.windows.topology
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			localTopologyWindow.reset();
+			localTopologyWindow.visible = false;
+			
+			globalTopologyWindow.reset();
+			globalTopologyWindow.visible = false;
+		}
 		
 		//--------------------------------------------------------------------------
 		//

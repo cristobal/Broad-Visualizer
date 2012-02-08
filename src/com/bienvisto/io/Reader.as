@@ -157,18 +157,6 @@ package com.bienvisto.io
 		}
 		
 		/**
-		 * Reset
-		 */ 
-		protected function reset():void
-		{
-			if (timer.running) {
-				timer.stop();
-			}
-			complete = true;
-			bytes.clear();
-		}
-		
-		/**
 		 * Add bytes
 		 * 
 		 * @param data
@@ -220,6 +208,7 @@ package com.bienvisto.io
 						new Event(Event.COMPLETE)
 					);
 				}
+				complete = false;
 			}
 		}
 		

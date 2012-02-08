@@ -82,6 +82,11 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
+		private var shapesVector:Vector.<Shape> = new Vector.<Shape>();
+		
+		/**
+		 * @private
+		 */ 
 		private var transmissions:Transmissions;
 		
 		/**
@@ -106,7 +111,25 @@ package com.bienvisto.view.drawing
 		//-------------------------------------------------------------------------
 		
 		/**
-		 * Invalidate
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			if (view) {
+				for each(var shape:Shape in shapes) {
+					shape.graphics.clear();
+					if (view.contains(shape)) {
+						view.removeChild(shape);
+					}
+				}
+			}
+			shapes   = new Dictionary();
+			states   = new Dictionary();
+			lastTime = 0;	
+		}
+		
+		/**
+		 * @override
 		 */ 
 		override protected function invalidate():void
 		{

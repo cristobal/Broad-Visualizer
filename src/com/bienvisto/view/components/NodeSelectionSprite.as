@@ -9,8 +9,11 @@ package com.bienvisto.view.components
 	[Event(name="selected", type="com.bienvisto.view.events.NodeSpriteEvent")]
 	
 	/**
+	 * NodeSelectionSprite.as
+	 * 
 	 * Node selection sprite
 	 * Sprite used to be clicked on which has an fixed size instead of using this since the size will vary depending on the child nodes
+	 * 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class NodeSelectionSprite extends Sprite
@@ -81,7 +84,7 @@ package com.bienvisto.view.components
 		 */ 
 		public function destroy():void
 		{
-			addEventListener(MouseEvent.CLICK, handleClick);
+			removeEventListener(MouseEvent.CLICK, handleClick);
 			_nodeSprite = null;
 		}
 			

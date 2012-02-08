@@ -39,6 +39,14 @@ package com.bienvisto.view.components
 		private var mobilityArea:MobilityArea;
 		
 		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			graphics.clear();
+		}
+		
+		/**
 		 * Setup
 		 */ 
 		public function setup():void

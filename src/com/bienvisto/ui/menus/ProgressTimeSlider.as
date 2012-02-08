@@ -298,6 +298,17 @@ package com.bienvisto.ui.menus
 			addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 		}
 		
+		public function reset():void
+		{
+			super.value = 0;
+			_loaded = 0;
+			_time = 0;
+			_timeFlag = false;
+			loading   = false;
+			_buffering = false;
+			invalidate();
+		}
+		
 		/**
 		 * Invalidate
 		 */ 

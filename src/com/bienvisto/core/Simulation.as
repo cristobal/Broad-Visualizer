@@ -207,7 +207,6 @@ package com.bienvisto.core
 		 */ 
 		private function setDuration(value:uint):void
 		{
-
 			_duration = value;
 			invalidate();
 		}
@@ -260,19 +259,26 @@ package com.bienvisto.core
 		 * Invalidate
 		 */ 
 		private function invalidate():void
-		{
-			// if this is a new simulation then do a global reset
-			if (!firstRun) {
-				dispatchEvent(new Event(RESET));
-			}		
+		{	
 			
 			var simulationObject:ISimulationObject;
 			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
 				simulationObject = simulationObjects[i];
 				simulationObject.setDuration(duration);
+				if (!firstRun) {
+					simulationObject.reset();
+				}
 			}
+			// if this is a new simulation then do a global reset
+			if (!firstRun) {
+				dispatchEvent(new Event(RESET));
+			}		
 			
-			
+			setTimeout(notifyReady, 10);
+		}
+		
+		private function notifyReady():void
+		{
 			dispatchEvent(new Event(READY));
 			firstRun = false;
 		}

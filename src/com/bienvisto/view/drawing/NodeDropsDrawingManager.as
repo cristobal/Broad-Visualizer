@@ -1,8 +1,8 @@
 package com.bienvisto.view.drawing
 {
 	import com.bienvisto.core.aggregate.Aggregate;
-	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.elements.drops.Drops;
 	import com.bienvisto.view.components.NodeSprite;
 	
 	import flash.utils.Dictionary;
@@ -47,7 +47,16 @@ package com.bienvisto.view.drawing
 		private var states:Dictionary = new Dictionary();
 		
 		/**
-		 * @overridej
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			lastTime = 0;
+			states   = new Dictionary();
+		}
+		
+		/**
+		 * @override
 		 */ 
 		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{

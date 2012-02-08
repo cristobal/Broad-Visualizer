@@ -20,6 +20,7 @@
 			import com.bienvisto.ui.windows.topology.TopologyWindows;
 			
 			import flash.utils.getTimer;
+			import flash.utils.setTimeout;
 			
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
@@ -205,6 +206,32 @@
 					lastLoadedInvalidation = value;
 					chartsWindows.invalidateWindows(); // while is still loading invalidate windows
 				}
+			}
+			
+			public function reset():void
+			{
+				visualizerView.loaderViewVisible = true;
+				sequencesWindow.visible = false;
+				
+				topologyWindows.reset();
+				nodeWindows.reset();
+				chartsWindows.reset();
+				menu.reset();
+				playback.reset();
+				visualizerView.reset();
+				setTimeout(function():void {
+					visualizerView.loaderViewVisible = false;
+				}, 2500);
+			}
+			
+			/**
+			 * Set sequences enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setStatsEnabled(value:Boolean):void
+			{
+				menu.setStatsEnabled(value);
 			}
 			
 			/**

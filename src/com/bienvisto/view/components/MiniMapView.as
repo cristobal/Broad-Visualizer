@@ -213,6 +213,19 @@ package com.bienvisto.view.components
 		/**
 		 * @override
 		 */ 
+		override public function reset():void
+		{
+			textField.text = "-";
+			textField.setTextFormat(textFormat);
+			lastTime = int.MIN_VALUE;
+			_displacedRect = null;
+			container.graphics.clear();
+		}
+			
+		
+		/**
+		 * @override
+		 */ 
 		override public function update(time:uint):void
 		{
 			if (!visible) {

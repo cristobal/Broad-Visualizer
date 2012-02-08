@@ -43,6 +43,16 @@
 				playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
 			}
 			
+			public function reset():void
+			{
+				setPerimeterViewEnabled(false);
+				playButtonState = PLAY;
+				timeSlider.reset();
+				
+				miniMapView.reset();
+				perimeterView.reset();
+			}
+			
 			
 			//--------------------------------------------------------------------------
 			//

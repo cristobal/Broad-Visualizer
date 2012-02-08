@@ -91,6 +91,16 @@ package com.bienvisto.view.drawing
 		//-------------------------------------------------------------------------
 		
 		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			shapes   = new Dictionary();
+			states   = new Dictionary();
+			lastTime = 0;
+		}
+		
+		/**
 		 * Invalidate
 		 */ 
 		override protected function invalidate():void

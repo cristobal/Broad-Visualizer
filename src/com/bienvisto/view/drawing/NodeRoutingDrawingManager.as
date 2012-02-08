@@ -16,6 +16,7 @@ package com.bienvisto.view.drawing
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
+	import flash.utils.setTimeout;
 	
 	/**
 	 * NodeRoutingDrawingManager.as
@@ -133,8 +134,19 @@ package com.bienvisto.view.drawing
 		// Methods
 		//
 		//-------------------------------------------------------------------------
+		
 		/**
-		 * Invalidate
+		 * @override
+		 */
+		override public function reset():void
+		{
+			clearGraphics();
+			lastTime = 0;
+			routesShape.visible = false;
+		}
+		
+		/**
+		 * @override
 		 */ 
 		override protected function invalidate():void
 		{

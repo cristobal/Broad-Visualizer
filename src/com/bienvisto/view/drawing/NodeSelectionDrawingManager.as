@@ -98,6 +98,18 @@ package com.bienvisto.view.drawing
 		}
 		
 		/**
+		 * @remove
+		 */ 
+		override public function reset():void
+		{
+			for (var i:int = nodeSelectionSprites.length; i--;) {
+				removeNodeSprite(nodeSelectionSprites[i].nodeSprite);
+			}
+			
+			nodeSelectionSprites = new Vector.<NodeSelectionSprite>();
+		}
+		
+		/**
 		 * Update selected from node selection sprite selected event
 		 * 
 		 * @param nodeSprite

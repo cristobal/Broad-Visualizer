@@ -290,6 +290,14 @@ package com.bienvisto.ui.windows
 		}
 		
 		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			
+		}
+		
+		/**
 		 * Invalidate resize listener
 		 */ 
 		protected function invalidateResizeListener():void

@@ -49,6 +49,14 @@
 				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
 			}
 			
+			public function reset():void
+			{
+				setStatsEnabled(false);
+				setSequencesEnabled(false);
+				setLocalTopologyEnabled(false);
+				setTopologyEnabled(false);
+			}
+			
 			/**
 			 * Set stats enabled
 			 * 

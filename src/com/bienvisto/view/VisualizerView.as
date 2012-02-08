@@ -149,6 +149,18 @@ package com.bienvisto.view
 		}
 		
 		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			var viewComponent:ViewComponent;
+			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
+				viewComponent = _viewComponents[i];
+				viewComponent.reset();
+			}
+		}
+		
+		/**
 		 * Update
 		 * 	Tell the view to update(refresh) all its view components
 		 */ 

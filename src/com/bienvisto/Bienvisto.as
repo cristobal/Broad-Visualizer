@@ -65,6 +65,8 @@ package com.bienvisto
 	import flash.utils.Timer;
 	import flash.utils.setTimeout;
 	
+	import mx.controls.Alert;
+	
 	import spark.components.Application;
 
 	/**
@@ -74,6 +76,13 @@ package com.bienvisto
 	 */ 
 	public final class Bienvisto
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		// Constructor
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
 		 * Constructor
 		 * 
@@ -86,17 +95,24 @@ package com.bienvisto
 			bindWindow(window);
 			
 			this.app 	= app;
-			// this.app.frameRate = 30; // 30fps
+			// this.app.frameRate = 30; // 30fps Manually set on the Main mxml file
 			this.window = window; 
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Variables
+		//
+		//-------------------------------------------------------------------------
 		
 		/* reference to application and the main window */
 		private var app:Application;
 		private var window:ApplicationWindow;
 		
 		/* helper variables */
-		private var first:Boolean = true;
-		private var ready:Boolean = false;
+		private var ready:Boolean 				 = false;
+		private var minLoadedPercentage:Number   = 25; // a minimum of 25% must be loaded before playback is enabled
 		
 		/* -- trace sources and simulation objects -- */
 		private var simulation:Simulation;
@@ -214,6 +230,7 @@ package com.bienvisto
 			parser.addTraceSource(sequencesContainer.inserted);
 			parser.addTraceSource(sequencesContainer.forwarded);;
 			
+			reader.addEventListener(IOErrorEvent.IO_ERROR, handleReaderIOError);
 			parser.addEventListener(TimedEvent.ELAPSED, handleParserTimedEventElapsed);
 			parser.addEventListener(Event.COMPLETE, handleParserEventComplete);
 			
@@ -362,6 +379,36 @@ package com.bienvisto
 			window.sequencesWindow.setSequencesContainer(sequencesContainer);
 		}
 		
+		
+		/**
+		 * Reset
+		 */ 
+		private function reset():void
+		{
+			trace("reset…");
+			window.playback.menu.enabled = false;
+			window.setDuration(0);
+			
+			ready = false;
+			window.reset();
+		}
+		
+		/**
+		 * Enable playback
+		 */ 
+		private function enablePlayback():void
+		{
+			window.playback.menu.enabled = true;
+		}
+		
+		/**
+		 * Enable stats
+		 */ 
+		private function enableStats():void
+		{
+			window.setStatsEnabled(true);
+		}
+		
 		/**
 		 * Update time
 		 */ 
@@ -383,40 +430,67 @@ package com.bienvisto
 			updateTime();
 		}
 		
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Simulation events
+		//
+		//-------------------------------------------------------------------------
+		
 		/**
-		 * Handle browse file click
+		 * Handle simulation ready
 		 * 
 		 * @param event
 		 */ 
-		private function handleBrowseFileClick(event:MouseEvent):void
+		private function handleSimulationReady(event:Event):void
 		{
-			reader.browse();
+			trace("handleSimulationReady");
+			ready = true;
+			window.setDuration(
+				simulation.duration
+			);
+			window.playback.showLoader();
 		}
 		
 		/**
-		 * Handle play button click
+		 * Handle simulation reset
 		 * 
 		 * @param event
 		 */ 
-		private function handlePlayButtonStateChange(event:Event):void
-		{	
-			if (!simulation.running) {
-				simulation.start();
-			}
-			else {
-				simulation.pause();
-			}
+		private function handleSimulationReset(event:Event):void
+		{
+			// Global Reset
+			window.reset();
 		}
 		
 		/**
-		 * Handle playback speed change
+		 * Handle simulation timer
 		 * 
 		 * @param event
 		 */ 
-		private function handlePlaybackSpeedChange(event:Event):void
+		private function handleSimulationTimer(event:TimerEvent):void
 		{
-			simulation.speed = window.playback.playbackSpeed.value;
+			updateTime();
 		}
+		
+		/**
+		 * Handle simulation complete
+		 * 
+		 * @param event
+		 */ 
+		private function handleSimulationComplete(event:Event):void
+		{
+			window.playback.playButtonState = Playback.PLAY;
+		}
+		
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Simulation Objects/TraceSource Init event handlers
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
 		 * Handle mobility area init
@@ -458,53 +532,26 @@ package com.bienvisto
 			window.setSequencesEnabled(true);
 		}
 		
-		/**
-		 * Handle simulation ready
-		 * 
-		 * @param event
-		 */ 
-		private function handleSimulationReady(event:Event):void
-		{
-			window.playback.menu.enabled = true;
-			window.setDuration(
-				simulation.duration
-			);
-			window.playback.showLoader();
-		}
+		
+		//--------------------------------------------------------------------------
+		//
+		// Parser/Reader events
+		//
+		//-------------------------------------------------------------------------
 		
 		/**
-		 * Handle simulation reset
-		 * 
+		 * Handle reader IOError
+		 * 	Dispatched when the user tries to load a new file when an process is still not finished
 		 * @param event
 		 */ 
-		private function handleSimulationReset(event:Event):void
+		private function handleReaderIOError(event:IOErrorEvent):void
 		{
-			// Global Reset
-			window.setTopologyEnabled(false);
-		}
-		
-		/**
-		 * Handle simulation timer
-		 * 
-		 * @param event
-		 */ 
-		private function handleSimulationTimer(event:TimerEvent):void
-		{
-			updateTime();
-		}
-		
-		/**
-		 * Handle simulation complete
-		 * 
-		 * @param event
-		 */ 
-		private function handleSimulationComplete(event:Event):void
-		{
-			window.playback.playButtonState = Playback.PLAY;
+			Alert.show("The current file process job must finish before you can start a new one!", "Warning", Alert.OK);	
 		}
 		
 		/**
 		 * Handle parser timed event elapsed
+		 * 	Tells us how much of the file has been parsed
 		 * 
 		 * @param event
 		 */ 
@@ -515,6 +562,11 @@ package com.bienvisto
 				window.setLoaded(value);
 				simulation.setLoaded(value);
 				window.playback.setLoaderValue(value);
+				
+				if (value >= minLoadedPercentage) {
+					enablePlayback();
+					enableStats();
+				}
 			}
 		}
 		
@@ -529,6 +581,55 @@ package com.bienvisto
 			simulation.setLoaded(100);
 			window.playback.setLoaderValue(100);
 			setTimeout(window.playback.hideLoader, 1000);
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Application Buttons events
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Handle browse file click
+		 * 
+		 * @param event
+		 */ 
+		private function handleBrowseFileClick(event:MouseEvent):void
+		{
+			reader.browse();
+		}
+		
+		/**
+		 * Handle play button click
+		 * 
+		 * @param event
+		 */ 
+		private function handlePlayButtonStateChange(event:Event):void
+		{	
+			if (!simulation.running) {
+				simulation.start();
+			}
+			else {
+				simulation.pause();
+			}
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		// Application Playback Progress & Speed event handlers
+		//
+		//-------------------------------------------------------------------------
+		
+		/**
+		 * Handle playback speed change
+		 * 
+		 * @param event
+		 */ 
+		private function handlePlaybackSpeedChange(event:Event):void
+		{
+			simulation.speed = window.playback.playbackSpeed.value;
 		}
 		
 		/**

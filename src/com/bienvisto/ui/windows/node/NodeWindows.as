@@ -298,6 +298,15 @@ package com.bienvisto.ui.windows.node
 			nodeView.addEventListener(NodeSpriteEvent.SELECTED, handleNodeSpriteSelected);	
 		}
 		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			windowsSettings = new Dictionary();
+			window.reset();
+			window2.reset();
+		}
 		
 		//--------------------------------------------------------------------------
 		//

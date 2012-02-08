@@ -117,6 +117,16 @@ package com.bienvisto.ui.windows.charts
 		//--------------------------------------------------------------------------
 		
 		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			for (var i:int = windows.length; i--;){ 
+				remove(windows[i]);
+			}
+		}
+		
+		/**
 		 * Add data provider
 		 * 
 		 * @param dataProvider

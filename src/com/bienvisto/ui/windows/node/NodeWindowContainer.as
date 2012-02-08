@@ -781,6 +781,14 @@ package com.bienvisto.ui.windows.node
 		}
 		
 		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			_selectedNode = null;
+		}
+		
+		/**
 		 * Invalidate
 		 */ 
 		private function invalidate():void

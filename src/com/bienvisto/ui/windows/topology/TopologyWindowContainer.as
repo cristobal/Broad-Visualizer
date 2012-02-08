@@ -246,6 +246,22 @@ package com.bienvisto.ui.windows.topology
 		}
 		
 		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			_userDefined = false;
+			needsInvalidation = false;
+			elapsed = -1;
+			from = int.MIN_VALUE;
+			to   = int.MIN_VALUE;
+			nodeFrom = null;
+			nodeTo   = null;
+			dropDownListFrom.dataProvider = null;
+			dropDownListTo.dataProvider = null;
+		}
+		
+		/**
 		 * Set selected nodes
 		 * 
 		 * @param from

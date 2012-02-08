@@ -39,6 +39,14 @@ package com.bienvisto.view.components
 		}
 		
 		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			
+		}
+		
+		/**
 		 * Set size
 		 * 
 		 * @param width

@@ -71,6 +71,14 @@ package com.bienvisto.view.drawing
 		}
 		
 		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			
+		}
+		
+		/**
 		 * Update 
 		 * 
 		 * @param time

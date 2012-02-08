@@ -30,6 +30,13 @@ package com.bienvisto.view.drawing
 		 */ 
 		private var textFormat:TextFormat = new TextFormat("DejaVuSansDF3", 13, 0x545454, true);
 		
+		/**
+		 * @override
+		 */ 
+		override public function reset():void
+		{
+			textFields = new Dictionary();
+		}
 		
 		/**
 		 * @override
