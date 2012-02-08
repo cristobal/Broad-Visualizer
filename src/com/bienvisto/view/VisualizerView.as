@@ -266,7 +266,7 @@ package com.bienvisto.view
 		public function setMiniMapView(view:ViewComponent):void
 		{
 			miniMapView = view;
-			addEventListener(MouseEvent.CLICK, handleMouseClick);
+			addEventListener(MouseEvent.CLICK, handleMiniMapViewMouseClick);
 		}
 		
 		/**
@@ -274,7 +274,7 @@ package com.bienvisto.view
 		 * 
 		 * @param event
 		 */ 
-		private function handleMouseClick(event:MouseEvent):void
+		private function handleMiniMapViewMouseClick(event:MouseEvent):void
 		{
 			if (miniMapView && !miniMapView.visible) {
 				return;
@@ -296,51 +296,36 @@ package com.bienvisto.view
 				var rect:Rectangle = MiniMapView(miniMapView).displacedRect;
 				if (rect && rect.width > 0 && rect.height > 0) {
 					
-					// TODO: Tune Pan to
-					
+					// Get rect, width for displaced rect
 					var aw:Number = rect.width;
 					var ah:Number = rect.height;
 					
-					var tx:Number = (sx - dx);
-					var ty:Number = (sy - dy);
+					// Get local point on min map view
+					var lx:Number = (sx - dx) * (aw / w);
+					var ly:Number = (sy - dy) * (ah / h);
 					
-					tx *= aw / w;
-					ty *= ah / h;
+					// Normalize to point on the view
+					var nx:Number = lx * aw;
+					var ny:Number = ly * ah;
 					
-					var cx:Number = draggableView.x;
-					var cy:Number = draggableView.y;
+					// Get center point
+					var cx:Number = parent.width / 2;
+					var cy:Number = parent.height / 2;
 					
-					var pw:Number = parent.width;
-					var ph:Number = parent.height;
-					var px:Number = pw / 2;
-					var py:Number = ph / 4;
+					// Get Point(dx,dy) such that Point(lx,y) is centered at the center Point(cx, cy) of the view. 
+					dx = cx - lx;
+					dy = cy - ly;
 					
 					var animate:Animate = new Animate(draggableView);
 					var easer:EaseInOutBase = new EaseInOutBase();
 					animate.easer = easer;
-					
-					var nx:Number;
-					if (tx > cx || tx > px) {
-						nx = -tx + px;
-					}
-					else {
-						nx = tx  + px;
-					}
-					/*					var ny:Number;
-					if (ty > cy || ty > py) {
-					ny = ty + py;
-					}
-					else {
-					ny = -ty + py;
-					}
-					*/
+				
 					animate.motionPaths = Vector.<MotionPath>([
-						new SimpleMotionPath("x", cx, nx)
-						// new SimpleMotionPath("y", cy, ny)
+						new SimpleMotionPath("x", draggableView.x, dx),
+						new SimpleMotionPath("y", draggableView.y, dy)
 					]);
 					
 					animate.play();
-					// trace("cx:", cx, "tx:", tx);
 				}
 			}
 			

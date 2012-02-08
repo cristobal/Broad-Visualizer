@@ -474,11 +474,12 @@ package com.bienvisto.ui.windows.charts
 			addProviderButton.addEventListener(MouseEvent.CLICK, handleAddProviderButtonClick);
 			borderContainer.addElement(addProviderButton);
 			
-			filterNodesButton = new Button();
+/*			filterNodesButton = new Button();
 			filterNodesButton.label = "filter";
 			filterNodesButton.width = 50;
 			filterNodesButton.addEventListener(MouseEvent.CLICK, handleFilterNodesButtonClick);
 			borderContainer.addElement(filterNodesButton);
+			*/
 			
 /*			nodesContainer = new BorderContainer();
 			nodesContainer.setStyle("width", "100");
@@ -488,7 +489,8 @@ package com.bienvisto.ui.windows.charts
 			nodesContainer.setStyle("right", 0);
 			nodesContainer.setStyle("top", 0);
 			nodesContainer.setStyle("bottom", 30);
-			contentGroup.addElement(nodesContainer);*/
+			contentGroup.addElement(nodesContainer);
+			*/
 			
 			super.setup();
 			updateProgress();

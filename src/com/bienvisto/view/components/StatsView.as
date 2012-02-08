@@ -1,7 +1,13 @@
 package com.bienvisto.view.components
 {
 	import com.bienvisto.util.HiResStats;
-
+	
+	/**
+	 * StatsView.as
+	 * 	Wrapper for the Hi-res Stats component thath show memoery and system usage of this application.
+	 * 
+	 * @author Cristobal Dabed
+	 */ 
 	public final class StatsView extends ViewComponent
 	{
 		public function StatsView()
