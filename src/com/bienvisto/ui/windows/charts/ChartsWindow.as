@@ -14,18 +14,22 @@ package com.bienvisto.ui.windows.charts
 	import mx.controls.Spacer;
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
+	import mx.events.ResizeEvent;
 	import mx.graphics.Stroke;
 	
 	import spark.components.BorderContainer;
 	import spark.components.Button;
+	import spark.components.CheckBox;
 	import spark.components.ComboBox;
 	import spark.components.DropDownList;
 	import spark.components.Group;
 	import spark.components.HSlider;
 	import spark.components.Label;
 	import spark.components.SkinnableContainer;
+	import spark.layouts.HorizontalAlign;
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.TileLayout;
+	import spark.layouts.VerticalAlign;
 	import spark.skins.spark.HSliderSkin;
 	
 	/**
@@ -34,7 +38,7 @@ package com.bienvisto.ui.windows.charts
 	 * @author Miguel Santirso
 	 * @author Cristobal Dabed
 	 */ 
-	public class ChartsWindow extends BaseWindow
+	public final class ChartsWindow extends BaseWindow
 	{
 		
 		/**
@@ -64,58 +68,25 @@ package com.bienvisto.ui.windows.charts
 		{
 			super();			
 			width = 500;
-			height = 300;
+			height = 350;
 		}
-		
-		/**
-		 * @public
-		 */ 
-		public var resolutionSlider:ResolutionSlider;
-		
-		/**
-		 * @public
-		 */ 
-		public var providersList:ComboBox;
-		
-		/**
-		 * @public
-		 */ 
-		public var addProviderButton:Button;
-		
-		/**
-		 * @public
-		 */ 
-		public var filterNodesButton:Button;
-		
-		/**
-		 * @private
-		 */ 
-		private var labelsContainer:BorderContainer;
-		
-		/**
-		 * @private
-		 */ 
-		private var nodesContainer:BorderContainer;
-		
-		/**
-		 * @private
-		 */ 
-		private var chart:AreaChart;
-		
-		/**
-		 * @protected
-		 */ 
-		private var chartAnnotations:UIComponent;
+
 		
 		/**
 		 * @private
 		 */ 
 		private var progress:Number = 0;
-		
+
 		/**
 		 * @private
 		 */ 
-		private var interests:Vector.<AggregateDataProvider> = new Vector.<AggregateDataProvider>();
+		private var filteredNodes:Vector.<Node>;
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Properties
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * @private
@@ -192,7 +163,6 @@ package com.bienvisto.ui.windows.charts
 			
 		}
 		
-		
 		/**
 		 * @readwrite minResolution
 		 * Sets the minimum resolution allowed when drawing the graph
@@ -229,6 +199,51 @@ package com.bienvisto.ui.windows.charts
 			return resolutionSlider.maximum;
 		}
 		
+		
+	
+		//--------------------------------------------------------------------------
+		//
+		//  Methods
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override
+		 */ 
+		override protected function setup():void
+		{
+			title = "Charts - #" + String(oid);
+			setupLabelsContainer();
+			setupChartsContainer();
+			setupOptionsContainer();
+			setupNodesContainer();
+			
+			super.setup();
+			updateProgress();
+			invalidateDataProviders();
+			setTimeout(updateProgress, 100);
+		}
+		
+		/**
+		 * @override
+		 */ 
+		override protected function onResizeChange():void
+		{
+			updateProgress();
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Data Providers
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var interests:Vector.<AggregateDataProvider> = new Vector.<AggregateDataProvider>();
+		
 		/**
 		 * @private
 		 */ 
@@ -262,7 +277,7 @@ package com.bienvisto.ui.windows.charts
 				item     = {label: provider.name, oid: provider.oid, id: i};
 				list.addItem(item);
 			}
-
+			
 			providersList.dataProvider = list;
 			providersList.selectedItem = list[0];
 		}
@@ -295,38 +310,254 @@ package com.bienvisto.ui.windows.charts
 				if (provider) {
 					interests.push(provider);
 					invalidateInterests();
-					
-					var label:DataProviderLabel = new DataProviderLabel(item, lineColors[interests.length - 1]);
-					label.addEventListener(DataProviderLabel.REMOVE, handleDataProviderLabelRemove);
-					labelsContainer.addElement(label);
+					addChartLabel(item, lineColors[interests.length - 1]);
 				}
 			}
 		}
 		
 		/**
-		 * Remove data provider label
+		 * Remove data provider
 		 * 
-		 * @param label
+		 * @param item
 		 */ 
-		private function removeDataProviderLabel(label:DataProviderLabel):void
+		private function removeDataProvider(item:Object):void
 		{
-		
-			var interest:Object = label.item;
+			
 			var removed:Boolean = false;
 			for (var i:int = interests.length; i--;) {
-				if (interests[i].oid == interest.oid) {
+				if (interests[i].oid == item.oid) {
 					interests.splice(i, 1);
 					removed = true;
 					break;
 				}
 			}
 			
-			
-			label.removeEventListener(DataProviderLabel.REMOVE, handleDataProviderLabelRemove);
-			labelsContainer.removeElement(label);
 			if (removed) {
 				invalidateInterests();
 			}
+		}
+		
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Charts Labels Container
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var labelsContainer:BorderContainer;
+		
+		/**
+		 * @private
+		 */ 
+		private var labels:Vector.<ChartLabel> = new Vector.<ChartLabel>();
+		
+		/**
+		 * Setup labels container
+		 */ 
+		private function setupLabelsContainer():void
+		{
+			labelsContainer = new BorderContainer();			
+			labelsContainer.setStyle("backgroundColor", "0xF5F5F5");	
+			labelsContainer.setStyle("borderColor", "0xE5E5E5");	
+			labelsContainer.setStyle("borderTop", 0);
+			labelsContainer.setStyle("borderBottom", 0);
+			labelsContainer.setStyle("borderRight", 0);
+			labelsContainer.setStyle("left", 0);
+			labelsContainer.setStyle("right", 0);
+			labelsContainer.setStyle("top", 0);
+			labelsContainer.height = 45;
+			addElement(labelsContainer);
+			
+			labelsContainer.addEventListener(ResizeEvent.RESIZE, handleLabelsContainerResize);
+		}
+		
+		/**
+		 * Invalidate labels container display list
+		 */ 
+		private function invalidateLabelsContainerDisplayList():void
+		{
+			var w:Number = labelsContainer.width;
+			
+			var x:int = 0;
+			var y:int = 0;
+			var offset:int = 5;
+			
+			var label:ChartLabel;
+			var rows:int = 0;
+			var hidden:Boolean 
+			for (var i:int = 0, l:int = labels.length; i < l; i++) {
+				label   = labels[i];
+				label.x = x;
+				label.y = y;	
+				label.visible = !hidden;
+				x = label.x + label.width + offset;
+				
+				// check on next 
+				if (i + 1 < l && labels[i + 1].width + x - offset > w) {
+					y = label.height + offset;
+					x = 0;
+					rows++;					
+				}
+				
+				
+				if (rows == 2) {
+					hidden = true;// we dont't show the rest until the user resized the window
+				}
+			}
+		}
+		
+		/**
+		 * Add chart label
+		 * 
+		 * @param item
+		 */ 
+		private function addChartLabel(item:Object, color:uint):void
+		{
+			var label:ChartLabel = new ChartLabel(item, color);
+			label.x = 0;
+			if (labels.length > 0) {
+				label.x = labels[labels.length - 1].x + labels[labels.length - 1].width + 5; 
+			}
+			labelsContainer.addElement(label);
+			label.addEventListener(ChartLabel.REMOVE, handleDataProviderLabelRemove);
+			labels.push(label);
+			
+			setTimeout(invalidateLabelsContainerDisplayList, 10);
+		}
+		
+		/**
+		 * Remove chart label
+		 */ 
+		private function removeChartLabel(label:ChartLabel):void
+		{
+			label.removeEventListener(ChartLabel.REMOVE, handleDataProviderLabelRemove);
+			labelsContainer.removeElement(label);
+			for (var i:int = labels.length; i--; ) {
+				if (label == labels[i]) {
+					labels.splice(i, 1);
+					label = null;
+					break;
+				}
+			}
+			invalidateLabelsContainerDisplayList();
+		}
+		
+		/**
+		 * Get color for chart label by item
+		 * 
+		 * @param item
+		 */ 
+		private function getColorForChartLabelByitem(item:Object):uint
+		{
+			var color:uint = 0;
+			for (var i:int = labels.length; i--;) {
+				if (labels[i].item.oid == item.oid) {
+					color = labels[i].color;
+					break;
+				}
+			}
+			
+			return color;
+		}
+		
+		/**
+		 * Handle data provider label remove
+		 * 
+		 * @param event
+		 */ 
+		private function handleDataProviderLabelRemove(event:Event):void
+		{
+			var label:ChartLabel = ChartLabel(event.target);
+			removeChartLabel(label);
+			removeDataProvider(label.item);
+		}
+		
+		/**
+		 * Handle labels container resize
+		 * 
+		 * @param
+		 */ 
+		private function handleLabelsContainerResize(event:ResizeEvent):void
+		{
+			invalidateLabelsContainerDisplayList();
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Charts Container
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 * 	The container for all the charts components
+		 */ 
+		private var chartsContainer:Group;
+		
+		/**
+		 * @private
+		 */ 
+		private var chart:AreaChart;
+		
+		/**
+		 * @private
+		 */ 
+		private var chartAnnotations:UIComponent;
+		
+		/**
+		 * @private
+		 */ 
+		private var chartNodesValue:Label;
+	
+		
+		/**
+		 * Setup charts container
+		 */ 
+		private function setupChartsContainer():void
+		{
+			chartsContainer = new Group();
+			chartsContainer.setStyle("top", 47);
+			chartsContainer.setStyle("right", 0);
+			chartsContainer.setStyle("bottom", 30);
+			chartsContainer.setStyle("left", 0);
+			addElement(chartsContainer);
+			
+			chart = new AreaChart();
+			chart.showDataTips = true;
+			chart.setStyle("left", 0);
+			chart.setStyle("right", 0);
+			chart.setStyle("top", 0);
+			chart.setStyle("bottom", 25);
+			chartsContainer.addElement(chart);
+			
+			
+			chartAnnotations = new UIComponent();
+			chartAnnotations.setStyle("left", 46);
+			chartAnnotations.setStyle("right", 15);
+			chartAnnotations.setStyle("top", 10);
+			chartAnnotations.setStyle("bottom", 50);
+			chartsContainer.addElement(chartAnnotations);
+			
+			var label:Label = new Label();
+			label.text = "Nodes:";
+			label.setStyle("fontSize", "12");
+			label.setStyle("fontSize", "bold");
+			label.setStyle("left", 10);
+			label.setStyle("bottom", 5);
+			chartsContainer.addElement(label);
+			
+			chartNodesValue = new Label();
+			chartNodesValue.text = "All";
+			chartNodesValue.setStyle("fontFamily", "DejaVuSansMono");
+			chartNodesValue.setStyle("fontSize", "10");
+			chartNodesValue.setStyle("left", 60);
+			chartNodesValue.setStyle("bottom", 5);
+			chartsContainer.addElement(chartNodesValue);
 		}
 		
 		/**
@@ -354,14 +585,17 @@ package com.bienvisto.ui.windows.charts
 			var series:Array = [];
 			var lineSeries:LineSeries;
 			var resolution:Number = resolutionSlider.value;
+			var color:uint;
+			var selectedNodes:Vector.<Node> = filteredNodes ? filteredNodes : nodes;
 			for (i = 0; i < l; i++) {
 				interest = interests[i];
 				lineSeries = new LineSeries();
-				lineSeries.dataProvider = interest.getValues(resolution, nodes);
+				lineSeries.dataProvider = interest.getValues(resolution, selectedNodes);
 				lineSeries.xField = "hAxis";
 				lineSeries.yField = "vAxis";
 				lineSeries.displayName = interest.name;
-				lineSeries.setStyle("lineStroke", new Stroke(lineColors[i], 2));
+				color = getColorForChartLabelByitem({oid: interest.oid});
+				lineSeries.setStyle("lineStroke", new Stroke(color, 2));
 				
 				if (ArrayCollection(lineSeries.dataProvider).length > 0) {
 					series.push(lineSeries);
@@ -369,7 +603,7 @@ package com.bienvisto.ui.windows.charts
 			}
 			
 			
-		 chart.series = series;
+			chart.series = series;
 		}
 		
 		/**
@@ -388,67 +622,100 @@ package com.bienvisto.ui.windows.charts
 		}
 		
 		/**
-		 * @override
+		 * Update selected node values
 		 */ 
-		override protected function onResizeChange():void
+		private function updateSelectedNodeValues():void
 		{
-			updateProgress();
+			filteredNodes = null; // reset state
+			// only filter when all are not selected
+			if (!selectAllCheckboxes.selected) {
+				filteredNodes = _nodes.concat(); // create shallow copy
+				
+				var list:Vector.<int> = new Vector.<int>; 
+				var id:int;
+				for (var i:int = filteredNodes.length; i--;) {
+					id = filteredNodes[i].id;
+					for (var j:int = checkboxes.length; j--;) {
+						if (checkboxes[j].nodeID == id) {
+							if (!checkboxes[j].selected) {
+								filteredNodes.splice(i, 1);	
+							}
+							else {
+								list.push(id);	
+							}
+							break; // found node break and continue
+						}
+					}
+				}
+				if (filteredNodes.length == 0) {
+					chartNodesValue.text = "None";
+				}
+				else {
+					chartNodesValue.text = "#" + list.join(" #");
+				}
+			}
+			else {
+				chartNodesValue.text = "All";
+			}
 		}
 		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Options Container
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
-		 * @override
+		 * @private
+		 * 	The holder for all the options
 		 */ 
-		override protected function setup():void
+		private var optionsContainer:BorderContainer;
+		
+		
+		/**
+		 * @private 
+		 */ 
+		private var resolutionSlider:ResolutionSlider;
+		
+		/**
+		 * @private 
+		 */ 
+		private var providersList:ComboBox;
+		
+		/**
+		 * @private 
+		 */ 
+		private var addProviderButton:Button;
+		
+		/**
+		 * @private 
+		 */ 
+		private var filterNodesButton:Button;
+	
+		/**
+		 * Setup options container
+		 */ 
+		private function setupOptionsContainer():void
 		{
 			
-			title = "Charts - #" + String(oid);
-			
-			labelsContainer = new BorderContainer();			
-			labelsContainer.setStyle("backgroundColor", "0xf1f1f1");	
-			labelsContainer.setStyle("borderColor", "0xcccccc");	
-			labelsContainer.setStyle("left", 0);
-			labelsContainer.setStyle("right", 0);
-			labelsContainer.height = 40;
-			
-			var layout:TileLayout = new TileLayout();
-			layout.horizontalAlign = "left";
-			layout.verticalAlign   = "top"; 
-			layout.paddingRight    = 5;
-			labelsContainer.layout = layout;
-			contentGroup.addElement(labelsContainer);
-			
-			chart = new AreaChart();
-			chart.showDataTips = true;
-			chart.setStyle("left", 0);
-			chart.setStyle("right", 0);
-			chart.setStyle("top", 40);
-			chart.setStyle("bottom", 30);
-			contentGroup.addElement(chart);
-			
-			chartAnnotations = new UIComponent();
-			chartAnnotations.setStyle("left", 46);
-			chartAnnotations.setStyle("right", 15);
-			chartAnnotations.setStyle("top", 50);
-			chartAnnotations.setStyle("bottom", 55);
-			contentGroup.addElement(chartAnnotations);
-		
-			var borderContainer:BorderContainer = new BorderContainer();
-			borderContainer.setStyle("backgroundColor", "0xF1F1F1");
-			borderContainer.setStyle("borderColor", "0xCCCCCC" );
-			borderContainer.setStyle("left", 0);
-			borderContainer.setStyle("right", 0);
-			borderContainer.setStyle("bottom", 0);
-			borderContainer.height = 30;
+			optionsContainer= new BorderContainer();
+			optionsContainer.setStyle("backgroundColor", "0xF1F1F1");
+			optionsContainer.setStyle("borderColor", "0xCCCCCC" );
+			optionsContainer.setStyle("left", 0);
+			optionsContainer.setStyle("right", 0);
+			optionsContainer.setStyle("bottom", 0);
+			optionsContainer.height = 30;
 			var horizontalLayout:HorizontalLayout = new HorizontalLayout();
 			horizontalLayout.horizontalAlign ="center";
 			horizontalLayout.verticalAlign ="middle";
-			borderContainer.layout = horizontalLayout;
-			contentGroup.addElement(borderContainer);
-		
+			optionsContainer.layout = horizontalLayout;
+			contentGroup.addElement(optionsContainer);
+			
 			var label:Label = new Label();
 			label.text = "Resolution:";
-			borderContainer.addElement(label);
-
+			optionsContainer.addElement(label);
+			
 			resolutionSlider = new ResolutionSlider();
 			resolutionSlider.minimum = 0;
 			resolutionSlider.maximum = 10000;
@@ -456,56 +723,30 @@ package com.bienvisto.ui.windows.charts
 			resolutionSlider.stepSize = 1;
 			resolutionSlider.snapInterval = 1;
 			resolutionSlider.addEventListener(Event.CHANGE, handleResolutionSliderChange);
-			borderContainer.addElement(resolutionSlider);
+			optionsContainer.addElement(resolutionSlider);
 			
 			var spacer:Spacer = new Spacer();
 			spacer.setStyle("width", "100%");
-			borderContainer.addElement(spacer);
+			optionsContainer.addElement(spacer);
 			
 			providersList = new ComboBox();
-			providersList.width = 150;
 			providersList.selectedIndex = 0;
 			providersList.labelField    = "label";
-			borderContainer.addElement(providersList);
+			optionsContainer.addElement(providersList);
 			
 			addProviderButton = new Button();
 			addProviderButton.label = "add";
 			addProviderButton.width = 50;
 			addProviderButton.addEventListener(MouseEvent.CLICK, handleAddProviderButtonClick);
-			borderContainer.addElement(addProviderButton);
+			optionsContainer.addElement(addProviderButton);
 			
-/*			filterNodesButton = new Button();
+			
+			
+			filterNodesButton = new Button();
 			filterNodesButton.label = "filter";
 			filterNodesButton.width = 50;
 			filterNodesButton.addEventListener(MouseEvent.CLICK, handleFilterNodesButtonClick);
-			borderContainer.addElement(filterNodesButton);
-			*/
-			
-/*			nodesContainer = new BorderContainer();
-			nodesContainer.setStyle("width", "100");
-			nodesContainer.setStyle("backgroundColor", "0xAFAFAF");
-			nodesContainer.setStyle("borderColor", "0xCCCCCC" );
-			nodesContainer.setStyle("left", 0);
-			nodesContainer.setStyle("right", 0);
-			nodesContainer.setStyle("top", 0);
-			nodesContainer.setStyle("bottom", 30);
-			contentGroup.addElement(nodesContainer);
-			*/
-			
-			super.setup();
-			updateProgress();
-			invalidateDataProviders();
-			setTimeout(updateProgress, 100);
-		}
-		
-		/**
-		 * Handle filter button click
-		 * 
-		 * @param event
-		 */ 
-		private function handleFilterNodesButtonClick(event:MouseEvent):void
-		{
-			
+			optionsContainer.addElement(filterNodesButton);
 		}
 		
 		/**
@@ -520,14 +761,18 @@ package com.bienvisto.ui.windows.charts
 		
 		
 		/**
-		 * Handle data provider label remove
+		 * Handle filter button click
 		 * 
 		 * @param event
 		 */ 
-		private function handleDataProviderLabelRemove(event:Event):void
+		private function handleFilterNodesButtonClick(event:MouseEvent):void
 		{
-			removeDataProviderLabel(DataProviderLabel(event.target));	
+			if (nodesContainer.visible) {
+				updateSelectedNodeValues();
+			}
+			nodesContainer.visible = !nodesContainer.visible;	
 		}
+		
 		
 		/**
 		 * Handle resolution slider change
@@ -538,6 +783,139 @@ package com.bienvisto.ui.windows.charts
 		{
 			invalidateInterests();
 		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Nodes Container
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var nodesContainer:BorderContainer;
+		
+		/**
+		 * @private
+		 */ 
+		private var checkboxesContainer:Group;
+		
+		/**
+		 * @private
+		 */ 
+		private var selectAllCheckboxes:CheckBox;
+		
+		/**
+		 * @private
+		 */ 
+		private var checkboxes:Vector.<NodeCheckBox> = new Vector.<NodeCheckBox>();
+		
+		/**
+		 * Setup nodes container
+		 */ 
+		private function setupNodesContainer():void
+		{
+			nodesContainer = new BorderContainer();
+			nodesContainer.setStyle("backgroundColor", "0x363636");
+			nodesContainer.setStyle("borderColor", "0x1B1B1b");
+			nodesContainer.setStyle("top", 47);
+			nodesContainer.setStyle("right", 0);
+			nodesContainer.setStyle("bottom", 30);
+			nodesContainer.setStyle("left", 0);
+			nodesContainer.visible = false;
+			contentGroup.addElement(nodesContainer);
+			
+			var label:Label = new Label();
+			label.text = "Select nodes:";
+			label.setStyle("fontSize", 15);
+			label.setStyle("top", 10);
+			label.setStyle("left", 10);
+			label.setStyle("color", "0xFAFAFA");
+			label.setStyle("fontWeight", "bold");
+			nodesContainer.addElement(label);
+			
+			selectAllCheckboxes = new CheckBox();
+			selectAllCheckboxes.addEventListener(Event.CHANGE, handleSelectAllNodesEventChange);
+			selectAllCheckboxes.setStyle("left", 10);
+			selectAllCheckboxes.setStyle("top", 30);
+			selectAllCheckboxes.selected = true;
+			nodesContainer.addElement(selectAllCheckboxes);
+			
+			label = new Label();
+			label.text = "All";
+			label.setStyle("left", 28);
+			label.setStyle("top", 33);
+			label.setStyle("fontSize", 13);
+			label.setStyle("color", "0xFAFAFA");
+			label.setStyle("fontWeight", "bold");
+			nodesContainer.addElement(label);
+			
+			checkboxesContainer = new Group();
+			var tileLayout:TileLayout = new TileLayout();
+			tileLayout.verticalAlign   = VerticalAlign.TOP;
+			tileLayout.horizontalAlign = HorizontalAlign.LEFT;
+			tileLayout.paddingLeft = 10;
+			tileLayout.paddingBottom = 5;
+			checkboxesContainer.layout = tileLayout;
+			checkboxesContainer.setStyle("top", 50);
+			checkboxesContainer.setStyle("bottom", 0);
+			checkboxesContainer.setStyle("left", 0);
+			checkboxesContainer.setStyle("right", 0);
+			nodesContainer.addElement(checkboxesContainer);
+			
+			var node:Node;
+			var checkbox:NodeCheckBox;
+			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
+				node = nodes[i];
+				checkbox = new NodeCheckBox(node.id);
+				checkbox.selected = true;
+				checkbox.addEventListener(Event.CHANGE, handleNodeCheckboxChange);
+				checkboxesContainer.addElement(checkbox);
+				checkboxes.push(checkbox);
+			}
+		}
+		
+		/**
+		 * Handle select all nodes event change
+		 * 
+		 * @param event
+		 */ 
+		private function handleSelectAllNodesEventChange(event:Event):void
+		{
+			if (selectAllCheckboxes.selected) {
+				for (var i:int = checkboxes.length; i--;) {
+					if (!checkboxes[i].selected) {
+						checkboxes[i].selected = true;
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Handle node checkbox change
+		 * 
+		 * @param event
+		 */ 
+		private function handleNodeCheckboxChange(event:Event):void
+		{
+			// Update selectAllCheckboxes state
+			var checkbox:NodeCheckBox = NodeCheckBox(event.target);
+			if (!checkbox.selected && selectAllCheckboxes.selected) {
+				selectAllCheckboxes.selected = false;
+			}
+			else {
+				var selected:Boolean = true;
+				for (var i:int = checkboxes.length; i--;) {
+					if (!checkboxes[i].selected) {
+						selected = false;
+						break;
+					}
+				}
+				selectAllCheckboxes.selected = selected;
+			}
+		}
+		
 		
 	}
 }

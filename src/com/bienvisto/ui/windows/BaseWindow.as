@@ -460,6 +460,8 @@ package com.bienvisto.ui.windows
 		 */
 		protected function handleTopGroupMouseMove(event:MouseEvent):void
 		{
+			invalidatePositionFixed();
+			
 			var stageX:Number = event.stageX;
 			var stageY:Number = event.stageY;
 			
