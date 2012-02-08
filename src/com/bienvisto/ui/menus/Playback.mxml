@@ -218,7 +218,9 @@
 			<s:CheckBox id="gridCheckbox" label="Grid" />
 			<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
 			<s:CheckBox id="perimeterCheckbox" label="Perimeter" enabled="false" selected="false" />
-			<s:CheckBox id="statsCheckbox" label="Hi-res Stats" />
+			
+			<!--- additional component to show information about the application such as memory usage, fps and other not necessary for end user -->
+			<s:CheckBox id="statsCheckbox" label="Hi-res Stats" enabled="false" visible="false" />
 		</s:Group>
 		
 		<!-- menu group -->	
