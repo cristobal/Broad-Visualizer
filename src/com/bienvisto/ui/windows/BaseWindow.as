@@ -1,7 +1,9 @@
 package com.bienvisto.ui.windows
 {	
 	import flash.display.DisplayObject;
+	import flash.display.StageDisplayState;
 	import flash.events.Event;
+	import flash.events.FullScreenEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -221,6 +223,22 @@ package com.bienvisto.ui.windows
 		}
 		
 		/**
+		 * Hide
+		 */ 
+		public function hide():void
+		{
+			super.visible = false;
+		}
+		
+		/**
+		 * Hide
+		 */ 
+		public function show():void
+		{
+			super.visible = true;
+		}
+		
+		/**
 		 * Toggle
 		 */ 
 		public function toggle():void
@@ -376,7 +394,19 @@ package com.bienvisto.ui.windows
 		protected function handleCreationComplete(event:FlexEvent):void
 		{
 			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
+			addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 			setup();
+		}
+		
+		/**
+		 * Handle added to stage
+		 * 
+		 * @param event
+		 */ 
+		protected function handleAddedToStage(event:Event):void
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+			stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
 		}
 		
 		/**
@@ -386,8 +416,21 @@ package com.bienvisto.ui.windows
 		 */ 
 		protected function handleRemovedFromStage(event:Event):void
 		{
-			removeEventListener(Event.ADDED_TO_STAGE, handleRemovedFromStage);
+			stage.removeEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
+			removeEventListener(Event.REMOVED_FROM_STAGE, handleRemovedFromStage);
 			_registeredAsFloatingWindow = false;
+		}
+		
+		/**
+		 * Handle fullScreen event
+		 * 
+		 * @param event
+		 */ 
+		protected function handleFullScreenEvent(event:FullScreenEvent):void
+		{
+			if (stage.displayState == StageDisplayState.NORMAL) {
+				moveTo(x, y); // after exiting fullscreen check if current position is ok.
+			}
 		}
 		
 		/**

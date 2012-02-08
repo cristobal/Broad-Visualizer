@@ -41,6 +41,18 @@
 			private function initComponent(event:FlexEvent):void
 			{
 				playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
+				if (!stage) {
+					addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+				}
+				else {
+					stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
+				}
+			}
+			
+			private function handleAddedToStage(event:Event):void
+			{
+				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
 			}
 			
 			public function reset():void
@@ -161,6 +173,36 @@
 				loaderValue.text = String(int(value)) + " %";
 			}
 			
+			private function enterFullScreen():void
+			{
+				try {
+					stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+					enterFullScreenButton.visible = false;
+					leaveFullScreenButton.visible = true;
+				}
+				catch(error:*) {
+					
+				}
+			}
+			
+			private function leaveFullScreen():void
+			{
+				enterFullScreenButton.visible = true;
+				leaveFullScreenButton.visible = false;
+				stage.displayState = StageDisplayState.NORMAL;
+			}
+			
+			/**
+			 * Handle fullscreen event
+			 */ 
+			private function handleFullScreenEvent(event:FullScreenEvent):void
+			{
+				if (leaveFullScreenButton.visible && stage.displayState == StageDisplayState.NORMAL) {
+					enterFullScreenButton.visible = true;
+					leaveFullScreenButton.visible = false;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<s:Group width="100%" height="100%">
@@ -206,12 +248,13 @@
 		
 		<!-- right group -->
 		<s:Group id="right" width="20%">
-			<s:layout>
-				<s:HorizontalLayout horizontalAlign="right" paddingTop="0" paddingRight="5" />
-			</s:layout>
-			<s:Group id="loader" width="100" visible="false">
+			<s:Group id="loader" width="100" visible="false" right="60" top="13">
 				<s:Label text="Loading:" left="0" />
-				<s:Label id="loaderValue" text="0 %" right="0" />
+				<s:Label id="loaderValue" text="100 %" right="0" 	/>
+			</s:Group>
+			<s:Group id="fullscreen" width="35" right="0">
+				<s:Image id="enterFullScreenButton" source="@Embed(source='fullscreen/enter.png')" top="0" height="32" width="32" buttonMode="true" click="enterFullScreen()" />
+				<s:Image id="leaveFullScreenButton" source="@Embed(source='fullscreen/leave.png')" top="0" height="32" width="32" visible="false" buttonMode="true" click="leaveFullScreen()" />
 			</s:Group>
 		</s:Group>
 	</s:Group>

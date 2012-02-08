@@ -14,9 +14,12 @@
 		<![CDATA[
 			import com.bienvisto.core.events.TimedEvent;
 			import com.bienvisto.ui.menus.ProgressTimeSlider;
+			import com.bienvisto.ui.windows.BaseWindow;
+			import com.bienvisto.ui.windows.charts.ChartsWindow;
 			import com.bienvisto.ui.windows.charts.ChartsWindows;
 			import com.bienvisto.ui.windows.node.NodeWindows;
 			import com.bienvisto.ui.windows.sequences.SequencesWindow;
+			import com.bienvisto.ui.windows.topology.TopologyWindow;
 			import com.bienvisto.ui.windows.topology.TopologyWindows;
 			
 			import flash.utils.getTimer;
@@ -24,6 +27,10 @@
 			
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
+			
+			import spark.effects.Animate;
+			import spark.effects.animation.MotionPath;
+			import spark.effects.animation.SimpleMotionPath;
 			
 			/**
 			 * ApplicationWindow.mxml
@@ -361,8 +368,141 @@
 			{
 				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
 				stage.addEventListener(Event.RESIZE, handleResize);
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
 			}
 			
+			//--------------------------------------------------------------------------
+			//
+			//  FullScreen functionality
+			//
+			//--------------------------------------------------------------------------
+			
+			/**
+			 * @private
+			 */ 
+			private var fullScreenTimer:Timer;
+			
+			/**
+			 * @private
+			 */ 
+			private var fullScreenState:Boolean;
+			
+			/**
+			 * @private
+			 */ 
+			private var fullScreenAnimate:Animate;
+			
+			/**
+			 * @private
+			 */ 
+			private var windows:Vector.<BaseWindow>;
+			
+			/**
+			 * Trace handle fullscreen event
+			 * 
+			 * @param event
+			 */ 
+			private function handleFullScreenEvent(event:FullScreenEvent):void
+			{
+				fullScreenState = stage.displayState == StageDisplayState.FULL_SCREEN || stage.displayState == StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				if (fullScreenState) {
+					
+					systemManager.getSandboxRoot().addEventListener(MouseEvent.MOUSE_MOVE, handleFullScreenMouseMove);
+					
+					fullScreenAnimate = new Animate();
+					fullScreenAnimate.motionPaths = Vector.<MotionPath>([
+						 new SimpleMotionPath("alpha", "1", "0")
+					]);
+					
+					fullScreenTimer = new Timer(2500, 1);
+					fullScreenTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);
+					
+					fullScreenTimer.start();
+				}
+				else if(fullScreenTimer) {
+					if (fullScreenTimer.running) {
+						fullScreenTimer.stop();
+					}
+					systemManager.getSandboxRoot().removeEventListener(MouseEvent.MOUSE_MOVE, handleFullScreenMouseMove);
+					
+					fullScreenTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);
+					fullScreenTimer = null;
+					fullScreenAnimate = null;
+				}
+			}
+			
+			/**
+			 * Handle fullScreen mouse move
+			 */ 
+			private function handleFullScreenMouseMove(event:MouseEvent):void
+			{
+				if (fullScreenTimer.running) {
+					fullScreenTimer.stop();
+				}
+				if (fullScreenAnimate.isPlaying) {
+					fullScreenAnimate.stop();
+				}
+				
+				playback.alpha = 1;
+				menu.alpha     = 1;
+
+				playback.visible = true;
+				menu.visible 	 = true;
+				fullScreenTimer.start();
+				if (windows) {
+					for (var i:int = windows.length; i--;) {
+						windows[i].show();
+						windows.splice(i, 1);
+					}
+					windows = null;
+				}
+			}
+			
+			/**
+			 * Handle fullscreen timer complete
+			 * 
+			 * @param event
+			 */ 
+			private function handleFullScreenTimerComplete(event:TimerEvent):void
+			{
+				fullScreenAnimate.play([menu, playback]);
+				
+				if (menu.hideWindowsInFullScreen) {
+					windows = new Vector.<BaseWindow>();
+					
+					for each(var chartsWindow:ChartsWindow in chartsWindows.windows) {
+						chartsWindow.hide();
+						windows.push(chartsWindow);
+					}
+					
+					if (topologyWindows.localTopologyWindow.visible) {
+						topologyWindows.localTopologyWindow.hide();
+						windows.push(topologyWindows.localTopologyWindow);
+					}
+					
+					if (topologyWindows.globalTopologyWindow.visible) {
+						topologyWindows.globalTopologyWindow.hide();
+						windows.push(topologyWindows.globalTopologyWindow);
+					}
+					
+					if (sequencesWindow.visible) {
+						sequencesWindow.hide();
+						windows.push(sequencesWindow);
+					}
+					
+					if (nodeWindows.window.visible) {
+						nodeWindows.window.hide();
+						windows.push(nodeWindows.window);
+					}
+					
+					if (nodeWindows.window2.visible) {
+						nodeWindows.window2.hide();
+						windows.push(nodeWindows.window2);
+					}
+				}
+				
+				
+			}
 			
 			//--------------------------------------------------------------------------
 			//

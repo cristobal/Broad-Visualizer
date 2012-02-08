@@ -49,6 +49,14 @@
 				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
 			}
 			
+			/**
+			 * @readonly hideWindowsInFullScreen option
+			 */ 
+			public function get hideWindowsInFullScreen():Boolean
+			{
+				return hideWindowInFullScreeenCheckbox.selected;
+			}
+			
 			public function reset():void
 			{
 				setStatsEnabled(false);
@@ -140,11 +148,19 @@
 		]]>
 	</fx:Script>
 	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
-		<s:layout>
-			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="0" paddingLeft="5" />
-		</s:layout>
-		<s:Label text="Toggle Elements:" />	
-		
+		<s:Group id="toggeableNodeDrawingManagerContainer" width="80%" left="0">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
+			</s:layout>
+			<s:Label text="Toggle Elements:" />	
+		</s:Group>
+		<s:Group id="customOptions" width="100" right="10">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
+			</s:layout>
+			<s:Label text="Hide windows in fullscreen:" />
+			<s:CheckBox id="hideWindowInFullScreeenCheckbox" selected="true" />
+		</s:Group>
 	</s:BorderContainer>
 	
 	<s:BorderContainer id="container" width="100%" height="30" backgroundColor="0xF1F1F1" borderColor="0xCCCCCC">

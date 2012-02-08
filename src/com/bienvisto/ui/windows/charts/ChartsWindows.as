@@ -29,10 +29,6 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		private var clampTime:uint = 1000; // sample every 1000seconds
 		
-		/**
-		 * @private
-		 */ 
-		private var windows:Vector.<ChartsWindow> = new Vector.<ChartsWindow>();
 		
 		/**
 		 * @private
@@ -45,6 +41,19 @@ package com.bienvisto.ui.windows.charts
 		//  Properties
 		//
 		//--------------------------------------------------------------------------
+		
+		/**
+		 * @private
+		 */ 
+		private var _windows:Vector.<ChartsWindow> = new Vector.<ChartsWindow>();
+		
+		/**
+		 * @readonly
+		 */ 
+		public function get windows():Vector.<ChartsWindow>
+		{
+			return _windows.concat(); // retun shallow copy
+		}
 		
 		/**
 		 * @private
@@ -86,8 +95,8 @@ package com.bienvisto.ui.windows.charts
 		public function setTime(time:uint):void
 		{
 			_time = time;
-			for (var i:int = 0, l:int = windows.length; i < l; i++) {
-				windows[i].setTime(time);
+			for (var i:int = 0, l:int = _windows.length; i < l; i++) {
+				_windows[i].setTime(time);
 			}
 		}
 		
@@ -121,8 +130,8 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		public function reset():void
 		{
-			for (var i:int = windows.length; i--;){ 
-				remove(windows[i]);
+			for (var i:int = _windows.length; i--;){ 
+				remove(_windows[i]);
 			}
 		}
 		
@@ -149,7 +158,7 @@ package com.bienvisto.ui.windows.charts
 			window.y = 40;
 			window.addEventListener(CloseEvent.CLOSE, handleChartsWindowClose);
 			container.addElement(window);
-			windows.push(window);
+			_windows.push(window);
 			
 			return window;
 		}
@@ -162,10 +171,10 @@ package com.bienvisto.ui.windows.charts
 		public function remove(window:ChartsWindow):void
 		{
 			var item:ChartsWindow;
-			for (var i:int = windows.length; i--;){ 
-				item = windows[i];	
+			for (var i:int = _windows.length; i--;){ 
+				item = _windows[i];	
 				if (item == window) {
-					windows.splice(i, 1);
+					_windows.splice(i, 1);
 					container.removeElement(window);
 					window = null;
 					break;
@@ -189,8 +198,8 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		public function invalidateWindows():void
 		{
-			for (var i:int = windows.length; i--;){ 
-				windows[i].invalidateInterests();
+			for (var i:int = _windows.length; i--;){ 
+				_windows[i].invalidateInterests();
 			}
 		}
 	}

@@ -42,6 +42,11 @@ package com.bienvisto.ui.menus
 		/**
 		 * @public
 		 */ 
+		public var toggeableNodeDrawingManagerContainer:Group;
+		
+		/**
+		 * @public
+		 */ 
 		public var container:BorderContainer; 
 		
 		/**
@@ -109,7 +114,7 @@ package com.bienvisto.ui.menus
 				element.label    = name;
 				element.selected = manager.enabled;
 				
-				optionsContainer.addElement(element);
+				toggeableNodeDrawingManagerContainer.addElement(element);
 				element.addEventListener(Event.CHANGE, handleNodeDrawingManagerCheckboxChange, false, 0, true); 
 				
 				managers[name] = manager;
