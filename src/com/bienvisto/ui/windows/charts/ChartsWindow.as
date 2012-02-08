@@ -769,6 +769,7 @@ package com.bienvisto.ui.windows.charts
 		{
 			if (nodesContainer.visible) {
 				updateSelectedNodeValues();
+				invalidateInterests();
 			}
 			nodesContainer.visible = !nodesContainer.visible;	
 		}
@@ -809,7 +810,17 @@ package com.bienvisto.ui.windows.charts
 		/**
 		 * @private
 		 */ 
+		private var selectNoneCheckboxes:CheckBox;
+		
+		/**
+		 * @private
+		 */ 
 		private var checkboxes:Vector.<NodeCheckBox> = new Vector.<NodeCheckBox>();
+		
+		/**
+		 * @private
+		 */ 
+		private var checkboxNeedsInvalidation:Boolean = true;
 		
 		/**
 		 * Setup nodes container
@@ -835,6 +846,8 @@ package com.bienvisto.ui.windows.charts
 			label.setStyle("fontWeight", "bold");
 			nodesContainer.addElement(label);
 			
+			
+			// -- Select all
 			selectAllCheckboxes = new CheckBox();
 			selectAllCheckboxes.addEventListener(Event.CHANGE, handleSelectAllNodesEventChange);
 			selectAllCheckboxes.setStyle("left", 10);
@@ -851,6 +864,28 @@ package com.bienvisto.ui.windows.charts
 			label.setStyle("fontWeight", "bold");
 			nodesContainer.addElement(label);
 			
+			
+			// -- Select none
+			selectNoneCheckboxes = new CheckBox();
+			selectNoneCheckboxes.addEventListener(Event.CHANGE, handleSelectNoneNodesEventChange);
+			selectNoneCheckboxes.setStyle("left", 67);
+			selectNoneCheckboxes.setStyle("top", 30);
+			selectNoneCheckboxes.selected = false;
+			nodesContainer.addElement(selectNoneCheckboxes);
+			
+			
+			// -- Label
+			label = new Label();
+			label.text = "None";
+			label.setStyle("left", 85);
+			label.setStyle("top", 33);
+			label.setStyle("fontSize", 13);
+			label.setStyle("color", "0xFAFAFA");
+			label.setStyle("fontWeight", "bold");
+			nodesContainer.addElement(label);
+			
+			
+			// -- Checkboxes
 			checkboxesContainer = new Group();
 			var tileLayout:TileLayout = new TileLayout();
 			tileLayout.verticalAlign   = VerticalAlign.TOP;
@@ -858,7 +893,7 @@ package com.bienvisto.ui.windows.charts
 			tileLayout.paddingLeft = 10;
 			tileLayout.paddingBottom = 5;
 			checkboxesContainer.layout = tileLayout;
-			checkboxesContainer.setStyle("top", 50);
+			checkboxesContainer.setStyle("top", 65);
 			checkboxesContainer.setStyle("bottom", 0);
 			checkboxesContainer.setStyle("left", 0);
 			checkboxesContainer.setStyle("right", 0);
@@ -884,11 +919,33 @@ package com.bienvisto.ui.windows.charts
 		private function handleSelectAllNodesEventChange(event:Event):void
 		{
 			if (selectAllCheckboxes.selected) {
+				checkboxNeedsInvalidation = false;
 				for (var i:int = checkboxes.length; i--;) {
 					if (!checkboxes[i].selected) {
 						checkboxes[i].selected = true;
 					}
 				}
+				selectNoneCheckboxes.selected = false;
+				checkboxNeedsInvalidation = true;
+			}
+		}
+		
+		/**
+		 * Handle select none nodes event change
+		 * 
+		 * @param event
+		 */  
+		private function handleSelectNoneNodesEventChange(event:Event):void
+		{
+			if (selectNoneCheckboxes.selected) {
+				checkboxNeedsInvalidation = false;
+				for (var i:int = checkboxes.length; i--;) {
+					if (checkboxes[i].selected) {
+						checkboxes[i].selected = false;
+					}
+				}
+				selectAllCheckboxes.selected = false;
+				checkboxNeedsInvalidation = true;
 			}
 		}
 		
@@ -899,21 +956,23 @@ package com.bienvisto.ui.windows.charts
 		 */ 
 		private function handleNodeCheckboxChange(event:Event):void
 		{
-			// Update selectAllCheckboxes state
-			var checkbox:NodeCheckBox = NodeCheckBox(event.target);
-			if (!checkbox.selected && selectAllCheckboxes.selected) {
-				selectAllCheckboxes.selected = false;
+			if (!checkboxNeedsInvalidation) {
+				return;
 			}
-			else {
-				var selected:Boolean = true;
-				for (var i:int = checkboxes.length; i--;) {
-					if (!checkboxes[i].selected) {
-						selected = false;
-						break;
-					}
+			
+			var on:Boolean  = true;
+			var off:Boolean = true;
+			for (var i:int = checkboxes.length; i--;) {
+				if (!checkboxes[i].selected && on) {
+					on = false;
 				}
-				selectAllCheckboxes.selected = selected;
+				else if(checkboxes[i].selected && off) {
+					off = false;
+				}
 			}
+			selectAllCheckboxes.selected = on;
+			selectNoneCheckboxes.selected = off;
+			
 		}
 		
 		

@@ -47,11 +47,6 @@ package com.bienvisto.ui.windows.topology
 		
 		/**
 		 * @private
-		 */  
-		private var node:Node;
-		
-		/**
-		 * @private
 		 */ 
 		private var sampleTime:uint = 500;
 		
@@ -297,6 +292,7 @@ package com.bienvisto.ui.windows.topology
 				from = -1;
 			}
 			_userDefined = false; // restore state
+			invalidate();
 		}
 		
 		/**
@@ -319,6 +315,7 @@ package com.bienvisto.ui.windows.topology
 				to = -1;
 			}
 			_userDefined = false; // restore state
+			invalidate();
 		}
 		
 		/**
@@ -344,10 +341,10 @@ package com.bienvisto.ui.windows.topology
 			
 			var graph:Graph;
 			if (windowType == WINDOW_TYPE_ROUTING) {
-				graph = routing.getGlobalGraph(time);
+				graph = routing.getGlobalGraph(elapsed);
 			}
-			else if ((windowType == WINDOW_TYPE_TOPOLOGY) && node) {
-				graph = topology.getLocalGraph(node, time);
+			else if ((windowType == WINDOW_TYPE_TOPOLOGY) && nodeFrom) {
+				graph = topology.getLocalGraph(nodeFrom, elapsed);
 			}
 			var adjacencyMatrix:AdjacencyMatrix;
 			var path:Vector.<Edge>;
@@ -534,17 +531,17 @@ package com.bienvisto.ui.windows.topology
 			if (dropDownList == dropDownListFrom) {
 				from = id;
 				if (from >= 1) {
-					node = nodeContainer.getNode(from);
+					nodeFrom = nodeContainer.getNode(from);
 				}
 				else {
-					node = null;
+					nodeFrom = null;
 				}
 			}
 			else {
 				to  = id;
 			}
 			// _userDefined = true; // ucomment if we want user defined
-			setTimeout(update, 10); // call later
+			setTimeout(invalidate, 10); // call later
 		}
 	
 	}

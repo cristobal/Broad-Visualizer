@@ -9,7 +9,6 @@
 		 xmlns:sequences="com.bienvisto.ui.windows.sequences.*"
 		 width="100%" height="100%"
 		 creationComplete="initComponent(event)">
-	
 	<fx:Script>
 		<![CDATA[
 			import com.bienvisto.core.events.TimedEvent;
@@ -27,6 +26,7 @@
 			
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
+			import mx.states.SetStyle;
 			
 			import spark.effects.Animate;
 			import spark.effects.animation.MotionPath;
@@ -406,7 +406,6 @@
 			{
 				fullScreenState = stage.displayState == StageDisplayState.FULL_SCREEN || stage.displayState == StageDisplayState.FULL_SCREEN_INTERACTIVE;
 				if (fullScreenState) {
-					
 					systemManager.getSandboxRoot().addEventListener(MouseEvent.MOUSE_MOVE, handleFullScreenMouseMove);
 					
 					fullScreenAnimate = new Animate();
@@ -415,8 +414,7 @@
 					]);
 					
 					fullScreenTimer = new Timer(2500, 1);
-					fullScreenTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);
-					
+					fullScreenTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);					
 					fullScreenTimer.start();
 				}
 				else if(fullScreenTimer) {
@@ -429,6 +427,11 @@
 					fullScreenTimer = null;
 					fullScreenAnimate = null;
 				}
+				
+				// invalidateParentSizeAndDisplayList();
+				// 
+		
+				
 			}
 			
 			/**
@@ -553,10 +556,10 @@
 			
 		]]>
 	</fx:Script>
-	<view:VisualizerView id="visualizerView" />
+	<view:VisualizerView id="visualizerView"  />
 	
 	<!-- Top Menu -->
-	<menus:Menu id="menu" top="0" width="100%" height="60"  />	
+	<menus:Menu id="menu" top="0" width="100%" height="60" />	
 
 	<!-- Playback Controller -->
 	<menus:Playback id="playback" bottom="0" width="100%" height="50" />

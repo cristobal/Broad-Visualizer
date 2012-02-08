@@ -34,7 +34,7 @@
 				<s:Label x="135" y="2" text="To:"/>
 				<s:DropDownList id="dropDownListTo" x="165" width="65" styleName="dropDownList" />
 				
-				<s:Label y="30" text="Dijsktra:"/> <s:Label id="pathValueLabel" x="60" y="32" styleName="value" text="–"/>
+				<s:Label y="30" text="Dijkstra:"/> <s:Label id="pathValueLabel" x="60" y="32" styleName="value" text="–"/>
 			</s:Group>
 			
 			<s:Label text="Adjacency matrix:" styleName="label" fontWeight="bold" top="75" left="10" />

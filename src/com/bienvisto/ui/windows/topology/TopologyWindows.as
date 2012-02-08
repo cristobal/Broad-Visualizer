@@ -23,7 +23,6 @@ package com.bienvisto.ui.windows.topology
 			setup(container);
 		}
 		
-		
 		//--------------------------------------------------------------------------
 		//
 		// Variables
@@ -34,7 +33,7 @@ package com.bienvisto.ui.windows.topology
 		 * @private
 		 */		
 		public var localTopologyWindow:TopologyWindow;
-		
+			
 		/**
 		 * @private
 		 */ 
@@ -153,6 +152,7 @@ package com.bienvisto.ui.windows.topology
 			globalTopologyWindow.reset();
 			globalTopologyWindow.visible = false;
 		}
+		
 		
 		//--------------------------------------------------------------------------
 		//

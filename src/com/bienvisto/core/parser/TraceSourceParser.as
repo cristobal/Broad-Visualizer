@@ -85,7 +85,7 @@ package com.bienvisto.core.parser
 			var time:uint, maxTime:uint = 0;
 			for (var i:int = 0, l:int = sources.length; i < l; i++) {
 				source = sources[i];
-				if (source.traceSource == traceSource) {
+				if (source.traceSource == traceSource && params) {
 					time = source.update(params);
 					if (time > maxTime) {
 						dispatchEvent(new TimedEvent(TimedEvent.ELAPSED, false, false, time));

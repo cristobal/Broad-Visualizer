@@ -142,6 +142,7 @@ package com.bienvisto.elements.topology
 				sets[id]		= new Dictionary();
 			}
 			
+			// Even if tuples have length 0 we add them since OLSR dictates that 
 			var tuples:Vector.<TopologyTuple> = parseTuples(params.splice(2, params.length - 2));
 			AggregateCollection(collections[id]).add(
 				new TopologySet(time, tuples)
