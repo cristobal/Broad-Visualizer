@@ -22,12 +22,14 @@
 			 */ 
 			[Event(name="play", type="flash.events.Event")]
 			public static const PLAY:String = "play";
+			
 			/**
 			 * @Event
 			 * 	Dispatched when the pause button is clicked
 			 */ 
 			[Event(name="pause", type="flash.events.Event")]
 			public static const PAUSE:String = "pause";
+	
 			
 			//--------------------------------------------------------------------------
 			//
@@ -205,28 +207,42 @@
 			
 		]]>
 	</fx:Script>
-	<s:Group width="100%" height="100%">
+	
+	<!-- left group -->
+	<s:Group id="left" left="0" top="10">
 		<s:layout>
-			<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" />
+			<s:HorizontalLayout horizontalAlign="left" paddingTop="5" paddingLeft="5" />
+		</s:layout>
+		<s:CheckBox id="gridCheckbox" label="Grid" />
+		<s:CheckBox id="miniMapCheckbox" label="Map" />
+		<s:CheckBox id="perimeterCheckbox" label="Area" enabled="false" selected="false" />
+		
+		<!--- additional component to show information about the application such as memory usage, fps and other not necessary for end user -->
+		<s:CheckBox id="statsCheckbox" label="Hi-res Stats" enabled="false" visible="false" />
+	</s:Group>
+	
+	<!-- right group -->
+	<s:Group id="right" right="0" top="10">
+		<s:Group id="loader" width="100" visible="false" right="60" top="13">
+			<s:Label text="Loading:" left="0" />
+			<s:Label id="loaderValue" text="100 %" right="0" 	/>
+		</s:Group>
+		<s:Group id="fullscreen" width="35" right="0">
+			<s:Image id="enterFullScreenButton" source="@Embed(source='fullscreen/enter.png')" top="0" height="32" width="32" buttonMode="true" click="enterFullScreen()" />
+			<s:Image id="leaveFullScreenButton" source="@Embed(source='fullscreen/leave.png')" top="0" height="32" width="32" visible="false" buttonMode="true" click="leaveFullScreen()" />
+		</s:Group>
+	</s:Group>
+	
+	
+	<!-- menu group -->	
+	<s:Group id="menu" width="100%" height="100%" top="10">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="center" />
 		</s:layout>
 		
-		<!-- left group -->
-		<s:Group id="left" width="20%">
+		<s:Group minWidth="600">
 			<s:layout>
-				<s:HorizontalLayout horizontalAlign="left" paddingTop="5" paddingLeft="5" />
-			</s:layout>
-			<s:CheckBox id="gridCheckbox" label="Grid" />
-			<s:CheckBox id="miniMapCheckbox" label="Mini Map" />
-			<s:CheckBox id="perimeterCheckbox" label="Perimeter" enabled="false" selected="false" />
-			
-			<!--- additional component to show information about the application such as memory usage, fps and other not necessary for end user -->
-			<s:CheckBox id="statsCheckbox" label="Hi-res Stats" enabled="false" visible="false" />
-		</s:Group>
-		
-		<!-- menu group -->	
-		<s:Group id="menu" width="80%">
-			<s:layout>
-				<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingTop="0" paddingLeft="20" />
+				<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingRight="5" />
 			</s:layout>
 		
 			<!-- Zoom -->
@@ -246,18 +262,6 @@
 			<s:Label id="timeLabel">00:00:00</s:Label>
 			<s:Label>/</s:Label>
 			<s:Label id="durationLabel">00:00:00</s:Label>
-		</s:Group>
-		
-		<!-- right group -->
-		<s:Group id="right" width="20%">
-			<s:Group id="loader" width="100" visible="false" right="60" top="13">
-				<s:Label text="Loading:" left="0" />
-				<s:Label id="loaderValue" text="100 %" right="0" 	/>
-			</s:Group>
-			<s:Group id="fullscreen" width="35" right="0">
-				<s:Image id="enterFullScreenButton" source="@Embed(source='fullscreen/enter.png')" top="0" height="32" width="32" buttonMode="true" click="enterFullScreen()" />
-				<s:Image id="leaveFullScreenButton" source="@Embed(source='fullscreen/leave.png')" top="0" height="32" width="32" visible="false" buttonMode="true" click="leaveFullScreen()" />
-			</s:Group>
 		</s:Group>
 	</s:Group>
 </menus:PlaybackContainer>

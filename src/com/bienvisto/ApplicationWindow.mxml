@@ -7,7 +7,7 @@
 		 xmlns:node="com.bienvisto.ui.windows.node.*"
 		 xmlns:topology="com.bienvisto.ui.windows.topology.*" 
 		 xmlns:sequences="com.bienvisto.ui.windows.sequences.*"
-		 width="100%" height="100%"
+		 top="0" right="0" bottom="0" left="0"
 		 creationComplete="initComponent(event)">
 	<fx:Script>
 		<![CDATA[
@@ -170,6 +170,18 @@
 				return _topologyWindows;
 			}
 			
+			
+			private var _isDesktop:Boolean;
+			
+			public function get isDesktop():Boolean
+			{
+				return _isDesktop;
+			}
+			
+			public function set isDesktop(value:Boolean):void
+			{
+				_isDesktop = value;
+			}
 			
 			//--------------------------------------------------------------------------
 			//
