@@ -97,29 +97,22 @@ package com.bienvisto.view.drawing
 		/**
 		 * @override
 		 */ 
-		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
-			if ((lastTime != time) && enabled) {
-				draw(time, nodeSprites);
-				
-				lastTime = time;
+			if (!enabled) {
+				return;
 			}
-		}
-		
-		/**
-		 * Draw
-		 * 
-		 * @param time
-		 * @param nodeSprites
-		 */ 
-		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
-		{
-			if (time != lastTime) {
+			
+			if (lastTime != time || needsInvalidation) {
 				
 				var nodeSprite:NodeSprite,  id:int; 
 				var shape:Shape, buffer:Buffer, size:Number;		
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
+					if (!nodeSprite.visibleInView) {
+						continue;
+					}
+					
 					buffer = buffers.findBuffer(nodeSprite.node, time);
 					shape  = Shape(shapes[id]);
 					
@@ -130,6 +123,7 @@ package com.bienvisto.view.drawing
 						}
 						continue;
 					}
+					
 					
 					if (!shape) {
 						shape = new Shape();

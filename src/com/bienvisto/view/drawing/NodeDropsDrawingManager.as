@@ -51,24 +51,27 @@ package com.bienvisto.view.drawing
 		 */ 
 		override public function reset():void
 		{
-			lastTime = 0;
 			states   = new Dictionary();
 		}
 		
 		/**
 		 * @override
 		 */ 
-		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
 			if (!enabled) {
 				return;	
 			}
 			
-			if (lastTime != time) {
+			if (lastTime != time || needsInvalidation) {
 				var nodeSprite:NodeSprite, node:Node;
 				var total:int;
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 					nodeSprite = nodeSprites[i];
+					if (!nodeSprite.visibleInView) {
+						continue;
+					}
+					
 					node       = nodeSprite.node;
 					
 					total  = drops.sampleTotalWithWindowSize(node, time, windowSize);

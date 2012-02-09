@@ -1,8 +1,6 @@
 package com.bienvisto.core.network.packet
 {
-	import com.bienvisto.core.network.node.Node;
-	import com.bienvisto.util.OIDUtil;
-
+	
 	/**
 	 * PacketStats.as
 	 * 

@@ -79,29 +79,30 @@ package com.bienvisto.view.drawing
 		/**
 		 * @override
 		 */ 
-		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
-			if (enabled) {
-				var id:int, nodeSprite:NodeSprite, textField:TextField;
-				
-				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
-					nodeSprite = nodeSprites[i];
-					id = nodeSprite.node.id;
-					if (!(id in textFields)) {
-						textField = new TextField();
-						textField.x = nodeSprite.cx / 6;
-						textField.y = nodeSprite.cy * 2;
-						textField.embedFonts = true;
-						textField.text = "#" + String(id);
-						textField.setTextFormat(textFormat);
-						
-						nodeSprite.addChild(textField);
-						
-						textFields[id] = textField;
-					}
+			if (!enabled) {
+				return;
+			}
+			
+			var id:int, nodeSprite:NodeSprite, textField:TextField;
+			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
+				nodeSprite = nodeSprites[i];
+				id = nodeSprite.node.id;
+				if (!(id in textFields)) {
+					textField = new TextField();
+					textField.x = nodeSprite.cx / 6;
+					textField.y = nodeSprite.cy * 2;
+					textField.embedFonts = true;
+					textField.text = "#" + String(id);
+					textField.setTextFormat(textFormat);
+					
+					nodeSprite.addChild(textField);
+					
+					textFields[id] = textField;
 				}
-				
 			}
 		}
+		
 	}
 }

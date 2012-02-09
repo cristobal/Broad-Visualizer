@@ -28,6 +28,7 @@
 			import mx.events.FlexEvent;
 			import mx.states.SetStyle;
 			
+			import spark.components.Application;
 			import spark.effects.Animate;
 			import spark.effects.animation.MotionPath;
 			import spark.effects.animation.SimpleMotionPath;
@@ -413,6 +414,11 @@
 			/**
 			 * @private
 			 */ 
+			private var normalScreenRect:Rectangle;
+			
+			/**
+			 * @private
+			 */ 
 			private var windows:Vector.<BaseWindow>;
 			
 			/**
@@ -434,6 +440,9 @@
 					fullScreenTimer = new Timer(2500, 1);
 					fullScreenTimer.addEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);					
 					fullScreenTimer.start();
+					if (isDesktop) {
+						normalScreenRect = new Rectangle(0, 0, width, height);
+					}
 				}
 				else if(fullScreenTimer) {
 					if (fullScreenTimer.running) {
@@ -444,6 +453,14 @@
 					fullScreenTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, handleFullScreenTimerComplete);
 					fullScreenTimer = null;
 					fullScreenAnimate = null;
+					if (isDesktop) {
+						height = normalScreenRect.height;
+						width  = normalScreenRect.width;
+						setTimeout(function():void {
+							setStyle("height", "100%");
+							setStyle("width", "100%");
+						}, 10);
+					}
 				}
 			}
 			

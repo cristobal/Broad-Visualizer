@@ -84,7 +84,7 @@ package com.bienvisto.view.drawing
 		 * @param time
 		 * @param nodeSprites
 		 */ 
-		public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
 			
 		}

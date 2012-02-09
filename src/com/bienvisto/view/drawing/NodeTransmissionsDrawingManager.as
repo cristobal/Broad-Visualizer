@@ -12,7 +12,6 @@ package com.bienvisto.view.drawing
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
 	
-	// TODO: Do not draw transmission arrows for already drawn destinations…
 	/**
 	 * NodeTransmissionsDrawingManager.as
 	 * 
@@ -144,14 +143,18 @@ package com.bienvisto.view.drawing
 		/**
 		 * @override 
 		 */ 
-		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
-			if ((time != lastTime) && enabled) {
+			if (!enabled) {
+				return;
+			}
+			
+			if (time != lastTime || needsInvalidation) {
 				draw(time, nodeSprites);
 				
 				lastTime = time;
 			}
-			else if(dirty && !enabled) {
+			else if(dirty) {
 				dirty = false;
 				
 				for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {

@@ -15,6 +15,8 @@ package com.bienvisto.view.components
 	import flash.ui.MouseCursor;
 	import flash.utils.getTimer;
 	
+	import mx.events.MoveEvent;
+	
 	[Event(name="selected", type="com.bienvisto.view.events.NodeSpriteEvent")]
 	
 	/**
@@ -206,20 +208,26 @@ package com.bienvisto.view.components
 		{
 			checkNodes();
 			
-			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
-				manager = managers[i];
-				manager.update(time, _nodeSprites);
+				managers[i].update(time, _nodeSprites);
 			}
 			
 			var nodeSprite:NodeSprite;
-			for (i = 0, l = _nodeSprites.length; i < l; i++) {
-				nodeSprite = _nodeSprites[i];
-				nodeSprite.update(time);
-				// nodeSprite.invalidate();
+			for (i = _nodeSprites.length; i--;) {
+				_nodeSprites[i].update(time);
 			}
 			
 			lastTime = time;
+		}
+		
+		/**
+		 * Redraw
+		 */ 
+		private function redraw():void
+		{
+			for (var i:int = 0, l:int = managers.length; i < l; i++) {
+				managers[i].update(lastTime, _nodeSprites, true);
+			}
 		}
 		
 		/**
@@ -350,9 +358,21 @@ package com.bienvisto.view.components
 			update(lastTime);
 		}
 		
+		/**
+		 * Handle move
+		 * 
+		 * @param event
+		 */ 
+		private function handleMove(event:Event):void
+		{
+			redraw();
+		}
+		
+		
 		private function handleAddedToStage(event:Event):void
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+			addEventListener(MoveEvent.MOVE, handleMove);
 			invalidateCenter();
 		}
 		

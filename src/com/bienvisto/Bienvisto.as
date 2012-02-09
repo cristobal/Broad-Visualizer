@@ -263,7 +263,7 @@ package com.bienvisto
 			nodeIDDrawingManager = new NodeIDDrawingManager();
 			nodeView.addDrawingManager(nodeIDDrawingManager);
 			
-			mobilityDrawingManager = new NodeMobilityDrawingManager(mobility);
+			mobilityDrawingManager = new NodeMobilityDrawingManager(mobility, nodeView);
 			nodeView.addDrawingManager(mobilityDrawingManager);
 			
 			receptionsDrawingManager = new NodeReceptionsDrawingManager(receptions);

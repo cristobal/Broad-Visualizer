@@ -218,7 +218,7 @@
 		<s:CheckBox id="perimeterCheckbox" label="Area" enabled="false" selected="false" />
 		
 		<!--- additional component to show information about the application such as memory usage, fps and other not necessary for end user -->
-		<s:CheckBox id="statsCheckbox" label="Hi-res Stats" enabled="false" visible="false" />
+		<s:CheckBox id="statsCheckbox" label="Stats" visible="false" />
 	</s:Group>
 	
 	<!-- right group -->

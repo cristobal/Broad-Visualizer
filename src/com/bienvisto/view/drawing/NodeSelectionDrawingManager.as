@@ -252,16 +252,11 @@ package com.bienvisto.view.drawing
 		/**
 		 * @override
 		 */ 
-		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>):void
+		override public function update(time:uint, nodeSprites:Vector.<NodeSprite>, needsInvalidation:Boolean = false):void
 		{
-			// if (lastTime != time) {
-				var nodeSelectionSprite:NodeSelectionSprite;
-				for (var i:int = 0, l:int = nodeSelectionSprites.length; i < l; i++) {
-					nodeSelectionSprite = nodeSelectionSprites[i];
-					nodeSelectionSprite.invalidate();
-				}
-			//	lastTime = time;
-			// }
+			for (var i:int = nodeSelectionSprites.length; i--;) {
+				nodeSelectionSprites[i].invalidate();
+			}
 		}
 		
 		/**

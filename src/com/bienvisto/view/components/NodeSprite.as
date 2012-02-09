@@ -175,7 +175,7 @@ package com.bienvisto.view.components
 		/**
 		 * @readwrite
 		 */ 
-		private var _visibleInView:Boolean;
+		private var _visibleInView:Boolean = true;
 		
 		/**
 		 * @readwrite
