@@ -278,9 +278,14 @@ package com.bienvisto.core
 		 */ 
 		private function reset():void
 		{
+			if (running) {
+				pause();
+			}
+			jumpToTime(0);
 			for (var i:int = simulationObjects.length; i--;) {
 				simulationObjects[i].reset();
 			}
+			
 			dispatchEvent(new Event(RESET));
 			gc(); // Call system gc
 		}

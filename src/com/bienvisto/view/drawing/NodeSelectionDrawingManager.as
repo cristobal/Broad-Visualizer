@@ -239,6 +239,9 @@ package com.bienvisto.view.drawing
 				nodeSelectionSprite = nodeSelectionSprites[i];
 				if (nodeSelectionSprite.nodeSprite.node.id == nodeSprite.node.id) {
 					sprite.removeChild(nodeSelectionSprite);
+					if (nodeSelectionSprite.nodeSprite.selected) {
+						nodeSelectionSprite.nodeSprite.selected = false;
+					}
 					nodeSelectionSprites.splice(i, 1);
 					nodeSelectionSprite.nodeSprite.removeEventListener(NodeSpriteEvent.SELECTED, handleNodeSpritedSelected);
 					nodeSelectionSprite.removeEventListener(NodeSpriteEvent.SELECTED, handleNodeSelectionSpriteSelected);

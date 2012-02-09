@@ -111,8 +111,8 @@ package com.bienvisto
 		private var window:ApplicationWindow;
 		
 		/* helper variables */
-		private var ready:Boolean 				 = false;
-		private var minLoadedPercentage:Number   = 0; // a minimum of 25% must be loaded before playback is enabled
+		private var ready:Boolean = false;
+		private var first:Boolean = true;
 		
 		/* -- trace sources and simulation objects -- */
 		private var simulation:Simulation;
@@ -385,11 +385,10 @@ package com.bienvisto
 		 */ 
 		private function reset():void
 		{
-			trace("reset…");
-			window.playback.menu.enabled = false;
-			window.setDuration(0);
-			
+			first = false;
 			ready = false;
+		
+			view.reset();
 			window.reset();
 		}
 		
@@ -398,7 +397,7 @@ package com.bienvisto
 		 */ 
 		private function enablePlayback():void
 		{
-			window.playback.menu.enabled = true;
+			window.setPlaybackEnabled(true);
 		}
 		
 		/**
@@ -445,7 +444,6 @@ package com.bienvisto
 		 */ 
 		private function handleSimulationReady(event:Event):void
 		{
-			trace("handleSimulationReady");
 			ready = true;
 			window.setDuration(
 				simulation.duration
@@ -461,7 +459,7 @@ package com.bienvisto
 		private function handleSimulationReset(event:Event):void
 		{
 			// Global Reset
-			window.reset();
+			reset();
 		}
 		
 		/**
@@ -563,7 +561,8 @@ package com.bienvisto
 				simulation.setLoaded(value);
 				window.playback.setLoaderValue(value);
 				
-				if (value >= minLoadedPercentage) {
+				// if there are nodes on the view enable playback
+				if (nodeView.nodeSprites.length > 0) {
 					enablePlayback();
 					enableStats();
 				}

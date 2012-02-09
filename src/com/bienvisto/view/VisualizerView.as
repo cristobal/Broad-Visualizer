@@ -18,6 +18,7 @@ package com.bienvisto.view
 	import flash.ui.MouseCursor;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
@@ -158,6 +159,7 @@ package com.bienvisto.view
 				viewComponent = _viewComponents[i];
 				viewComponent.reset();
 			}
+			setTime(0);
 		}
 		
 		/**

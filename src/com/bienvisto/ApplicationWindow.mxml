@@ -239,15 +239,27 @@
 				visualizerView.loaderViewVisible = true;
 				sequencesWindow.visible = false;
 				
+				setDuration(0);
 				topologyWindows.reset();
 				nodeWindows.reset();
 				chartsWindows.reset();
 				menu.reset();
 				playback.reset();
-				visualizerView.reset();
+				
+				setPlaybackEnabled(false);
 				setTimeout(function():void {
 					visualizerView.loaderViewVisible = false;
 				}, 2500);
+			}
+			
+			/**
+			 * Set playback enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setPlaybackEnabled(value:Boolean):void
+			{
+				playback.menu.enabled = value;
 			}
 			
 			/**

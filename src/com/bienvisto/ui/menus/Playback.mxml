@@ -62,6 +62,7 @@
 				setPerimeterViewEnabled(false);
 				playButtonState = PLAY;
 				timeSlider.reset();
+				setTime(0);
 				
 				miniMapView.reset();
 				perimeterView.reset();

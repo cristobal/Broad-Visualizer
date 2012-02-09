@@ -142,7 +142,6 @@ package com.bienvisto.view.drawing
 		{
 			clearGraphics();
 			lastTime = 0;
-			routesShape.visible = false;
 		}
 		
 		/**
