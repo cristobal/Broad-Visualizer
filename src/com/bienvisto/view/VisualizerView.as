@@ -169,17 +169,19 @@ package com.bienvisto.view
 		private function update():void
 		{	
 			var tt:int = getTimer();
+			
 			var viewComponent:ViewComponent;
 			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
 				viewComponent = _viewComponents[i];
 				viewComponent.update(time);
 			}
+			
 			if (s != time) {
 				s = time;
 				sum += (getTimer() - tt);
 				total++;
 				if (total % 10 == 0) {
-					trace("Avg update time:", String(sum / total), "ms");
+					// trace("Avg update time:", String(sum / total), "ms"); 
 					total = 0;
 					sum   = 0;
 				}

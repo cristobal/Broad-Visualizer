@@ -8,7 +8,7 @@
 			   xmlns:bienvisto="com.bienvisto.*"
 			   applicationComplete="initApp();">
 	
-	<fx:Style source="visualizer.css" />
+	<fx:Style source="main.css" />
 	<fx:Script>
 		<![CDATA[
 			import com.bienvisto.Bienvisto;
