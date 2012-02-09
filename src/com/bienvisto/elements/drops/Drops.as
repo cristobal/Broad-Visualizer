@@ -57,6 +57,12 @@ package com.bienvisto.elements.drops
 		
 		/**
 		 * @private
+		 * 	The last point in time at which we sampled a mac drop
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
+		
+		/**
+		 * @private
 		 */ 
 		private var complete:Boolean = false;
 		
@@ -94,6 +100,7 @@ package com.bienvisto.elements.drops
 		{
 			collections = new Dictionary();
 			samples		= new Dictionary();
+			delta		= uint.MAX_VALUE;
 			complete	= false;
 		}
 		
@@ -128,6 +135,7 @@ package com.bienvisto.elements.drops
 			AggregateCollection(collections[id]).add(
 				new Aggregate(time)
 			);
+			delta = time;
 			
 			return time;
 		}
@@ -161,8 +169,8 @@ package com.bienvisto.elements.drops
 			
 			var items:Vector.<Aggregate>  = AggregateCollection(collections[id]).sampleItems(time, windowSize);
 			
-			// only cache if parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				samples[key] = items;
 			}
 			

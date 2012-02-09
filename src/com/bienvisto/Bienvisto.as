@@ -112,7 +112,7 @@ package com.bienvisto
 		
 		/* helper variables */
 		private var ready:Boolean 				 = false;
-		private var minLoadedPercentage:Number   = 25; // a minimum of 25% must be loaded before playback is enabled
+		private var minLoadedPercentage:Number   = 0; // a minimum of 25% must be loaded before playback is enabled
 		
 		/* -- trace sources and simulation objects -- */
 		private var simulation:Simulation;

@@ -97,6 +97,12 @@ package com.bienvisto.elements.sequences.sources
 		
 		/**
 		 * @private
+		 * 	The last point in time at which we sampled a sequence recv
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
+		
+		/**
+		 * @private
 		 */ 
 		private var init:Boolean = false;
 		
@@ -128,6 +134,49 @@ package com.bienvisto.elements.sequences.sources
 		public function get destNode():Node
 		{
 			return _destNode;
+		}
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  ISimulation Object Implementation
+		//
+		//--------------------------------------------------------------------------
+		
+		/**
+		 * On time update
+		 * 
+		 * @param elapsed
+		 */ 
+		public function onTimeUpdate(elapsed:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Set duration
+		 * 
+		 * @param duration
+		 */
+		public function setDuration(duration:uint):void
+		{
+			
+		}
+		
+		/**
+		 * Reset
+		 */ 
+		public function reset():void
+		{
+			collections = new Dictionary();
+			recv		= new Dictionary();
+			stats       = new Dictionary();
+			map		    = new Dictionary();
+			recvCache   = new Dictionary(); 
+			
+			delta	 = uint.MAX_VALUE;
+			complete = false;
+			init     = false;
 		}
 		
 		
@@ -169,6 +218,7 @@ package com.bienvisto.elements.sequences.sources
 			var node:Node = parent.nodeContainer.getNode(id);
 			updateDrops(node, sequence);
 			updateStats(node, sequence);
+			delta = time;
 			
 			if (!init) {
 				_destNode = node;
@@ -225,48 +275,6 @@ package com.bienvisto.elements.sequences.sources
 				
 				AggregateCollection(recv[id]).add(sequence);
 			}
-		}
-		
-		
-		//--------------------------------------------------------------------------
-		//
-		//  ISimulation Object Implementation
-		//
-		//--------------------------------------------------------------------------
-		
-		/**
-		 * On time update
-		 * 
-		 * @param elapsed
-		 */ 
-		public function onTimeUpdate(elapsed:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Set duration
-		 * 
-		 * @param duration
-		 */
-		public function setDuration(duration:uint):void
-		{
-			
-		}
-		
-		/**
-		 * Reset
-		 */ 
-		public function reset():void
-		{
-			collections = new Dictionary();
-			recv		= new Dictionary();
-			stats       = new Dictionary();
-			map		    = new Dictionary();
-			recvCache   = new Dictionary(); 
-			
-			complete = false;
-			init     = false;
 		}
 		
 		
@@ -478,8 +486,8 @@ package com.bienvisto.elements.sequences.sources
 			
 			var items:Vector.<Sequence> = Vector.<Sequence>(samples);
 			
-			// only store if the parsing is complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				recvCache[key] = items;
 			}
 			

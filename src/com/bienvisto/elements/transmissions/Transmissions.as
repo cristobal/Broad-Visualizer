@@ -62,7 +62,13 @@ package com.bienvisto.elements.transmissions
 		 * @private
 		 * 	A hash map to lookup sampled items that have already been calculated
 		 */ 
-		private var samples:Dictionary	   = new Dictionary();
+		private var samples:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 * 	The last point in time at which we sampled a mac transmission
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
 		
 		/**
 		 * @private
@@ -103,7 +109,9 @@ package com.bienvisto.elements.transmissions
 		{
 			collections = new Dictionary();
 			samples	    = new Dictionary();
-			complete	= false;
+			
+			delta	 = uint.MAX_VALUE;
+			complete = false;
 		}
 
 		
@@ -140,6 +148,7 @@ package com.bienvisto.elements.transmissions
 			AggregateCollection(collections[id]).add(
 				new Packet(time, id, destination, size)
 			);
+			delta = time;
 			
 			return time;
 		}
@@ -188,9 +197,9 @@ package com.bienvisto.elements.transmissions
 			
 			var packets:Vector.<Packet> = Vector.<Packet>(AggregateCollection(collections[id]).sampleItems(time, windowSize));
 			
-			// only cache if parsing complete
-			if (complete) {
-				samples[key] = packets;
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
+				samples[id][key] = packets;
 			}
 			
 			return packets;

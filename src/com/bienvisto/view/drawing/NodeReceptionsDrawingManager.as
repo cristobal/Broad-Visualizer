@@ -1,16 +1,30 @@
 package com.bienvisto.view.drawing
 {
+	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.core.network.packet.Packet;
 	import com.bienvisto.core.network.packet.PacketStats;
+	import com.bienvisto.elements.mobility.Mobility;
+	import com.bienvisto.elements.mobility.Waypoint2D;
 	import com.bienvisto.elements.receptions.Receptions;
 	import com.bienvisto.view.components.NodeSprite;
 	
+	import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.utils.Dictionary;
+	
+	import mx.managers.SystemManager;
 	
 	/**
 	 * NodeReceptionsDrawingManager.as
 	 * 	Draws circles for the received packets.
+	 * 	
+	 *  Most expensive drawing of them all.
+	 *  Uses about 30-40ms when cached and more when not.
+	 * 
+	 *  Could be optimized further to not draw circle for nodes that are not visible but also requires 
+	 *  more logic to be handled when window resizes and when user drags the windows around.
+	 *  In additions to calculating if the nodeSprite is actually visible. 
+	 *  This should be managed outside by the nodeSprite.
 	 * 
 	 * @author Cristobal Dabed
 	 */
@@ -76,6 +90,11 @@ package com.bienvisto.view.drawing
 		/**
 		 * @private
 		 */ 
+		private var stats:Dictionary  = new Dictionary();
+		
+		/**
+		 * @private
+		 */ 
 		private var states:Dictionary = new Dictionary();
 		
 		/**
@@ -97,6 +116,8 @@ package com.bienvisto.view.drawing
 		{
 			shapes   = new Dictionary();
 			states   = new Dictionary();
+			stats    = new Dictionary();
+			
 			lastTime = 0;
 		}
 		
@@ -133,34 +154,41 @@ package com.bienvisto.view.drawing
 		private function draw(time:uint, nodeSprites:Vector.<NodeSprite>):void
 		{
 			var nodeSprite:NodeSprite;
+			
+			var opacketStats:PacketStats;
 			var packetStats:PacketStats;
 			var id:int;
 			var shape:Shape;
+			
+			var cx:Number, cy:Number;
+			var radius:Number, radiusOwn:Number;
+			
+			var vx:Number, vy:Number;
 			
 			for (var i:int = 0, l:int = nodeSprites.length; i < l; i++) {
 				nodeSprite = nodeSprites[i];
 				id    = nodeSprite.node.id;
 				shape = Shape(shapes[id]);
 				
+				
 				packetStats = receptions.samplePacketStats(nodeSprite.node, time, windowSize);
-				if (!packetStats) {
+				
+				// If no packets stats or the reception is after the moment visualized, we just return
+				if (!packetStats || time > packetStats.time) {
 					if (states[id]) {
+						stats[id]  = null;
 						states[id] = false;
 						shape.graphics.clear();
 					}
 					continue;	
 				}
 				
+				opacketStats = PacketStats(stats[id]);
+				stats[id]    = packetStats;
 				
-				// If the reception is after the moment visualized, we just return
-				if (time > packetStats.time) {
-					if (states[id]) {
-						states[id] = false;
-						shape.graphics.clear();
-					}
-					continue;
+				if (opacketStats && (opacketStats.totalOther == packetStats.totalOther) && (opacketStats.totalOwn == packetStats.totalOwn)) {
+					continue; // we are drawing the same as before just continue to next
 				}
-				
 				
 				if (!shape) {
 					shape = new Shape();
@@ -169,21 +197,38 @@ package com.bienvisto.view.drawing
 					shapes[id] = shape;
 				}
 				
-				var cx:Number = nodeSprite.cx;
-				var cy:Number = nodeSprite.cy;
-				var radius:Number = 9 +  0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
+				cx = nodeSprite.cx;
+				cy = nodeSprite.cy;
 				
 				shape.graphics.clear();
+				radius    =  9 + 0.5 * (packetStats.totalOwn + 0.5 * packetStats.totalOther);
+				radiusOwn =  9 + 0.5 *  packetStats.totalOwn;
 				
-				shape.graphics.beginFill(highlightColorOther, 0.5);
-				shape.graphics.drawCircle(cx, cy, radius);
-				shape.graphics.endFill();
 				
-				radius =  9 + 0.5 * packetStats.totalOwn;
+				// only draw to others
+				if (packetStats.totalOther > 0 && packetStats.totalOwn == 0) {
+					shape.graphics.beginFill(highlightColorOther, 0.5);
+					shape.graphics.drawCircle(cx, cy, radius);
+					shape.graphics.endFill();					
+				}
 				
-				shape.graphics.beginFill(highlightColor);
-				shape.graphics.drawCircle(cx, cy, radius); 
-				shape.graphics.endFill();
+				// only draw to myself
+				else if (packetStats.totalOwn > 0 && packetStats.totalOther == 0) {
+					shape.graphics.beginFill(highlightColor);
+					shape.graphics.drawCircle(cx, cy, radiusOwn); 
+					shape.graphics.endFill();
+				}
+				
+				// draw both
+				else {
+					shape.graphics.beginFill(highlightColorOther, 0.5);
+					shape.graphics.drawCircle(cx, cy, radius);
+					shape.graphics.endFill();	
+					
+					shape.graphics.beginFill(highlightColor);
+					shape.graphics.drawCircle(cx, cy, radiusOwn); 
+					shape.graphics.endFill();
+				}
 				
 				states[id] = true;
 				

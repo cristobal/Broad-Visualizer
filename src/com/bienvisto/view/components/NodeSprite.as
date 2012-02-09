@@ -172,6 +172,23 @@ package com.bienvisto.view.components
 			return _node;	
 		}
 		
+		/**
+		 * @readwrite
+		 */ 
+		private var _visibleInView:Boolean;
+		
+		/**
+		 * @readwrite
+		 */ 
+		public function get visibleInView():Boolean
+		{
+			return _visibleInView;
+		}
+		
+		public function set visibleInView(value:Boolean):void
+		{
+			_visibleInView = value;
+		}
 		
 		//--------------------------------------------------------------------------
 		//

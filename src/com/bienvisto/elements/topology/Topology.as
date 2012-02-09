@@ -2,10 +2,10 @@ package com.bienvisto.elements.topology
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.core.network.graph.Graph;
 	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.core.network.node.NodeContainer;
+	import com.bienvisto.core.parser.TraceSource;
 	
 	import flash.events.Event;
 	import flash.utils.Dictionary;
@@ -67,6 +67,12 @@ package com.bienvisto.elements.topology
 		
 		/**
 		 * @private
+		 * 	The last point in time at which we sampled a waypoint
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
+		
+		/**
+		 * @private
 		 */ 
 		private var init:Boolean = false;
 		
@@ -109,6 +115,8 @@ package com.bienvisto.elements.topology
 		{
 			collections = new Dictionary();
 			sets		= new Dictionary();
+			
+			delta       = uint.MAX_VALUE;
 			complete	= false;
 			init		= false;
 		}
@@ -147,6 +155,7 @@ package com.bienvisto.elements.topology
 			AggregateCollection(collections[id]).add(
 				new TopologySet(time, tuples)
 			);
+			delta = time;
 			
 			if (!init) {
 				dispatchEvent(new Event(Event.INIT));
@@ -248,8 +257,8 @@ package com.bienvisto.elements.topology
 			
 			var set:TopologySet = TopologySet(AggregateCollection(collections[id]).findNearest(time));
 			
-			// only cache if parsing completed
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				sets[id][time] = set;	
 			}
 			

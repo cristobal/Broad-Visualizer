@@ -239,11 +239,13 @@ package com.bienvisto.core
 			}
 		}
 		
+		
 		//--------------------------------------------------------------------------
 		//
 		// Methods
 		//
 		//-------------------------------------------------------------------------
+		
 		/**
 		 * Setup
 		 */ 
@@ -260,23 +262,32 @@ package com.bienvisto.core
 		 */ 
 		private function invalidate():void
 		{	
-			
-			var simulationObject:ISimulationObject;
-			for (var i:int = 0, l:int = simulationObjects.length; i < l; i++) {
-				simulationObject = simulationObjects[i];
-				simulationObject.setDuration(duration);
-				if (!firstRun) {
-					simulationObject.reset();
-				}
-			}
-			// if this is a new simulation then do a global reset
+			// If not first run do a global reset
 			if (!firstRun) {
-				dispatchEvent(new Event(RESET));
-			}		
+				reset();
+			}
 			
+			for (var i:int = simulationObjects.length; i--; ) {
+				simulationObjects[i].setDuration(duration);
+			}	
 			setTimeout(notifyReady, 10);
 		}
 		
+		/**
+		 * Reset
+		 */ 
+		private function reset():void
+		{
+			for (var i:int = simulationObjects.length; i--;) {
+				simulationObjects[i].reset();
+			}
+			dispatchEvent(new Event(RESET));
+			gc(); // Call system gc
+		}
+		
+		/**
+		 * Notify ready
+		 */ 
 		private function notifyReady():void
 		{
 			dispatchEvent(new Event(READY));

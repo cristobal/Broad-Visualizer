@@ -3,9 +3,9 @@ package com.bienvisto.elements.mobility
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.Vector2D;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.core.network.node.NodeContainer;
+	import com.bienvisto.core.parser.TraceSource;
 	
 	import flash.utils.Dictionary;
 	
@@ -52,6 +52,22 @@ package com.bienvisto.elements.mobility
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
+		/**
+		 * @private
+		 */ 
+		private var cache:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 * 	The last point in time at which we sampled a waypoint
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
+		
+		/**
+		 * @private
+		 */ 
+		private var complete:Boolean = false;
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -85,6 +101,9 @@ package com.bienvisto.elements.mobility
 		public function reset():void
 		{
 			collections = new Dictionary();
+			cache		= new Dictionary();
+			delta		= uint.MAX_VALUE;
+			complete    = false;
 		}
 		
 		
@@ -93,6 +112,14 @@ package com.bienvisto.elements.mobility
 		//  Override TraceSource Methods
 		//
 		//--------------------------------------------------------------------------
+		
+		/**
+		 * @override
+		 */ 
+		override public function onComplete():void
+		{
+			complete = true;
+		}
 		
 		/**
 		 * @override
@@ -107,11 +134,13 @@ package com.bienvisto.elements.mobility
 			
 			if (!(id in collections)) {
 				collections[id] = new AggregateCollection();
+				cache[id]	    = new Dictionary();
 			}
 			
 			AggregateCollection(collections[id]).add(
 				new Waypoint2D(time, pos, dir)
 			);
+			delta = time;
 			
 			return time;
 		}
@@ -136,9 +165,17 @@ package com.bienvisto.elements.mobility
 				return null;
 			}
 			
-			return Waypoint2D(AggregateCollection(collections[id]).findNearest(time));
+			if (time in cache[id]) {
+				return Waypoint2D(cache[id][time]);
+			}
+			
+			var waypoint:Waypoint2D = Waypoint2D(AggregateCollection(collections[id]).findNearest(time));
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
+				cache[id][time] = waypoint;
+			}
+			
+			return waypoint;
 		}
-		
-
 	}
 }

@@ -170,9 +170,14 @@
 				return _topologyWindows;
 			}
 			
-			
+			/**
+			 * @private
+			 */ 
 			private var _isDesktop:Boolean;
 			
+			/**
+			 * @readwrite isDesktop
+			 */ 
 			public function get isDesktop():Boolean
 			{
 				return _isDesktop;
@@ -182,6 +187,7 @@
 			{
 				_isDesktop = value;
 			}
+			
 			
 			//--------------------------------------------------------------------------
 			//
@@ -439,11 +445,6 @@
 					fullScreenTimer = null;
 					fullScreenAnimate = null;
 				}
-				
-				// invalidateParentSizeAndDisplayList();
-				// 
-		
-				
 			}
 			
 			/**

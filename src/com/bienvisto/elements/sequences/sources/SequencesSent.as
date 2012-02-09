@@ -74,7 +74,7 @@ package com.bienvisto.elements.sequences.sources
 		 * 	A hash map to lookup sequences that have been sent by seqNum
 		 */ 
 		private var map:Dictionary = new Dictionary();
-
+		
 		/**
 		 * @private
 		 */	

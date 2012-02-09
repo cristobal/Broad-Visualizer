@@ -55,7 +55,6 @@ package com.bienvisto.elements.buffer
 		 */ 
 		private var collections:Dictionary = new Dictionary();
 		
-		
 		//--------------------------------------------------------------------------
 		//
 		//  ISimulation Object Implementation
@@ -138,7 +137,7 @@ package com.bienvisto.elements.buffer
 				return null;
 			}
 			
-			return Buffer(AggregateCollection(collections[id]).findNearest(time));;
+			return Buffer(AggregateCollection(collections[id]).findNearest(time));
 		}
 		
 		/**
@@ -156,7 +155,6 @@ package com.bienvisto.elements.buffer
 			
 			return AggregateCollection(collections[id]).sampleTotal(time);
 		}
-		
 		
 		//--------------------------------------------------------------------------
 		//

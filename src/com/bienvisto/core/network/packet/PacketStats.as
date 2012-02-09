@@ -1,6 +1,7 @@
 package com.bienvisto.core.network.packet
 {
 	import com.bienvisto.core.network.node.Node;
+	import com.bienvisto.util.OIDUtil;
 
 	/**
 	 * PacketStats.as
@@ -9,25 +10,11 @@ package com.bienvisto.core.network.packet
 	 */ 
 	public final class PacketStats
 	{
-		public function PacketStats(id:int, time:uint, totalOwn:int, totalOther:int)
+		public function PacketStats(time:uint, totalOwn:int, totalOther:int)
 		{
-			_id         = id;
-			_time 		= time;
+			_time		= time;
 			_totalOwn 	= totalOwn;
 			_totalOther = totalOther;
-		}
-		
-		/**
-		 * @private
-		 */ 
-		private var _id:int;
-		
-		/**
-		 * @readonly id
-		 */ 
-		public function get id():int
-		{
-			return _id;
 		}
 		
 		/**

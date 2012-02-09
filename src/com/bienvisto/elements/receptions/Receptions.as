@@ -63,7 +63,13 @@ package com.bienvisto.elements.receptions
 		 * @private
 		 * 	A hash map to lookup sampled items that have already been calculated
 		 */ 
-		private var samples:Dictionary     = new Dictionary();
+		private var samples:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 * 	The last point in time at which we sampled a mac reception
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
 		
 		/**
 		 * @private
@@ -104,7 +110,9 @@ package com.bienvisto.elements.receptions
 		{
 			collections = new Dictionary();
 			samples		= new Dictionary();
-			complete    = false;
+			
+			delta    = uint.MAX_VALUE;
+			complete = false;
 		}
 		
 		
@@ -142,6 +150,7 @@ package com.bienvisto.elements.receptions
 			AggregateCollection(collections[id]).add(
 				new Packet(time, from, to, size)
 			);
+			delta = time;
 			
 			return time;
 		}
@@ -152,6 +161,16 @@ package com.bienvisto.elements.receptions
 		//  Methods
 		//
 		//--------------------------------------------------------------------------
+		
+		public function samplePacket(node:Node, time:uint):Packet
+		{
+			var id:int = node.id;
+			if (!(id in collections)) {
+				return null;
+			}
+			
+			return Packet(AggregateCollection(collections[id]).findNearest(time));
+		}
 		
 		/**
 		 * Sample packet stats
@@ -173,14 +192,15 @@ package com.bienvisto.elements.receptions
 			}
 			
 			var packetStats:PacketStats = resolvePacketStats(node, time, windowSize);
-			// only cache if parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				samples[id][key] = packetStats;
 			}
 			
 			return packetStats;
 		}
 		
+		private var totalCreated:Number = 0;
 		
 		/**
 		 * Resolve packet stats
@@ -225,9 +245,10 @@ package com.bienvisto.elements.receptions
 					totalOther++;
 				}
 			}
+			
 			var packetStats:PacketStats;
 			if ((totalOwn + totalOther) > 0) {
-				packetStats = new PacketStats(id, items[key].time, totalOwn, totalOther);
+				packetStats = new PacketStats(items[key].time, totalOwn, totalOther);	
 			}
 			
 			return packetStats;

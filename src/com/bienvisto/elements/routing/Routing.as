@@ -72,7 +72,7 @@ package com.bienvisto.elements.routing
 		 * 	A hash map to lookup routes in context to a select node that have already been resolved
 		 */ 
 		private var routesWithNode:Dictionary = new Dictionary();
-
+		
 		/**
 		 * @private
 		 * 	A hash map to lookup routes in context to two selected nodes that have already been resolved
@@ -90,6 +90,12 @@ package com.bienvisto.elements.routing
 		 * 	A hash map to lookup graphs that already have been resolved
 		 */ 
 		private var graphs:Dictionary = new Dictionary();
+		
+		/**
+		 * @private
+		 * 	The last point in time at which we sampled a mac reception
+		 */ 
+		private var delta:uint = uint.MAX_VALUE;
 		
 		/**
 		 * @private
@@ -140,7 +146,7 @@ package com.bienvisto.elements.routing
 			tableRoutes    = new Dictionary();
 			graphs		   = new Dictionary();
 			
-			
+			delta    = uint.MAX_VALUE;
 			init     = false;
 			complete = false;
 		}
@@ -180,6 +186,7 @@ package com.bienvisto.elements.routing
 			AggregateCollection(collections[id]).add(
 				new RoutingTable(time, node, entries)
 			);
+			delta = time;
 			
 			if (!init) {
 				dispatchEvent(new Event(Event.INIT));
@@ -243,7 +250,7 @@ package com.bienvisto.elements.routing
 		private function getTables(time:uint):Dictionary
 		{
 			
-			if ((lastTableTime != time) || !complete) {
+			if (lastTableTime != time) { // || !complete
 				lastTableTime = time;	
 				_tables = null;
 			}
@@ -288,8 +295,8 @@ package com.bienvisto.elements.routing
 			
 			var routes:Vector.<SimpleRoute> = resolveSimpleRoutes(time);
 			
-			// only cache after parsing completed
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				simpleRoutes[time] = routes;
 			}
 			
@@ -324,7 +331,7 @@ package com.bienvisto.elements.routing
 					u = vertices[y];
 					for (var x:int = 0; x < l; x++) {
 						v = vertices[x];
-		
+						
 						uv = String(u) + "-" + String(v);
 						vu = String(v) + "-" + String(u);
 						if (adjacencyMatrix.edgeExists(u, v) && !(uv in visited) && !(vu in visited)) {
@@ -338,8 +345,8 @@ package com.bienvisto.elements.routing
 				}
 			}
 			
-			// only cache after parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				simpleRoutes[key] = routes;
 			}
 			
@@ -366,8 +373,8 @@ package com.bienvisto.elements.routing
 			}
 			
 			var routes:Vector.<SimpleRoute> = resolveSimpleRoutesWithNode(time, node);
-			// only cache after parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				routesWithNode[id][time]  = routes;
 			}
 			
@@ -439,8 +446,8 @@ package com.bienvisto.elements.routing
 			}
 			
 			var	route:SimpleRoute = resolveCompleteRoute(time, nodeFrom, nodeTo);
-			// only cache when parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				completeRoutes[key] = route;
 			}
 			
@@ -458,7 +465,7 @@ package com.bienvisto.elements.routing
 		{
 			var from:int = nodeFrom.id;
 			var to:int   = nodeTo.id;
-				
+			
 			var lut:Dictionary = getTables(time);
 			var table:RoutingTable = RoutingTable(lut[from]);
 			
@@ -531,8 +538,8 @@ package com.bienvisto.elements.routing
 			}
 			
 			var routes:Vector.<SimpleRoute> = resolveRoutes(node, time);
-			// onlye cache after parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				tableRoutes[id][time] = routes;
 			}
 			
@@ -569,7 +576,7 @@ package com.bienvisto.elements.routing
 				route 			= new SimpleRoute(from, dest, (entry.distance == 1 ? -1 : entry.next), entry.distance);
 				route.paths     = resolvePaths(from, entry, lut);
 				route.traceback = tracebackPath(from, entry, lut);
-					
+				
 				route.complete = true;
 				if (route.distance > 2) {
 					paths = route.paths;
@@ -709,8 +716,8 @@ package com.bienvisto.elements.routing
 			}
 			
 			var	graph:Graph = resolveGlobalGraph(time);
-			// only store after parsing complete
-			if (complete) {
+			// only cache after parsing completed or if the time is before the last sampled value
+			if (complete || time < delta) {
 				graphs[time] = graph;
 			}
 			
@@ -725,7 +732,7 @@ package com.bienvisto.elements.routing
 		 */ 
 		private function resolveGlobalGraph(time:uint):Graph
 		{
-
+			
 			var nodes:Vector.<Node> = nodeContainer.nodes;
 			var tables:Dictionary   = getTables(time);			
 			var table:RoutingTable;
@@ -769,8 +776,8 @@ package com.bienvisto.elements.routing
 					graph.addEdge(edge.from, edge.to, edge.weight);
 				}
 				
-				// only store after parsing complete
-				if (complete) {
+				// only cache after parsing completed or if the time is before the last sampled value
+				if (complete || time < delta) {
 					graphs[key] = graph; // store referencce
 				}
 			}

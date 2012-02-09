@@ -176,8 +176,10 @@ package com.bienvisto.view
 				s = time;
 				sum += (getTimer() - tt);
 				total++;
-				if (total % 100 == 0) {
+				if (total % 10 == 0) {
 					trace("Avg update time:", String(sum / total), "ms");
+					total = 0;
+					sum   = 0;
 				}
 				
 			}
