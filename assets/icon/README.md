@@ -1,0 +1,1 @@
+Icon was designed and provided by Richard Øiestad.

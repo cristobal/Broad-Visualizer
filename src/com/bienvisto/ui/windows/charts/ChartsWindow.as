@@ -41,10 +41,17 @@ package com.bienvisto.ui.windows.charts
 	public final class ChartsWindow extends BaseWindow
 	{
 		
+		//--------------------------------------------------------------------------
+		//
+		//  Class variables
+		//
+		//--------------------------------------------------------------------------
+		
 		/**
 		 * @private
+		 * 	The color array for the lines draw
 		 */ 
-		private static var lineColors:Vector.<uint> = Vector.<uint>([0x0000ff,
+		private static var colors:Vector.<uint> = Vector.<uint>([0x0000ff,
 			0x00FF00,
 			0xFF0000,
 			0xF6FF00,
@@ -58,8 +65,16 @@ package com.bienvisto.ui.windows.charts
 		
 		/**
 		 * @private
+		 * 	A next id for the chart window's
 		 */ 
 		private static var nextOID:int = 1;
+		
+		
+		//--------------------------------------------------------------------------
+		//
+		//  Constructor
+		//
+		//--------------------------------------------------------------------------
 		
 		/**
 		 * Constructor
@@ -81,6 +96,7 @@ package com.bienvisto.ui.windows.charts
 		 * @private
 		 */ 
 		private var filteredNodes:Vector.<Node>;
+		
 		
 		//--------------------------------------------------------------------------
 		//
@@ -309,8 +325,8 @@ package com.bienvisto.ui.windows.charts
 				
 				if (provider) {
 					interests.push(provider);
+					addChartLabel(item);
 					invalidateInterests();
-					addChartLabel(item, lineColors[interests.length - 1]);
 				}
 			}
 		}
@@ -415,8 +431,27 @@ package com.bienvisto.ui.windows.charts
 		 * 
 		 * @param item
 		 */ 
-		private function addChartLabel(item:Object, color:uint):void
+		private function addChartLabel(item:Object):void
 		{
+			var color:uint = colors[0];
+			if (labels.length > 0) {
+				var taken:Boolean;
+				for (var i:int = 0, l:int = colors.length; i < l; i++) {
+					color = colors[i];
+					taken = false;
+					for (var j:int = labels.length; j--;) {
+						if (labels[j].color == color) {
+							taken = true;
+							break;
+						}
+					}
+					
+					if (!taken) {
+						break;
+					}
+				}
+			}
+			
 			var label:ChartLabel = new ChartLabel(item, color);
 			label.x = 0;
 			if (labels.length > 0) {

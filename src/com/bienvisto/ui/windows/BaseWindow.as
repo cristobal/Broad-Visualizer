@@ -22,6 +22,12 @@ package com.bienvisto.ui.windows
 	import spark.skins.spark.TitleWindowSkin;
 	
 	/**
+	 * @Event
+	 * 	Triggered when window has toggled its visibility
+	 */ 
+	[Event(name="toggle", type="flash.events.Event")]
+
+	/**
 	 * BaseWindow.as
 	 * 	The base window class for all the floating windows in the application.
 	 *  Manages properties such as moving and constraining the movement area.
@@ -31,6 +37,16 @@ package com.bienvisto.ui.windows
 	 */ 
 	public class BaseWindow extends TitleWindow
 	{
+		
+		//--------------------------------------------------------------------------
+		//
+		// Class Constants
+		//
+		//-------------------------------------------------------------------------
+		/**
+		 * @public
+		 */ 
+		public static const TOGGLE:String = "toggle";
 		
 		//--------------------------------------------------------------------------
 		//
@@ -244,6 +260,7 @@ package com.bienvisto.ui.windows
 		public function toggle():void
 		{
 			visible = !visible;
+			dispatchEvent(new Event(TOGGLE));
 		}
 		
 		/**

@@ -4,12 +4,16 @@ package com.bienvisto.ui.windows.topology
 	import com.bienvisto.core.network.node.NodeContainer;
 	import com.bienvisto.elements.routing.Routing;
 	import com.bienvisto.elements.topology.Topology;
+	import com.bienvisto.ui.windows.BaseWindow;
 	import com.bienvisto.view.components.NodeView;
 	import com.bienvisto.view.events.NodeSpriteEvent;
+	
+	import flash.events.Event;
 	
 	import mx.events.CloseEvent;
 	
 	import spark.components.Group;
+	import spark.events.TitleWindowBoundsEvent;
 	
 	/**
 	 * TopologyWindows.as
@@ -63,19 +67,20 @@ package com.bienvisto.ui.windows.topology
 			localTopologyWindow.visible = false;
 			localTopologyWindow.windowType = TopologyWindowContainer.WINDOW_TYPE_TOPOLOGY;
 			container.addElement(localTopologyWindow);
-			
-			
+			localTopologyWindow.addEventListener(BaseWindow.TOGGLE, handleTopologyWindowToggle);
+	
 			globalTopologyWindow = new TopologyWindow();
 			globalTopologyWindow.setInitialPosition(40, 10, "", "");
 			globalTopologyWindow.title = "Global Topology";
 			globalTopologyWindow.visible = false;
+			globalTopologyWindow.addEventListener(BaseWindow.TOGGLE, handleTopologyWindowToggle);
 			container.addElement(globalTopologyWindow);
 		}
 		
 		/**
 		 * Update topology windows
 		 */ 
-		private function updateTopologyWindows():void
+		public function updateTopologyWindows():void
 		{
 			var from:Node = nodeView.selectedNodeSprite ? nodeView.selectedNodeSprite.node : null;
 			var to:Node   = nodeView.selectedNodeSprite2 ? nodeView.selectedNodeSprite2.node : null;
@@ -166,6 +171,16 @@ package com.bienvisto.ui.windows.topology
 		 * @param event
 		 */ 
 		private function handleNodeSpriteSelected(event:NodeSpriteEvent):void
+		{
+			updateTopologyWindows();
+		}
+		
+		/**
+		 * Handle topology window toggle
+		 * 
+		 * @param event
+		 */ 
+		private function handleTopologyWindowToggle(event:Event):void
 		{
 			updateTopologyWindows();
 		}

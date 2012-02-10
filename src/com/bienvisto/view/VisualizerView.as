@@ -415,13 +415,24 @@ package com.bienvisto.view
 		}
 		
 		/**
+		 * Check dragg mouse cursorstate
+		 */ 
+		private function checkDragMouseCursorState():void
+		{
+			// Mouse cursor to hand making it easir to user to see that we are dragging
+			if (Mouse.cursor != MouseCursor.HAND && isDragging) {
+				Mouse.cursor = MouseCursor.HAND;
+			}
+		}
+		
+		/**
 		 * Handle drag timer complete
 		 */ 
 		private function handleDragTimerComplete(event:TimerEvent):void
 		{
 			if (draggable) {
-				Mouse.cursor = MouseCursor.HAND;
 				isDragging = true;
+				Mouse.cursor = MouseCursor.HAND;
 			}
 		}
 		
@@ -489,6 +500,7 @@ package com.bienvisto.view
 			
 			// store current position as las position.
 			lastDragPoint = new Point(stageX, stageY);
+			setTimeout(checkDragMouseCursorState, 10);
 		}
 		
 		

@@ -228,9 +228,10 @@
 			<s:Label text="Loading:" left="0" />
 			<s:Label id="loaderValue" text="100 %" right="0" 	/>
 		</s:Group>
-		<s:Group id="fullscreen" width="35" right="0">
-			<s:Image id="enterFullScreenButton" source="@Embed(source='fullscreen/enter.png')" top="0" height="32" width="32" buttonMode="true" click="enterFullScreen()" />
-			<s:Image id="leaveFullScreenButton" source="@Embed(source='fullscreen/leave.png')" top="0" height="32" width="32" visible="false" buttonMode="true" click="leaveFullScreen()" />
+		<s:Group id="fullscreen" width="70" right="0">
+			<!-- <s:Image id="screenshotButton" source="@Embed(source='images/discovery/camera-photo.png')" top="0" height="32" width="32" left="0" buttonMode="true" /> -->
+			<s:Image id="enterFullScreenButton" source="@Embed(source='images/discovery/fullscreen-enter.png')" top="0" height="32" width="32" right="0" buttonMode="true" click="enterFullScreen()" />
+			<s:Image id="leaveFullScreenButton" source="@Embed(source='images/discovery/fullscreen-leave.png')" top="0" height="32" width="32" right="0"  visible="false" buttonMode="true" click="leaveFullScreen()" />
 		</s:Group>
 	</s:Group>
 	

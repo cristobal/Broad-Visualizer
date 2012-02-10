@@ -20,28 +20,28 @@ package com.bienvisto.view.components
 		//--------------------------------------------------------------------------
 		
 		// Frames
-		[Embed(source="loader/frame_0.gif")]
+		[Embed(source="images/loader/frame_0.gif")]
 		private static var Frame0:Class;
 		
-		[Embed(source="loader/frame_1.gif")]
+		[Embed(source="images/loader/frame_1.gif")]
 		private static var Frame1:Class;
 		
-		[Embed(source="loader/frame_2.gif")]
+		[Embed(source="images/loader/frame_2.gif")]
 		private static var Frame2:Class;
 		
-		[Embed(source="loader/frame_3.gif")]
+		[Embed(source="images/loader/frame_3.gif")]
 		private static var Frame3:Class;						
 		
-		[Embed(source="loader/frame_4.gif")]
+		[Embed(source="images/loader/frame_4.gif")]
 		private static var Frame4:Class;
 		
-		[Embed(source="loader/frame_5.gif")]
+		[Embed(source="images/loader/frame_5.gif")]
 		private static var Frame5:Class;
 		
-		[Embed(source="loader/frame_6.gif")]
+		[Embed(source="images/loader/frame_6.gif")]
 		private static var Frame6:Class;	
 		
-		[Embed(source="loader/frame_7.gif")]
+		[Embed(source="images/loader/frame_7.gif")]
 		private static var Frame7:Class;	
 		
 		/**

@@ -148,11 +148,13 @@
 		]]>
 	</fx:Script>
 	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
-		<s:Group id="toggeableNodeDrawingManagerContainer" width="80%" left="0">
-			<s:layout>
-				<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
-			</s:layout>
-			<s:Label text="Toggle Elements:" />	
+		<s:Group width="100%" left="0">
+			<s:Label text="Toggle Elements:" top="9" left="5" />	
+			<s:Group id="toggeableNodeDrawingManagerContainer" left="120">
+				<s:layout>
+					<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
+				</s:layout>
+			</s:Group>
 		</s:Group>
 		<s:Group id="customOptions" width="100" right="10">
 			<s:layout>

@@ -1,0 +1,1 @@
+This images are taken from http://hbons.deviantart.com/art/Discovery-Icon-Theme-77399781 created by http://hbons.deviantart.com/. The where modified and adapted for this application only.
