@@ -2,12 +2,12 @@ package com.bienvisto.elements.routing
 {
 	import com.bienvisto.core.ISimulationObject;
 	import com.bienvisto.core.aggregate.AggregateCollection;
-	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.core.network.graph.AdjacencyMatrix;
 	import com.bienvisto.core.network.graph.Edge;
 	import com.bienvisto.core.network.graph.Graph;
 	import com.bienvisto.core.network.node.Node;
 	import com.bienvisto.core.network.node.NodeContainer;
+	import com.bienvisto.core.parser.TraceSource;
 	import com.bienvisto.util.fnv;
 	
 	import flash.events.Event;
@@ -746,9 +746,11 @@ package com.bienvisto.elements.routing
 			
 			var node:Node;
 			var from:int;
+			var vertices:Vector.<int> = new Vector.<int>();
 			for (var i:int = 0, l:int = nodes.length; i < l; i++) {
 				node  = nodes[i];
 				from  = node.id;
+				vertices.push(from);
 				
 				table = RoutingTable(tables[from]);
 				if (table) {
@@ -757,8 +759,8 @@ package com.bienvisto.elements.routing
 					entries = table.entries;
 					for (var j:int = entries.length; j--;) {
 						entry = entries[j];
-						if (entry.distance == 1) {
-							edge = new Edge(from, entry.destination, 1); //
+						if (entry.distance == 1) { // only add edges when there is one-hop routes
+							edge = new Edge(from, entry.destination, 1); 
 							edges.push(edge);
 						}
 					}
@@ -769,12 +771,30 @@ package com.bienvisto.elements.routing
 			var graph:Graph  = Graph(graphs[key]);
 			
 			if (!graph) {
+				
 				// Create new graph
 				graph = new Graph();
 				for (i = 0, l = edges.length; i < l; i++) {
 					edge = edges[i];
 					graph.addEdge(edge.from, edge.to, edge.weight);
 				}
+				
+				var adjacencyMatrix:AdjacencyMatrix = graph.getAdjacencyMatrix();
+				if (!adjacencyMatrix) {
+					for (i = vertices.length; i--;) {
+						from = vertices[i];
+						graph.addEdge(from, Graph.VERTICE_NONE);
+					}		
+				}
+				else {
+					for (i = vertices.length; i--;) {
+						from = vertices[i];
+						if (!adjacencyMatrix.vertexExists(from)) {
+							graph.addEdge(from, Graph.VERTICE_NONE);
+						}
+					}
+				}
+				
 				
 				// only cache after parsing completed or if the time is before the last sampled value
 				if (complete || time < delta) {
