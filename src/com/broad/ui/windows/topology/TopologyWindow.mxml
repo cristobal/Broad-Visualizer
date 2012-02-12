@@ -8,7 +8,7 @@
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
-		@namespace topology "com.bienvisto.ui.windows.topology.*";
+		@namespace topology "com.broad.ui.windows.topology.*";
 		.label{
 			fontSize: 12px;
 		}

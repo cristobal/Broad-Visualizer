@@ -7,6 +7,7 @@ package com.broad.io
 	import flash.system.System;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
+	import flash.utils.getTimer;
 	
 	// TODO: Handle case where we are writing to stream as well as reading from the stream and yet not finished
 	
@@ -29,7 +30,12 @@ package com.broad.io
 		/**
  		 * @private
  	     */
-		private static var timerDelay:uint	  = 10;
+		private static var minTimerDelay:uint = 10;
+		
+		/**
+		 * @private
+		 */ 
+		private static var maxTimerDelay:uint = 250;
 		
 		/**
  		 * @private
@@ -84,7 +90,16 @@ package com.broad.io
 		 * @private
 		 */ 
 		private var bytes:ByteArray;
-
+		
+		/**
+		 * @private
+		 */ 
+		private var lastTime:int = -1;
+		
+		/**
+		 * @private
+		 */ 
+		private var lastCount:int = -1;
 		
 		//--------------------------------------
 		//
@@ -113,7 +128,7 @@ package com.broad.io
 		{
 			bytes = new ByteArray();
 			
-			timer = new Timer(timerDelay);
+			timer = new Timer(minTimerDelay);
 			timer.addEventListener(TimerEvent.TIMER, handleTimer);
 		}
 		
@@ -144,7 +159,9 @@ package com.broad.io
 		 */ 
 		protected function start():void
 		{
-			
+			lastTime  = getTimer();
+			lastCount = 0;
+			timer.delay = minTimerDelay;
 			timer.start();
 		}
 		
@@ -262,6 +279,20 @@ package com.broad.io
 		 */ 
 		private function handleTimer(event:TimerEvent):void
 		{
+			// automatically regulate timer delay
+			var elapsed:int = getTimer() - lastTime;
+			if (elapsed >= 1000) {
+				var fps:int = int(1000 / lastCount);
+				if (fps <= 15 && timer.delay < maxTimerDelay) {
+					timer.delay += minTimerDelay;
+				}
+				else if (fps > 15 && timer.delay > minTimerDelay) {
+					timer.delay -= minTimerDelay;
+				}
+				lastCount = 0;
+				lastTime  = getTimer();
+			}
+			
 			processBytes();
 		}
 

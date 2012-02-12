@@ -7,7 +7,7 @@
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
-		@namespace sequences "com.bienvisto.ui.windows.sequences.*";
+		@namespace sequences "com.broad.ui.windows.sequences.*";
 		.heading {
 			fontSize: 13px;
 			textDecoration: underline;

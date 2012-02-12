@@ -8,7 +8,7 @@
 	<fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
-		@namespace node "com.bienvisto.ui.node.*";
+		@namespace node "com.broad.ui.node.*";
 		.label{
 			fontSize: 12px;
 		}
