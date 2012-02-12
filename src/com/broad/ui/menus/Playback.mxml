@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menus:PlaybackContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" 
+						xmlns:menus="com.broad.ui.menus.*"
+						backgroundColor="0xF1F1F1"
+						borderColor="0xCCCCCC" creationComplete="initComponent(event)">
+	
+	<fx:Declarations>
+		<s:Animate id="loaderHideAnimation" target="{loader}" duration="1250" effectEnd="hideLoaderEnd(event)">
+			<s:SimpleMotionPath property="alpha" valueFrom="1" valueTo="0" />
+		</s:Animate>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.EffectEvent;
+			import mx.events.FlexEvent;
+			
+			/**
+			 * @Event
+			 * 	Distpatched when the play button is clicked
+			 */ 
+			[Event(name="play", type="flash.events.Event")]
+			public static const PLAY:String = "play";
+			
+			/**
+			 * @Event
+			 * 	Dispatched when the pause button is clicked
+			 */ 
+			[Event(name="pause", type="flash.events.Event")]
+			public static const PAUSE:String = "pause";
+	
+			
+			//--------------------------------------------------------------------------
+			//
+			// Initialization
+			//
+			//-------------------------------------------------------------------------
+			
+			/**
+			 * Init component
+			 */ 
+			private function initComponent(event:FlexEvent):void
+			{
+				playButton.addEventListener(MouseEvent.CLICK, handlePlayButtonClick);
+				if (!stage) {
+					addEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+				}
+				else {
+					stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
+				}
+			}
+			
+			private function handleAddedToStage(event:Event):void
+			{
+				removeEventListener(Event.ADDED_TO_STAGE, handleAddedToStage);
+				stage.addEventListener(FullScreenEvent.FULL_SCREEN, handleFullScreenEvent);
+			}
+			
+			public function reset():void
+			{
+				setPerimeterViewEnabled(false);
+				playButtonState = PLAY;
+				timeSlider.reset();
+				setTime(0);
+				
+				miniMapView.reset();
+				perimeterView.reset();
+			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			// Play/Pause Functionality
+			//
+			//-------------------------------------------------------------------------
+			
+			/**
+			 * @private
+			 */ 
+			private var _playButtonState:String = PLAY;
+			
+			/**
+			 * @readwrite playButtonState
+			 */ 
+			public function set playButtonState(value:String):void
+			{
+				if (!(value == PLAY || value == PAUSE)) {
+					throw(new Error("Invalid playback button state"));
+				}
+				
+				_playButtonState = value;
+				playButton.label = value.substr(0,1).toUpperCase() + value.substr(1);
+			}
+			
+			public function get playButtonState():String
+			{
+				return _playButtonState;
+			}
+			
+			/**
+			 * @readonly isPlaying
+			 */ 
+			public function get isPlaying():Boolean
+			{
+				return playButtonState == PAUSE;
+			}
+				
+			/**
+			 * Set perimeter view enabled
+			 */ 
+			public function setPerimeterViewEnabled(value:Boolean):void
+			{
+				perimeterCheckbox.enabled = value;
+				if (!perimeterCheckbox.enabled) {
+					perimeterCheckbox.selected = false; 
+				}
+			}
+			
+			
+			/**
+			 * Handle play button click
+			 */ 
+			private function handlePlayButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(playButtonState));
+				if (playButtonState == PLAY) {
+					playButtonState = PAUSE;
+				}
+				else {
+					playButtonState = PLAY;
+				}
+			}
+			
+			
+			//--------------------------------------------------------------------------
+			//
+			// Loader Functionality
+			//
+			//-------------------------------------------------------------------------
+			
+			/**
+			 * Show loader
+			 */ 
+			public function showLoader():void
+			{
+				loader.visible = true;	
+			}
+			
+			/**
+			 * Hide loader
+			 */ 
+			public function hideLoader():void
+			{
+				loaderHideAnimation.play();
+			}
+			
+			/**
+			 * Hide loader end
+			 * 
+			 * @param effect
+			 */ 
+			public function hideLoaderEnd(event:EffectEvent):void
+			{
+				loader.visible = false;
+				loader.alpha   = 1;
+			}
+			
+			/**
+			 * Set loader value
+			 * 
+			 * @param value
+			 */ 
+			public function setLoaderValue(value:Number):void
+			{
+				loaderValue.text = String(int(value)) + " %";
+			}
+			
+			private function enterFullScreen():void
+			{
+				try {
+					stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+					enterFullScreenButton.visible = false;
+					leaveFullScreenButton.visible = true;
+				}
+				catch(error:*) {
+					
+				}
+			}
+			
+			private function leaveFullScreen():void
+			{
+				enterFullScreenButton.visible = true;
+				leaveFullScreenButton.visible = false;
+				stage.displayState = StageDisplayState.NORMAL;
+			}
+			
+			/**
+			 * Handle fullscreen event
+			 */ 
+			private function handleFullScreenEvent(event:FullScreenEvent):void
+			{
+				if (leaveFullScreenButton.visible && stage.displayState == StageDisplayState.NORMAL) {
+					enterFullScreenButton.visible = true;
+					leaveFullScreenButton.visible = false;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<!-- left group -->
+	<s:Group id="left" left="0" top="10">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="left" paddingTop="5" paddingLeft="5" />
+		</s:layout>
+		<s:CheckBox id="gridCheckbox" label="Grid" />
+		<s:CheckBox id="miniMapCheckbox" label="Map" />
+		<s:CheckBox id="perimeterCheckbox" label="Area" enabled="false" selected="false" />
+		
+		<!--- additional component to show information about the application such as memory usage, fps and other not necessary for end user -->
+		<s:CheckBox id="statsCheckbox" label="Stats" visible="false" />
+	</s:Group>
+	
+	<!-- right group -->
+	<s:Group id="right" right="0" top="10">
+		<s:Group id="loader" width="100" visible="false" right="60" top="13">
+			<s:Label text="Loading:" left="0" />
+			<s:Label id="loaderValue" text="100 %" right="0" 	/>
+		</s:Group>
+		<s:Group id="fullscreen" width="70" right="0">
+			<!-- <s:Image id="screenshotButton" source="@Embed(source='images/discovery/camera-photo.png')" top="0" height="32" width="32" left="0" buttonMode="true" /> -->
+			<s:Image id="enterFullScreenButton" source="@Embed(source='images/discovery/fullscreen-enter.png')" top="0" height="32" width="32" right="0" buttonMode="true" click="enterFullScreen()" />
+			<s:Image id="leaveFullScreenButton" source="@Embed(source='images/discovery/fullscreen-leave.png')" top="0" height="32" width="32" right="0"  visible="false" buttonMode="true" click="leaveFullScreen()" />
+		</s:Group>
+	</s:Group>
+	
+	
+	<!-- menu group -->	
+	<s:Group id="menu" width="100%" height="100%" top="10">
+		<s:layout>
+			<s:HorizontalLayout horizontalAlign="center" />
+		</s:layout>
+		
+		<s:Group minWidth="600">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingRight="5" />
+			</s:layout>
+		
+			<!-- Zoom -->
+			<s:Label>Zoom</s:Label>
+			<menus:MenuStepper id="zoomLevel" value="100" stepSize="10" snapInterval="10" maximum="250" minimum="10" />
+		
+			<!-- playButton -->
+			<s:Button id="playButton" label="Play" />
+		
+			<!-- Playback speed -->
+			<menus:IntervalStepper id="playbackSpeed" width="45" value="1"  />
+		
+			<!-- Time slider -->
+			<menus:ProgressTimeSlider id="timeSlider" enabled="false" width="300" durationProgressEnabled="true" />
+		
+			<!-- Time display -->
+			<s:Label id="timeLabel">00:00:00</s:Label>
+			<s:Label>/</s:Label>
+			<s:Label id="durationLabel">00:00:00</s:Label>
+		</s:Group>
+	</s:Group>
+</menus:PlaybackContainer>

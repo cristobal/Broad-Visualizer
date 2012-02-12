@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menus:MenuContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" 
+					xmlns:menus="com.broad.ui.menus.*" 
+					creationComplete="initComponent(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			/**
+			 * @Event
+			 * 	This event is triggered when the stats button has been clicked
+			 */ 
+			[Event(name="statsClick", type="flash.events.Event")]
+			public static const STATS_CLICK:String = "statsClick";
+			
+			/**
+			 * @Event
+			 * 	This event is triggered when the sequences button has been clicked
+			 */ 
+			[Event(name="sequencesClick", type="flash.events.Event")]
+			public static const SEQUENCES_CLICK:String = "sequencesClick";
+			
+			/**
+			 * @Event
+			 * 	This event is triggered when the local topology button has been clicked
+			 */ 
+			[Event(name="localTopologyClick", type="flash.events.Event")]
+			public static const LOCAL_TOPOLOGY_CLICK:String = "localTopologyClick";
+			
+			/**
+			 * @Event
+			 * 	This event is triggered when the global topology button has been clicked
+			 */ 
+			[Event(name="topologyClick", type="flash.events.Event")]
+			public static const TOPOLOGY_CLICK:String = "topologyClick";
+			
+			
+			/**
+			 * Initialize component
+			 * 
+			 * @param event
+			 */ 
+			private function initComponent(event:FlexEvent):void
+			{	
+				statsButton.addEventListener(MouseEvent.CLICK, handleStatsButtonClick);
+				sequencesButton.addEventListener(MouseEvent.CLICK, handleVideoButtonClick);
+				localTopologyButton.addEventListener(MouseEvent.CLICK, handleLocalTopologyButtonClick);
+				topologyButton.addEventListener(MouseEvent.CLICK, handleTopologyButtonClick);
+			}
+			
+			/**
+			 * @readonly hideWindowsInFullScreen option
+			 */ 
+			public function get hideWindowsInFullScreen():Boolean
+			{
+				return hideWindowInFullScreeenCheckbox.selected;
+			}
+			
+			public function reset():void
+			{
+				setStatsEnabled(false);
+				setSequencesEnabled(false);
+				setLocalTopologyEnabled(false);
+				setTopologyEnabled(false);
+			}
+			
+			/**
+			 * Set stats enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setStatsEnabled(value:Boolean):void
+			{
+				statsButton.enabled = value;
+			}
+			
+			/**
+			 * Set sequences enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setSequencesEnabled(value:Boolean):void
+			{
+				sequencesButton.enabled = value;
+			}
+			
+			/**
+			 * Set local topology enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setLocalTopologyEnabled(value:Boolean):void
+			{
+				localTopologyButton.enabled = value;
+			}
+			
+			/**
+			 * Set topology enabled
+			 * 
+			 * @param value
+			 */ 
+			public function setTopologyEnabled(value:Boolean):void
+			{
+				topologyButton.enabled = value;
+			}
+			
+			/**
+			 * Handle stats button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleStatsButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(STATS_CLICK));
+			}
+			
+			/**
+			 * Handle video button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleVideoButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(SEQUENCES_CLICK));
+			}
+			
+			/**
+			 * Handle local topology button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleLocalTopologyButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(LOCAL_TOPOLOGY_CLICK));
+			}
+			
+			/**
+			 * Handle topology button click
+			 * 
+			 * @param event
+			 */ 
+			private function handleTopologyButtonClick(event:MouseEvent):void
+			{
+				dispatchEvent(new Event(TOPOLOGY_CLICK));
+			}
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer id="optionsContainer" width="100%" height="30" y="0" backgroundColor="0xafafaf" borderColor="0x717171">
+		<s:Group width="100%" left="0">
+			<s:Label text="Toggle Elements:" top="9" left="5" />	
+			<s:Group id="toggeableNodeDrawingManagerContainer" left="120">
+				<s:layout>
+					<s:HorizontalLayout horizontalAlign="left" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
+				</s:layout>
+			</s:Group>
+		</s:Group>
+		<s:Group id="customOptions" width="100" right="10">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" paddingTop="5" paddingLeft="5" />
+			</s:layout>
+			<s:Label text="Hide windows in fullscreen:" />
+			<s:CheckBox id="hideWindowInFullScreeenCheckbox" selected="true" />
+		</s:Group>
+	</s:BorderContainer>
+	
+	<s:BorderContainer id="container" width="100%" height="30" backgroundColor="0xF1F1F1" borderColor="0xCCCCCC">
+		<s:Group left="5" top="2">	
+			<s:Button id="browseFileButton" label="Load file" />		
+		</s:Group>
+		
+		<s:Group id="buttons" right="85" top="2">
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle" />
+			</s:layout>
+			<s:Button id="statsButton" label="+ Stats" enabled="false"/>
+			<s:Button id="sequencesButton" label="Sequences" enabled="false" />
+			<s:Button id="localTopologyButton" label="Local Topology" enabled="false" />
+			<s:Button id="topologyButton" label="Topology" enabled="false" />
+		</s:Group>
+		
+		<s:Group right="5" top="2">
+			<s:Button id="optionsButton" label="Options" />	
+		</s:Group>
+	</s:BorderContainer>
+</menus:MenuContainer>

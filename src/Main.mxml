@@ -5,22 +5,22 @@
 			   minWidth="1024" 
 			   minHeight="768" 
 			   frameRate="30"
-			   xmlns:gran="com.gran.*"
+			   xmlns:broad="com.broad.*"
 			   applicationComplete="initApp();">
 	
 	<fx:Style source="main.css" />
 	<fx:Script>
 		<![CDATA[
-			import com.gran.Gran;
+			import com.broad.BroadController;
 			
 			/**
 			 * Init app
 			 */ 
 			private function initApp():void
 			{
-				new Gran(this, applicationWindow);
+				new BroadController(this, applicationWindow);
 			}
 		]]>
 	</fx:Script>
-	<gran:ApplicationWindow id="applicationWindow" />
+	<broad:ApplicationWindow id="applicationWindow" />
 </s:Application>
