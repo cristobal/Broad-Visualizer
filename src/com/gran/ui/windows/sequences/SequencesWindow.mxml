@@ -32,7 +32,7 @@
 			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="sourceSent"/>
 			<s:Label y="40" text="Unique:" styleName="label" /><s:Label x="80" y="42" text="0" styleName="value" id="sourceUnique" />
 			<s:Label y="60" text="Last Seq:" styleName="label" /><s:Label x="80" y="62" text="–" styleName="value" id="sourceLastSeqNum"/>
-			<s:Label y="80" text="Avg Pck/s:" styleName="label" /><s:Label x="80" y="82" text="0" styleName="value" id="sourceAvgRate"/>
+			<s:Label y="80" text="Avg Seq/s:" styleName="label" /><s:Label x="80" y="82" text="0" styleName="value" id="sourceAvgRate"/>
 		</s:Group>
 	</s:Group>
 	
@@ -43,7 +43,7 @@
 			<s:Label y="20" text="Total:" styleName="label" /><s:Label x="80" y="22" text="0" styleName="value" id="destRecv"/>
 			<s:Label y="40" text="Dropped:" styleName="label" /><s:Label x="80" y="42" text="0" styleName="value" id="destDropped" />
 			<s:Label y="60" text="Last Seq:" styleName="label" /><s:Label x="80" y="62" text="–" styleName="value" id="destLastSeqNum"/>
-			<s:Label y="80" text="Avg Pck/s:" styleName="label" /><s:Label x="80" y="82" text="–" styleName="value" id="destAvgRate"/>
+			<s:Label y="80" text="Avg Seq/s:" styleName="label" /><s:Label x="80" y="82" text="–" styleName="value" id="destAvgRate"/>
 			<s:Label y="100" text="Avg Time:" styleName="label" /><s:Label x="80" y="102" text="0 ms" styleName="value" id="destAvgTimeRecv"/>
 		</s:Group>
 	</s:Group>

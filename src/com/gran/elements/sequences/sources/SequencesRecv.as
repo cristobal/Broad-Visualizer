@@ -169,10 +169,11 @@ package com.gran.elements.sequences.sources
 		public function reset():void
 		{
 			collections = new Dictionary();
-			recv		= new Dictionary();
-			stats       = new Dictionary();
 			map		    = new Dictionary();
+			stats       = new Dictionary();
+			recv		= new Dictionary();
 			recvCache   = new Dictionary(); 
+			drops 		= new Dictionary();
 			
 			delta	 = uint.MAX_VALUE;
 			complete = false;

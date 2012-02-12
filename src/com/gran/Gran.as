@@ -239,15 +239,19 @@ package com.gran
 			view = window.visualizerView;
 			
 			// 2. Add views
+			// 2.1 Grid view draws the grid
+			// 2.2 Node view represents all the nodes in the ystem
+			// 2.3 Mini map view adds the clickable displaced view of the nodes in the network
+			// 2.4 Perimeter view adds the mobility perimeter 
+			// 2.5 Loader view add the loading view which is presented when the user tries to jump 
+			//     to a point in time that has not yet been loaded
+			// 2.6 Stats view only used for debugging the frame rate of the application
 			gridView = new GridView();
 			view.addViewComponent(gridView);
 			
 			nodeView = new NodeView(nodeContainer)
 			view.addViewComponent(nodeView);
 			view.setDraggableView(nodeView);
-			
-			statsView = new StatsView();
-			view.addViewComponent(statsView);
 			
 			miniMapView = new MiniMapView(nodeView, gridView, nodeContainer, mobilityArea);
 			view.addViewComponent(miniMapView);
@@ -256,8 +260,10 @@ package com.gran
 			perimeterView = new PerimeterView(nodeView, mobilityArea);
 			
 			loaderView = new LoaderView();
-			view.setLoaderView(loaderView);
+			view.setLoaderView(loaderView);			
 			
+			statsView = new StatsView();
+			view.addViewComponent(statsView);
 			
 			// 3 Append node drawing managers
 			nodeIDDrawingManager = new NodeIDDrawingManager();
@@ -281,6 +287,7 @@ package com.gran
 			routingDrawingManager = new NodeRoutingDrawingManager(routing, nodeView);
 			nodeView.addDrawingManager(routingDrawingManager);
 		
+			// 4. Setup up the data providers for the
 			buffersDataProvider = new BuffersDataProvider(buffers);
 			dropsDataProvider = new DropsDataProvider(drops);
 			receptionsDataProvider = new ReceptionsDataProvider(receptions);
