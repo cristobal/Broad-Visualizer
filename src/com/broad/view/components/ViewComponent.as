@@ -39,9 +39,9 @@ package com.broad.view.components
 		}
 		
 		/**
-		 * Reset
+		 * Clear
 		 */ 
-		public function reset():void
+		public function clear():void
 		{
 			
 		}

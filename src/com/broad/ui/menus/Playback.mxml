@@ -64,8 +64,8 @@
 				timeSlider.reset();
 				setTime(0);
 				
-				miniMapView.reset();
-				perimeterView.reset();
+				miniMapView.clear();
+				perimeterView.clear();
 			}
 			
 			

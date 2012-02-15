@@ -32,7 +32,7 @@ package com.broad.view
 	import spark.effects.easing.EaseInOutBase;
 	
 	/**
-	 * VisualizerView.as
+	 * VisualizationView.as
 	 * 	This class contains as set of view components and tells them to update(refresh) 
 	 *  their content when an update is issued to this view.
 	 * 
@@ -41,7 +41,7 @@ package com.broad.view
 	 * 
 	 * @author Cristobal Dabed
 	 */ 
-	public final class VisualizerView extends Group
+	public final class VisualizationView extends Group
 	{	
 		
 		//--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ package com.broad.view
 		/**
 		 * VisualizerView
 		 */ 
-		public function VisualizerView()
+		public function VisualizationView()
 		{
 			super();
 			setup();
@@ -150,14 +150,14 @@ package com.broad.view
 		}
 		
 		/**
-		 * Reset
+		 * Clear
 		 */ 
-		public function reset():void
+		public function clear():void
 		{
 			var viewComponent:ViewComponent;
 			for (var i:int = 0, l:int = _viewComponents.length; i < l; i++) {
 				viewComponent = _viewComponents[i];
-				viewComponent.reset();
+				viewComponent.clear();
 			}
 			setTime(0);
 		}

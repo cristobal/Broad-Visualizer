@@ -213,7 +213,7 @@ package com.broad.view.components
 		/**
 		 * @override
 		 */ 
-		override public function reset():void
+		override public function clear():void
 		{
 			textField.text = "-";
 			textField.setTextFormat(textFormat);

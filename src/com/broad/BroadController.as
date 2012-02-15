@@ -38,7 +38,7 @@ package com.broad
 	import com.broad.ui.menus.Playback;
 	import com.broad.ui.menus.PlaybackContainer;
 	import com.broad.ui.menus.ProgressTimeSlider;
-	import com.broad.view.VisualizerView;
+	import com.broad.view.VisualizationView;
 	import com.broad.view.components.GridView;
 	import com.broad.view.components.LoaderView;
 	import com.broad.view.components.MiniMapView;
@@ -132,7 +132,7 @@ package com.broad
 		private var reader:FileReferenceReader;
 	
 		/* -- visualiser view & its view components-- */
-		private var view:VisualizerView;
+		private var view:VisualizationView;
 		private var nodeView:NodeView;
 		private var gridView:GridView;
 		private var statsView:StatsView;
@@ -395,7 +395,7 @@ package com.broad
 			first = false;
 			ready = false;
 		
-			view.reset();
+			view.clear();
 			window.reset();
 		}
 		

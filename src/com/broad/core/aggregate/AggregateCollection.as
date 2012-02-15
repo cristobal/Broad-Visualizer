@@ -6,7 +6,6 @@ package com.broad.core.aggregate
 	/**
 	 * AggregateCollection.as
 	 * 
-	 * @author Miguel Santirso 
 	 * @author Cristobal Dabed
 	 */ 
 	public final class AggregateCollection

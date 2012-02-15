@@ -41,7 +41,7 @@ package com.broad.view.components
 		/**
 		 * @override
 		 */ 
-		override public function reset():void
+		override public function clear():void
 		{
 			graphics.clear();
 		}

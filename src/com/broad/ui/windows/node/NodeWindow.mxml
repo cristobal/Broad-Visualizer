@@ -100,7 +100,7 @@
 		</s:NavigatorContent>
 		
 		<!-- Node::Topolgy/Routing tab-->
-		<s:NavigatorContent id="routingContent" width="100%" height="100%" label="Routing">
+		<s:NavigatorContent id="routingContent" width="100%" height="100%" label="Routes">
 			<s:DataGrid id="routingDataGrid" x="0" top="-7" bottom="0" left="0" right="-1" requestedRowCount="4" 
 						sortableColumns="true">
 				<s:columns>

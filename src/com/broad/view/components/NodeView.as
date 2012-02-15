@@ -233,7 +233,7 @@ package com.broad.view.components
 		/**
 		 * @override
 		 */ 
-		override public function reset():void
+		override public function clear():void
 		{
 			var manager:NodeDrawingManager;
 			for (var i:int = 0, l:int = managers.length; i < l; i++) {
