@@ -1,6 +1,6 @@
-## Bienvisto
+## Broad Visualizer
 
-This project aims to work further on the Bienvisto "Basic Interactive Extensible Network Visualization Tool" 
-created by Miguel Santirso.
+Broad An Extensive Network Simulation Visualizer
 
-More documentation to come.
+This implementation is based on the work of the Bienvisto an "Basic Interactive Extensible Network Visualization Tool" 
+created by Miguel Santirso. 
